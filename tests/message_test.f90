@@ -18,7 +18,7 @@ contains
 
     pure function checkType() result(result_)
         use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info, INFO_TYPE
+        use Message_m, only: Message_t, Info, DEBUG_TYPE, INFO_TYPE
         use Vegetables_m, only: Result_t, assertNot, assertThat
 
         type(Result_t) :: result_
@@ -27,9 +27,13 @@ contains
 
         allocate(info_message, source = Info( &
                 "Some_module_m", "someProcedure", "Test Message"))
+
         result_ = &
                 assertThat( &
                         info_message.isType.INFO_TYPE, &
-                        info_message%repr() // ".isType." // INFO_TYPE%repr())
+                        info_message%repr() // ".isType." // INFO_TYPE%repr()) &
+                .and.assertNot( &
+                        info_message.isType.DEBUG_TYPE, &
+                        info_message%repr() // ".isType." // DEBUG_TYPE%repr())
     end function checkType
 end module message_test

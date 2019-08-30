@@ -10,6 +10,7 @@ module Message_m
         character(len=100) :: description
     contains
         private
+        procedure, public :: toString => messageTypeToString
         procedure, public :: repr => messageTypeRepr
     end type MessageType_t
 
@@ -20,29 +21,35 @@ module Message_m
         type(MessageType_t) :: message_type
     contains
         private
+        procedure, public :: toString => messageToString
+        procedure(messageToString_), deferred :: typeString
         procedure :: isType
-        procedure(messageToString), deferred :: typeRepr
         generic, public :: operator(.isType.) => isType
         procedure, public :: repr => messageRepr
+        procedure(messageToString_), deferred :: typeRepr
     end type Message_t
 
     abstract interface
-        pure function messageToString(self) result(string)
+        pure function messageToString_(self) result(string)
             use iso_varying_string, only: VARYING_STRING
             import Message_t
 
             class(Message_t), intent(in) :: self
             type(VARYING_STRING) :: string
-        end function messageToString
+        end function messageToString_
     end interface
 
     type, public, extends(Message_t) :: Info_t
     contains
+        procedure :: typeString => infoTypeString
         procedure :: typeRepr => infoTypeRepr
     end type Info_t
 
+    character(len=*), parameter :: DEBUG_TYPE_REPR = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_REPR = "Info_t"
 
+    type(MessageType_t), parameter, public :: DEBUG_TYPE = MessageType_t( &
+            DEBUG_TYPE_REPR)
     type(MessageType_t), parameter, public :: INFO_TYPE = MessageType_t( &
             INFO_TYPE_REPR)
 
@@ -61,6 +68,19 @@ contains
         info_%message = message
         info_%message_type = INFO_TYPE
     end function Info
+
+    pure function messageToString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, operator(//)
+        use strff, only: NEWLINE
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        string = &
+                self%call_stack%toString() // ":" // NEWLINE &
+                // "    " // self%typeString() // self%message_type%toString() &
+                // self%message
+    end function messageToString
 
     pure function isType(self, type_tag)
         class(Message_t), intent(in) :: self
@@ -96,6 +116,20 @@ contains
                 // '    message = "' // self%message // '")'
     end function messageRepr
 
+    pure function messageTypeToString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(MessageType_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        select case (trim(self%description))
+        case (INFO_TYPE_REPR, DEBUG_TYPE_REPR)
+            string = ""
+        case default
+            string = trim(self%description) // ": "
+        end select
+    end function messageTypeToString
+
     pure function messageTypeRepr(self) result(repr)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
 
@@ -104,6 +138,17 @@ contains
 
         repr = "MessageType(" // trim(self%description) // ")"
     end function messageTypeRepr
+
+    pure function infoTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Info_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = "IN: "
+    end function infoTypeString
 
     pure function infoTypeRepr(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
