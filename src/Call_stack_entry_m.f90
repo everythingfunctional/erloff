@@ -126,13 +126,14 @@ contains
 
     elemental function repr(self)
         use iso_varying_string, only: VARYING_STRING, operator(//)
+        use strff, only: NEWLINE
 
         class(CallStackEntry_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
         repr = &
-                'CallStackEntry("' &
-                // self%module_name // '", "' &
-                // self%procedure_name // '")'
+                'CallStackEntry(' // NEWLINE &
+                // '    module_name = "' // self%module_name // '", ' // NEWLINE &
+                // '    procedure_name = "' // self%procedure_name // '")'
     end function repr
 end module Call_stack_entry_m
