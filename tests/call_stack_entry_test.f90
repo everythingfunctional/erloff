@@ -32,10 +32,10 @@ contains
         result_ = &
                 assertThat( &
                         entry_.isFromModule."Some_module_m", &
-                        entry_%toString() // '.isFromModule."Some_module_m"') &
+                        entry_%repr() // '.isFromModule."Some_module_m"') &
                 .and.assertNot( &
                         entry_.isFromModule."Other_module_m", &
-                        entry_%toString() // '.isFromModule."Other_module_m"')
+                        entry_%repr() // '.isFromModule."Other_module_m"')
     end function checkIsFromModule
 
     pure function checkIsFromProcedure() result(result_)
@@ -52,9 +52,9 @@ contains
         result_ = &
                 assertThat( &
                         entry_.isFromProcedure."someProcedure", &
-                        entry_%toString() // '.isFromProcedure."someProcedure"') &
+                        entry_%repr() // '.isFromProcedure."someProcedure"') &
                 .and.assertNot( &
                         entry_.isFromProcedure."otherProcedure", &
-                        entry_%toString() // '.isFromProcedure."otherProcedure"')
+                        entry_%repr() // '.isFromProcedure."otherProcedure"')
     end function checkIsFromProcedure
 end module call_stack_entry_test

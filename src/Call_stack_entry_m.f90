@@ -19,6 +19,7 @@ module Call_stack_entry_m
         procedure :: isFromProcedureS
         generic, public :: operator(.isFromProcedure.) => &
                 isFromProcedureC, isFromProcedureS
+        procedure, public :: repr
     end type CallStackEntry_t
 
     interface CallStackEntry
@@ -74,7 +75,7 @@ contains
         entry_%procedure_name = procedure_name
     end function CallStackEntrySS
 
-    pure function toString(self) result(string)
+    elemental function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, operator(//)
 
         class(CallStackEntry_t), intent(in) :: self
@@ -122,4 +123,16 @@ contains
 
         isFromProcedureS = self%procedure_name == procedure_name
     end function isFromProcedureS
+
+    elemental function repr(self)
+        use iso_varying_string, only: VARYING_STRING, operator(//)
+
+        class(CallStackEntry_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        repr = &
+                'CallStackEntry("' &
+                // self%module_name // '", "' &
+                // self%procedure_name // '")'
+    end function repr
 end module Call_stack_entry_m
