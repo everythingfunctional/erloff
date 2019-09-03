@@ -29,6 +29,7 @@ module Message_m
         procedure, public :: toString => messageToString
         procedure(messageToString_), deferred :: typeString
         procedure :: isType
+        generic, public :: operator(.isType.) => isType
         procedure :: originatedFromProcedureC
         procedure :: originatedFromProcedureS
         generic, public :: operator(.originatedFromProcedure.) => &
@@ -37,7 +38,14 @@ module Message_m
         procedure :: originatedFromModuleS
         generic, public :: operator(.originatedFromModule.) => &
                 originatedFromModuleC, originatedFromModuleS
-        generic, public :: operator(.isType.) => isType
+        procedure :: isFromProcedureC
+        procedure :: isFromProcedureS
+        generic, public :: operator(.isFromProcedure.) => &
+                isFromProcedureC, isFromProcedureS
+        procedure :: isFromModuleC
+        procedure :: isFromModuleS
+        generic, public :: operator(.isFromModule.) => &
+                isFromModuleC, isFromModuleS
         procedure, public :: repr => messageRepr
         procedure(messageToString_), deferred :: typeRepr
     end type Message_t
@@ -1658,6 +1666,42 @@ contains
 
         originated_from = self%call_stack.originatingModuleIs.module_name
     end function originatedFromModuleS
+
+    pure function isFromProcedureC(self, procedure_name) result(is_from)
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: procedure_name
+        logical :: is_from
+
+        is_from = self%call_stack.containsProcedure.procedure_name
+    end function isFromProcedureC
+
+    pure function isFromProcedureS(self, procedure_name) result(is_from)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: procedure_name
+        logical :: is_from
+
+        is_from = self%call_stack.containsProcedure.procedure_name
+    end function isFromProcedureS
+
+    pure function isFromModuleC(self, module_name) result(is_from)
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        logical :: is_from
+
+        is_from = self%call_stack.containsModule.module_name
+    end function isFromModuleC
+
+    pure function isFromModuleS(self, module_name) result(is_from)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        logical :: is_from
+
+        is_from = self%call_stack.containsModule.module_name
+    end function isFromModuleS
 
     pure function messageRepr(self) result(repr)
         use iso_varying_string, only: VARYING_STRING, operator(//)
