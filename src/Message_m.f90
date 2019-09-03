@@ -20,6 +20,12 @@ module Message_m
         type(MessageType_t) :: message_type
     contains
         private
+        procedure :: prependNamesCC
+        procedure :: prependNamesCS
+        procedure :: prependNamesSC
+        procedure :: prependNamesSS
+        generic, public :: prependNames => &
+                prependNamesCC, prependNamesCS, prependNamesSC, prependNamesSS
         procedure, public :: toString => messageToString
         procedure(messageToString_), deferred :: typeString
         procedure :: isType
@@ -1484,6 +1490,60 @@ contains
         internal_%message = message
         internal_%message_type = type_tag
     end function internalWithTypeSSS
+
+    pure function prependNamesCC( &
+            self, module_name, procedure_name) result(message)
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        class(Message_t), allocatable :: message
+
+        allocate(message, source = self)
+        message%call_stack = self%call_stack%prependNames( &
+                module_name, procedure_name)
+    end function prependNamesCC
+
+    pure function prependNamesCS( &
+            self, module_name, procedure_name) result(message)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        class(Message_t), allocatable :: message
+
+        allocate(message, source = self)
+        message%call_stack = self%call_stack%prependNames( &
+                module_name, procedure_name)
+    end function prependNamesCS
+
+    pure function prependNamesSC( &
+            self, module_name, procedure_name) result(message)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        class(Message_t), allocatable :: message
+
+        allocate(message, source = self)
+        message%call_stack = self%call_stack%prependNames( &
+                module_name, procedure_name)
+    end function prependNamesSC
+
+    pure function prependNamesSS( &
+            self, module_name, procedure_name) result(message)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        class(Message_t), allocatable :: message
+
+        allocate(message, source = self)
+        message%call_stack = self%call_stack%prependNames( &
+                module_name, procedure_name)
+    end function prependNamesSS
 
     pure function messageToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, operator(//)

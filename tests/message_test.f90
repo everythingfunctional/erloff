@@ -9,10 +9,12 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(1)
+        type(TestItem_t) :: individual_tests(2)
 
         individual_tests(1) = it( &
                 "Can tell whether it is of a given type", checkType)
+        individual_tests(2) = it( &
+                "Can prepend names to a message", checkPrependNames)
         tests = describe("Message_t", individual_tests)
     end function test_message
 
@@ -136,4 +138,25 @@ contains
                         internal_message.isType.UNKNOWN_TYPE_TYPE, &
                         internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())
     end function checkType
+
+    pure function checkPrependNames() result(result_)
+        use Message_m, only: Message_t, Info
+        use strff, only: NEWLINE
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: prepended
+        character(len=*), parameter :: EXPECTED_MESSAGE = &
+                "Another_module_m.anotherProcedure->Some_module_m.someProcedure:" &
+                // NEWLINE // "    IN: Test Message"
+
+        allocate(message, source = Info( &
+                "Some_module_m", "someProcedure", "Test Message"))
+        allocate(prepended, source = message%prependNames( &
+                "Another_module_m", "anotherProcedure"))
+
+        result_ = assertEquals(EXPECTED_MESSAGE, prepended%toString())
+    end function checkPrependNames
 end module message_test
