@@ -9,11 +9,13 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(1)
+        type(TestItem_t) :: individual_tests(2)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
                 checkEmptyToString)
+        individual_tests(2) = it( &
+                "can append to an empty list", checkAppendToEmpty)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -27,4 +29,23 @@ contains
 
         result_ = assertEmpty(message_list%toString())
     end function checkEmptyToString
+
+    pure function checkAppendToEmpty() result(result_)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t
+        use strff, only: NEWLINE
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: message_list
+        character(len=*), parameter :: EXPECTED_STRING = &
+                "Some_module_m.someProcedure:" // NEWLINE &
+                // "    IN: Test Message"
+
+        message_list = message_list%appendMessage(Info( &
+                "Some_module_m", "someProcedure", "Test Message"))
+
+        result_ = assertEquals(EXPECTED_STRING, message_list%toString())
+    end function checkAppendToEmpty
 end module message_list_test
