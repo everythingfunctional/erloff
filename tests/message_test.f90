@@ -18,18 +18,28 @@ contains
 
     pure function checkType() result(result_)
         use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info, DEBUG_TYPE, INFO_TYPE
+        use Message_m, only: Message_t, Debug, Info, DEBUG_TYPE, GENERAL, INFO_TYPE
         use Vegetables_m, only: Result_t, assertNot, assertThat
 
         type(Result_t) :: result_
 
+        class(Message_t), allocatable :: debug_message
         class(Message_t), allocatable :: info_message
+
+        allocate(debug_message, source = Debug( &
+                "Some_module_m", "someProcedure", GENERAL, "Test Message"))
 
         allocate(info_message, source = Info( &
                 "Some_module_m", "someProcedure", "Test Message"))
 
         result_ = &
                 assertThat( &
+                        debug_message.isType.DEBUG_TYPE, &
+                        debug_message%repr() // ".isType." // DEBUG_TYPE%repr()) &
+                .and.assertNot( &
+                        debug_message.isType.INFO_TYPE, &
+                        debug_message%repr() // ".isType." // INFO_TYPE%repr()) &
+                .and.assertThat( &
                         info_message.isType.INFO_TYPE, &
                         info_message%repr() // ".isType." // INFO_TYPE%repr()) &
                 .and.assertNot( &
