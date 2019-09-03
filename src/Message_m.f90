@@ -46,6 +46,14 @@ module Message_m
         procedure :: isFromModuleS
         generic, public :: operator(.isFromModule.) => &
                 isFromModuleC, isFromModuleS
+        procedure :: cameThroughProcedureC
+        procedure :: cameThroughProcedureS
+        generic, public :: operator(.cameThroughProcedure.) => &
+                cameThroughProcedureC, cameThroughProcedureS
+        procedure :: cameThroughModuleC
+        procedure :: cameThroughModuleS
+        generic, public :: operator(.cameThroughModule.) => &
+                cameThroughModuleC, cameThroughModuleS
         procedure, public :: repr => messageRepr
         procedure(messageToString_), deferred :: typeRepr
     end type Message_t
@@ -1702,6 +1710,52 @@ contains
 
         is_from = self%call_stack.containsModule.module_name
     end function isFromModuleS
+
+    pure function cameThroughProcedureC( &
+            self, procedure_name) result(came_through)
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: procedure_name
+        logical :: came_through
+
+        came_through = &
+                .not.(self%call_stack.originatingProcedureIs.procedure_name) &
+                .and.(self%call_stack.containsProcedure.procedure_name)
+    end function cameThroughProcedureC
+
+    pure function cameThroughProcedureS( &
+            self, procedure_name) result(came_through)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: procedure_name
+        logical :: came_through
+
+        came_through = &
+                .not.(self%call_stack.originatingProcedureIs.procedure_name) &
+                .and.(self%call_stack.containsProcedure.procedure_name)
+    end function cameThroughProcedureS
+
+    pure function cameThroughModuleC(self, module_name) result(came_through)
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        logical :: came_through
+
+        came_through = &
+                .not.(self%call_stack.originatingModuleIs.module_name) &
+                .and.(self%call_stack.containsModule.module_name)
+    end function cameThroughModuleC
+
+    pure function cameThroughModuleS(self, module_name) result(came_through)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        logical :: came_through
+
+        came_through = &
+                .not.(self%call_stack.originatingModuleIs.module_name) &
+                .and.(self%call_stack.containsModule.module_name)
+    end function cameThroughModuleS
 
     pure function messageRepr(self) result(repr)
         use iso_varying_string, only: VARYING_STRING, operator(//)

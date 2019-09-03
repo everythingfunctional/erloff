@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(6)
+        type(TestItem_t) :: individual_tests(8)
 
         individual_tests(1) = it( &
                 "Can tell whether it is of a given type", checkType)
@@ -27,6 +27,12 @@ contains
         individual_tests(6) = it( &
                 "can tell which modules it came from", &
                 checkFromModule)
+        individual_tests(7) = it( &
+                "can tell which procedures it came through", &
+                checkThroughProcedure)
+        individual_tests(8) = it( &
+                "can tell which modules it came through", &
+                checkThroughModule)
         tests = describe("Message_t", individual_tests)
     end function test_message
 
@@ -193,7 +199,10 @@ contains
                         prepended%repr() // '.originatedFromProcedure."someProcedure"') &
                 .and.assertNot( &
                         prepended.originatedFromProcedure."anotherProcedure", &
-                        prepended%repr() // '.originatedFromProcedure."anotherProcedure"')
+                        prepended%repr() // '.originatedFromProcedure."anotherProcedure"') &
+                .and.assertNot( &
+                        prepended.originatedFromProcedure."yetAnotherProcedure", &
+                        prepended%repr() // '.originatedFromProcedure."yetAnotherProcedure"')
     end function checkOriginatingProcedure
 
     pure function checkOriginatingModule() result(result_)
@@ -217,7 +226,10 @@ contains
                         prepended%repr() // '.originatedFromModule."Some_module_m"') &
                 .and.assertNot( &
                         prepended.originatedFromModule."Another_module_m", &
-                        prepended%repr() // '.originatedFromModule."Another_module_m"')
+                        prepended%repr() // '.originatedFromModule."Another_module_m"') &
+                .and.assertNot( &
+                        prepended.originatedFromModule."Yet_another_module_m", &
+                        prepended%repr() // '.originatedFromModule."Yet_another_module_m"')
     end function checkOriginatingModule
 
     pure function checkFromProcedure() result(result_)
@@ -273,4 +285,58 @@ contains
                         prepended.isFromModule."Yet_another_module_m", &
                         prepended%repr() // '.isFromModule."Yet_another_module_m"')
     end function checkFromModule
+
+    pure function checkThroughProcedure() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Message_t, Info
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: prepended
+
+        allocate(message, source = Info( &
+                "Some_module_m", "someProcedure", "Test Message"))
+        allocate(prepended, source = message%prependNames( &
+                "Another_module_m", "anotherProcedure"))
+
+        result_ = &
+                assertNot( &
+                        prepended.cameThroughProcedure."someProcedure", &
+                        prepended%repr() // '.cameThroughProcedure."someProcedure"') &
+                .and.assertThat( &
+                        prepended.cameThroughProcedure."anotherProcedure", &
+                        prepended%repr() // '.cameThroughProcedure."anotherProcedure"') &
+                .and.assertNot( &
+                        prepended.cameThroughProcedure."yetAnotherProcedure", &
+                        prepended%repr() // '.cameThroughProcedure."yetAnotherProcedure"')
+    end function checkThroughProcedure
+
+    pure function checkThroughModule() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Message_t, Info
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: prepended
+
+        allocate(message, source = Info( &
+                "Some_module_m", "someProcedure", "Test Message"))
+        allocate(prepended, source = message%prependNames( &
+                "Another_module_m", "anotherProcedure"))
+
+        result_ = &
+                assertNot( &
+                        prepended.cameThroughModule."Some_module_m", &
+                        prepended%repr() // '.cameThroughModule."Some_module_m"') &
+                .and.assertThat( &
+                        prepended.cameThroughModule."Another_module_m", &
+                        prepended%repr() // '.cameThroughModule."Another_module_m"') &
+                .and.assertNot( &
+                        prepended.cameThroughModule."Yet_another_module_m", &
+                        prepended%repr() // '.cameThroughModule."Yet_another_module_m"')
+    end function checkThroughModule
 end module message_test
