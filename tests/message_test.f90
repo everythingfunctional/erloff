@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(8)
+        type(TestItem_t) :: individual_tests(9)
 
         individual_tests(1) = it( &
                 "Can tell whether it is of a given type", checkType)
@@ -33,6 +33,9 @@ contains
         individual_tests(8) = it( &
                 "can tell which modules it came through", &
                 checkThroughModule)
+        individual_tests(9) = it( &
+                "can tell lots about its contents", &
+                checkContents)
         tests = describe("Message_t", individual_tests)
     end function test_message
 
@@ -339,4 +342,43 @@ contains
                         prepended.cameThroughModule."Yet_another_module_m", &
                         prepended%repr() // '.cameThroughModule."Yet_another_module_m"')
     end function checkThroughModule
+
+    pure function checkContents() result(result_)
+        use iso_varying_string, only: operator(//), var_str
+        use Message_m, only: Message_t, Info
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        class(Message_t), allocatable :: message
+
+        allocate(message, source = Info( &
+                "Some_module_m", "someProcedure", "Test Message Content"))
+
+        result_ = &
+                assertThat( &
+                        message.includes."Test", &
+                        message%repr() // '.includes."Test"') &
+                .and.assertNot( &
+                        message.includes."test", &
+                        message%repr() // '.includes."test"') &
+                .and.assertThat( &
+                        message.includesAnyOf.[var_str("Test"), var_str("else")], &
+                        message%repr() // '.includesAnyOf.[var_str("Test"), var_str("else")]') &
+                .and.assertThat( &
+                        message.includesAnyOf.[var_str("Test"), var_str("Content")], &
+                        message%repr() // '.includesAnyOf.[var_str("Test"), var_str("Content")]') &
+                .and.assertNot( &
+                        message.includesAnyOf.[var_str("test"), var_str("else")], &
+                        message%repr() // '.includesAnyOf.[var_str("test"), var_str("else")]') &
+                .and.assertThat( &
+                        message.includesAllOf.[var_str("Test"), var_str("Message")], &
+                        message%repr() // '.includesAllOf.[var_str("Test"), var_str("Message")]') &
+                .and.assertNot( &
+                        message.includesAllOf.[var_str("test"), var_str("Message")], &
+                        message%repr() // '.includesAllOf.[var_str("test"), var_str("Message")]') &
+                .and.assertNot( &
+                        message.includesAllOf.[var_str("Test"), var_str("message")], &
+                        message%repr() // '.includesAllOf.[var_str("Test"), var_str("message")]')
+    end function checkContents
 end module message_test

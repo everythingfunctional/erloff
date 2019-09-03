@@ -54,6 +54,13 @@ module Message_m
         procedure :: cameThroughModuleS
         generic, public :: operator(.cameThroughModule.) => &
                 cameThroughModuleC, cameThroughModuleS
+        procedure :: includesC
+        procedure :: includesS
+        generic, public :: operator(.includes.) => includesC, includesS
+        procedure :: includesAnyOf
+        generic, public :: operator(.includesAnyOf.) => includesAnyOf
+        procedure :: includesAllOf
+        generic, public :: operator(.includesAllOf.) => includesAllOf
         procedure, public :: repr => messageRepr
         procedure(messageToString_), deferred :: typeRepr
     end type Message_t
@@ -1756,6 +1763,47 @@ contains
                 .not.(self%call_stack.originatingModuleIs.module_name) &
                 .and.(self%call_stack.containsModule.module_name)
     end function cameThroughModuleS
+
+    pure function includesC(self, string) result(includes)
+        use strff, only: operator(.includes.)
+
+        class(Message_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        logical :: includes
+
+        includes = self%message.includes.string
+    end function includesC
+
+    elemental function includesS(self, string) result(includes)
+        use iso_varying_string, only: VARYING_STRING
+        use strff, only: operator(.includes.)
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: string
+        logical :: includes
+
+        includes = self%message.includes.string
+    end function includesS
+
+    pure function includesAnyOf(self, strings) result(includes)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: strings(:)
+        logical :: includes
+
+        includes = any(self.includes.strings)
+    end function includesAnyOf
+
+    pure function includesAllOf(self, strings) result(includes)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Message_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: strings(:)
+        logical :: includes
+
+        includes = all(self.includes.strings)
+    end function includesAllOf
 
     pure function messageRepr(self) result(repr)
         use iso_varying_string, only: VARYING_STRING, operator(//)
