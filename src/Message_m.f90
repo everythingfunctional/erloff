@@ -80,11 +80,18 @@ module Message_m
         procedure :: typeRepr => fatalTypeRepr
     end type Fatal_t
 
+    type, public, extends(Error_t) :: Internal_t
+    contains
+        procedure :: typeString => internalTypeString
+        procedure :: typeRepr => internalTypeRepr
+    end type Internal_t
+
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
     character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
     character(len=*), parameter :: ERROR_TYPE_STRING = "Error_t"
     character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
+    character(len=*), parameter :: INTERNAL_TYPE_STRING = "Internal_t"
 
     type(MessageType_t), parameter, public :: DEBUG_TYPE = MessageType_t( &
             DEBUG_TYPE_STRING)
@@ -96,6 +103,8 @@ module Message_m
             ERROR_TYPE_STRING)
     type(MessageType_t), parameter, public :: FATAL_TYPE = MessageType_t( &
             FATAL_TYPE_STRING)
+    type(MessageType_t), parameter, public :: INTERNAL_TYPE = MessageType_t( &
+            INTERNAL_TYPE_STRING)
     type(MessageType_t), parameter, public :: INPUTS_TYPE = MessageType_t( &
             "Inputs")
     type(MessageType_t), parameter, public :: OUTPUTS_TYPE = MessageType_t( &
@@ -183,7 +192,26 @@ module Message_m
         module procedure fatalWithTypeSSS
     end interface Fatal
 
-    public :: Debug, Info, Warning, Fatal
+    interface Internal
+        module procedure genericInternalCCC
+        module procedure genericInternalCCS
+        module procedure genericInternalCSC
+        module procedure genericInternalCSS
+        module procedure genericInternalSCC
+        module procedure genericInternalSCS
+        module procedure genericInternalSSC
+        module procedure genericInternalSSS
+        module procedure internalWithTypeCCC
+        module procedure internalWithTypeCCS
+        module procedure internalWithTypeCSC
+        module procedure internalWithTypeCSS
+        module procedure internalWithTypeSCC
+        module procedure internalWithTypeSCS
+        module procedure internalWithTypeSSC
+        module procedure internalWithTypeSSS
+    end interface Internal
+
+    public :: Debug, Info, Warning, Fatal, Internal
 contains
     pure function genericDebugCCC( &
             module_name, procedure_name, level, message) result(debug_)
@@ -1209,6 +1237,254 @@ contains
         fatal_%message_type = type_tag
     end function fatalWithTypeSSS
 
+    pure function genericInternalCCC( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalCCC
+
+    pure function genericInternalCCS( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalCCS
+
+    pure function genericInternalCSC( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalCSC
+
+    pure function genericInternalCSS( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalCSS
+
+    pure function genericInternalSCC( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalSCC
+
+    pure function genericInternalSCS( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalSCS
+
+    pure function genericInternalSSC( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalSSC
+
+    pure function genericInternalSSS( &
+            module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = INTERNAL_TYPE
+    end function genericInternalSSS
+
+    pure function internalWithTypeCCC( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeCCC
+
+    pure function internalWithTypeCCS( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeCCS
+
+    pure function internalWithTypeCSC( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeCSC
+
+    pure function internalWithTypeCSS( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeCSS
+
+    pure function internalWithTypeSCC( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeSCC
+
+    pure function internalWithTypeSCS( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeSCS
+
+    pure function internalWithTypeSSC( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeSSC
+
+    pure function internalWithTypeSSS( &
+            type_tag, module_name, procedure_name, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%call_stack = CallStack(module_name, procedure_name)
+        internal_%message = message
+        internal_%message_type = type_tag
+    end function internalWithTypeSSS
+
     pure function messageToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, operator(//)
         use strff, only: NEWLINE
@@ -1259,6 +1535,13 @@ contains
         case (FATAL_TYPE_STRING)
             select type (self)
             class is (Fatal_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (INTERNAL_TYPE_STRING)
+            select type (self)
+            class is (Internal_t)
                 isType = .true.
             class default
                 isType = .false.
@@ -1390,6 +1673,28 @@ contains
 
         string = FATAL_TYPE_STRING
     end function fatalTypeRepr
+
+    pure function internalTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Internal_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = "IE: "
+    end function internalTypeString
+
+    pure function internalTypeRepr(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Internal_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = INTERNAL_TYPE_STRING
+    end function internalTypeRepr
 
     pure function debugLevelToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING
