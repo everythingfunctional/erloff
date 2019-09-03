@@ -6,7 +6,6 @@ module Message_m
     private
 
     type, public :: MessageType_t
-        private
         character(len=100) :: description
     contains
         private
@@ -45,17 +44,37 @@ module Message_m
         procedure :: typeRepr => infoTypeRepr
     end type Info_t
 
-    character(len=*), parameter :: DEBUG_TYPE_REPR = "Debug_t"
-    character(len=*), parameter :: INFO_TYPE_REPR = "Info_t"
+    character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
+    character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
 
     type(MessageType_t), parameter, public :: DEBUG_TYPE = MessageType_t( &
-            DEBUG_TYPE_REPR)
+            DEBUG_TYPE_STRING)
     type(MessageType_t), parameter, public :: INFO_TYPE = MessageType_t( &
-            INFO_TYPE_REPR)
+            INFO_TYPE_STRING)
+
+    interface Info
+        module procedure genericInfoCCC
+        module procedure genericInfoCCS
+        module procedure genericInfoCSC
+        module procedure genericInfoCSS
+        module procedure genericInfoSCC
+        module procedure genericInfoSCS
+        module procedure genericInfoSSC
+        module procedure genericInfoSSS
+        module procedure infoWithTypeCCC
+        module procedure infoWithTypeCCS
+        module procedure infoWithTypeCSC
+        module procedure infoWithTypeCSS
+        module procedure infoWithTypeSCC
+        module procedure infoWithTypeSCS
+        module procedure infoWithTypeSSC
+        module procedure infoWithTypeSSS
+    end interface Info
 
     public :: Info
 contains
-    pure function Info(module_name, procedure_name, message) result(info_)
+    pure function genericInfoCCC( &
+            module_name, procedure_name, message) result(info_)
         use Call_stack_m, only: CallStack
         use iso_varying_string, only: assignment(=)
 
@@ -67,7 +86,240 @@ contains
         info_%call_stack = CallStack(module_name, procedure_name)
         info_%message = message
         info_%message_type = INFO_TYPE
-    end function Info
+    end function genericInfoCCC
+
+    pure function genericInfoCCS( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoCCS
+
+    pure function genericInfoCSC( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoCSC
+
+    pure function genericInfoCSS( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoCSS
+
+    pure function genericInfoSCC( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoSCC
+
+    pure function genericInfoSCS( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoSCS
+
+    pure function genericInfoSSC( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoSSC
+
+    pure function genericInfoSSS( &
+            module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = INFO_TYPE
+    end function genericInfoSSS
+
+    pure function infoWithTypeCCC( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeCCC
+
+    pure function infoWithTypeCCS( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeCCS
+
+    pure function infoWithTypeCSC( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeCSC
+
+    pure function infoWithTypeCSS( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeCSS
+
+    pure function infoWithTypeSCC( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeSCC
+
+    pure function infoWithTypeSCS( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeSCS
+
+    pure function infoWithTypeSSC( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeSSC
+
+    pure function infoWithTypeSSS( &
+            type_tag, module_name, procedure_name, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%call_stack = CallStack(module_name, procedure_name)
+        info_%message = message
+        info_%message_type = type_tag
+    end function infoWithTypeSSS
 
     pure function messageToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, operator(//)
@@ -88,7 +340,7 @@ contains
         logical :: isType
 
         select case (trim(type_tag%description))
-        case (INFO_TYPE_REPR)
+        case (INFO_TYPE_STRING)
             select type (self)
             class is (Info_t)
                 isType = .true.
@@ -123,7 +375,7 @@ contains
         type(VARYING_STRING) :: string
 
         select case (trim(self%description))
-        case (INFO_TYPE_REPR, DEBUG_TYPE_REPR)
+        case (INFO_TYPE_STRING, DEBUG_TYPE_STRING)
             string = ""
         case default
             string = trim(self%description) // ": "
@@ -158,6 +410,6 @@ contains
 
         associate(a => self); end associate
 
-        string = INFO_TYPE_REPR
+        string = INFO_TYPE_STRING
     end function infoTypeRepr
 end module Message_m
