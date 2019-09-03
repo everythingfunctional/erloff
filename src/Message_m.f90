@@ -71,9 +71,20 @@ module Message_m
         procedure :: typeRepr => warningTypeRepr
     end type Warning_t
 
+    type, public, abstract, extends(Message_t) :: Error_t
+    end type Error_t
+
+    type, public, extends(Error_t) :: Fatal_t
+    contains
+        procedure :: typeString => fatalTypeString
+        procedure :: typeRepr => fatalTypeRepr
+    end type Fatal_t
+
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
     character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
+    character(len=*), parameter :: ERROR_TYPE_STRING = "Error_t"
+    character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
 
     type(MessageType_t), parameter, public :: DEBUG_TYPE = MessageType_t( &
             DEBUG_TYPE_STRING)
@@ -81,6 +92,20 @@ module Message_m
             INFO_TYPE_STRING)
     type(MessageType_t), parameter, public :: WARNING_TYPE = MessageType_t( &
             WARNING_TYPE_STRING)
+    type(MessageType_t), parameter, public :: ERROR_TYPE = MessageType_t( &
+            ERROR_TYPE_STRING)
+    type(MessageType_t), parameter, public :: FATAL_TYPE = MessageType_t( &
+            FATAL_TYPE_STRING)
+    type(MessageType_t), parameter, public :: INPUTS_TYPE = MessageType_t( &
+            "Inputs")
+    type(MessageType_t), parameter, public :: OUTPUTS_TYPE = MessageType_t( &
+            "Outputs")
+    type(MessageType_t), parameter, public :: OUTSIDE_NORMAL_RANGE_TYPE = &
+            MessageType_t("Outside Normal Range")
+    type(MessageType_t), parameter, public :: UNEQUAL_ARRAY_SIZES_TYPE = &
+            MessageType_t("Unequal Array Sizes")
+    type(MessageType_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
+            MessageType_t("Unknown Type Encountered")
 
     interface Debug
         module procedure genericDebugCCC
@@ -139,7 +164,26 @@ module Message_m
         module procedure warningWithTypeSSS
     end interface Warning
 
-    public :: Debug, Info, Warning
+    interface Fatal
+        module procedure genericFatalCCC
+        module procedure genericFatalCCS
+        module procedure genericFatalCSC
+        module procedure genericFatalCSS
+        module procedure genericFatalSCC
+        module procedure genericFatalSCS
+        module procedure genericFatalSSC
+        module procedure genericFatalSSS
+        module procedure fatalWithTypeCCC
+        module procedure fatalWithTypeCCS
+        module procedure fatalWithTypeCSC
+        module procedure fatalWithTypeCSS
+        module procedure fatalWithTypeSCC
+        module procedure fatalWithTypeSCS
+        module procedure fatalWithTypeSSC
+        module procedure fatalWithTypeSSS
+    end interface Fatal
+
+    public :: Debug, Info, Warning, Fatal
 contains
     pure function genericDebugCCC( &
             module_name, procedure_name, level, message) result(debug_)
@@ -917,6 +961,254 @@ contains
         warning_%message_type = type_tag
     end function warningWithTypeSSS
 
+    pure function genericFatalCCC( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalCCC
+
+    pure function genericFatalCCS( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalCCS
+
+    pure function genericFatalCSC( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalCSC
+
+    pure function genericFatalCSS( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalCSS
+
+    pure function genericFatalSCC( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalSCC
+
+    pure function genericFatalSCS( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalSCS
+
+    pure function genericFatalSSC( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalSSC
+
+    pure function genericFatalSSS( &
+            module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = FATAL_TYPE
+    end function genericFatalSSS
+
+    pure function fatalWithTypeCCC( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeCCC
+
+    pure function fatalWithTypeCCS( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeCCS
+
+    pure function fatalWithTypeCSC( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeCSC
+
+    pure function fatalWithTypeCSS( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeCSS
+
+    pure function fatalWithTypeSCC( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeSCC
+
+    pure function fatalWithTypeSCS( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeSCS
+
+    pure function fatalWithTypeSSC( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeSSC
+
+    pure function fatalWithTypeSSS( &
+            type_tag, module_name, procedure_name, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%call_stack = CallStack(module_name, procedure_name)
+        fatal_%message = message
+        fatal_%message_type = type_tag
+    end function fatalWithTypeSSS
+
     pure function messageToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, operator(//)
         use strff, only: NEWLINE
@@ -936,9 +1228,37 @@ contains
         logical :: isType
 
         select case (trim(type_tag%description))
+        case (DEBUG_TYPE_STRING)
+            select type (self)
+            class is (Debug_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
         case (INFO_TYPE_STRING)
             select type (self)
             class is (Info_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (WARNING_TYPE_STRING)
+            select type (self)
+            class is (Warning_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (ERROR_TYPE_STRING)
+            select type (self)
+            class is (Error_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (FATAL_TYPE_STRING)
+            select type (self)
+            class is (Fatal_t)
                 isType = .true.
             class default
                 isType = .false.
@@ -1048,6 +1368,28 @@ contains
 
         string = WARNING_TYPE_STRING
     end function warningTypeRepr
+
+    pure function fatalTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Fatal_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = "FE: "
+    end function fatalTypeString
+
+    pure function fatalTypeRepr(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Fatal_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = FATAL_TYPE_STRING
+    end function fatalTypeRepr
 
     pure function debugLevelToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING
