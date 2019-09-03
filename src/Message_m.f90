@@ -65,13 +65,22 @@ module Message_m
         procedure :: typeRepr => infoTypeRepr
     end type Info_t
 
+    type, public, extends(Message_t) :: Warning_t
+    contains
+        procedure :: typeString => warningTypeString
+        procedure :: typeRepr => warningTypeRepr
+    end type Warning_t
+
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
+    character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
 
     type(MessageType_t), parameter, public :: DEBUG_TYPE = MessageType_t( &
             DEBUG_TYPE_STRING)
     type(MessageType_t), parameter, public :: INFO_TYPE = MessageType_t( &
             INFO_TYPE_STRING)
+    type(MessageType_t), parameter, public :: WARNING_TYPE = MessageType_t( &
+            WARNING_TYPE_STRING)
 
     interface Debug
         module procedure genericDebugCCC
@@ -111,7 +120,26 @@ module Message_m
         module procedure infoWithTypeSSS
     end interface Info
 
-    public :: Debug, Info
+    interface Warning
+        module procedure genericWarningCCC
+        module procedure genericWarningCCS
+        module procedure genericWarningCSC
+        module procedure genericWarningCSS
+        module procedure genericWarningSCC
+        module procedure genericWarningSCS
+        module procedure genericWarningSSC
+        module procedure genericWarningSSS
+        module procedure warningWithTypeCCC
+        module procedure warningWithTypeCCS
+        module procedure warningWithTypeCSC
+        module procedure warningWithTypeCSS
+        module procedure warningWithTypeSCC
+        module procedure warningWithTypeSCS
+        module procedure warningWithTypeSSC
+        module procedure warningWithTypeSSS
+    end interface Warning
+
+    public :: Debug, Info, Warning
 contains
     pure function genericDebugCCC( &
             module_name, procedure_name, level, message) result(debug_)
@@ -641,6 +669,254 @@ contains
         info_%message_type = type_tag
     end function infoWithTypeSSS
 
+    pure function genericWarningCCC( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningCCC
+
+    pure function genericWarningCCS( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningCCS
+
+    pure function genericWarningCSC( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningCSC
+
+    pure function genericWarningCSS( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningCSS
+
+    pure function genericWarningSCC( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningSCC
+
+    pure function genericWarningSCS( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningSCS
+
+    pure function genericWarningSSC( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningSSC
+
+    pure function genericWarningSSS( &
+            module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = WARNING_TYPE
+    end function genericWarningSSS
+
+    pure function warningWithTypeCCC( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeCCC
+
+    pure function warningWithTypeCCS( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeCCS
+
+    pure function warningWithTypeCSC( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeCSC
+
+    pure function warningWithTypeCSS( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeCSS
+
+    pure function warningWithTypeSCC( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeSCC
+
+    pure function warningWithTypeSCS( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeSCS
+
+    pure function warningWithTypeSSC( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeSSC
+
+    pure function warningWithTypeSSS( &
+            type_tag, module_name, procedure_name, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%call_stack = CallStack(module_name, procedure_name)
+        warning_%message = message
+        warning_%message_type = type_tag
+    end function warningWithTypeSSS
+
     pure function messageToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, operator(//)
         use strff, only: NEWLINE
@@ -750,6 +1026,28 @@ contains
 
         string = INFO_TYPE_STRING
     end function infoTypeRepr
+
+    pure function warningTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Warning_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = "WN: "
+    end function warningTypeString
+
+    pure function warningTypeRepr(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Warning_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self); end associate
+
+        string = WARNING_TYPE_STRING
+    end function warningTypeRepr
 
     pure function debugLevelToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING
