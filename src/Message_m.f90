@@ -1828,7 +1828,13 @@ contains
         type(VARYING_STRING) :: string
 
         select case (trim(self%description))
-        case (INFO_TYPE_STRING, DEBUG_TYPE_STRING)
+        case ( &
+                DEBUG_TYPE_STRING, &
+                INFO_TYPE_STRING, &
+                WARNING_TYPE_STRING, &
+                ERROR_TYPE_STRING, &
+                FATAL_TYPE_STRING, &
+                INTERNAL_TYPE_STRING)
             string = ""
         case default
             string = trim(self%description) // ": "
