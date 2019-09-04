@@ -80,13 +80,15 @@ contains
         integer :: i
         integer :: num_messages
 
-        num_messages = size(messages%messages)
-        allocate(messages%messages(num_messages))
-        do i = 1, num_messages
-            allocate(messages%messages(i)%message, source = &
-                    self%messages(i)%message%prependNames( &
-                            module_name, procedure_name))
-        end do
+        if (allocated(self%messages)) then
+            num_messages = size(messages%messages)
+            allocate(messages%messages(num_messages))
+            do i = 1, num_messages
+                allocate(messages%messages(i)%message, source = &
+                        self%messages(i)%message%prependNames( &
+                                module_name, procedure_name))
+            end do
+        end if
     end function prependNamesCC
 
     pure function toString(self) result(string)

@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(7)
+        type(TestItem_t) :: individual_tests(8)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -27,6 +27,9 @@ contains
                 "can combine two lists", checkCombine)
         individual_tests(7) = it( &
                 "can prepend names to a list", checkPrepend)
+        individual_tests(8) = it( &
+                "prepending names to an empty list is still empty", &
+                checkPrependToEmpty)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -175,4 +178,17 @@ contains
                 .and.assertIncludes(MODULE_NAME2, messages%toString()) &
                 .and.assertIncludes(PROCEDURE_NAME2, messages%toString())
     end function checkPrepend
+
+    pure function checkPrependToEmpty() result(result_)
+        use Message_list_m, only: MessageList_t
+        use Vegetables_m, only: Result_t, assertEmpty
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+
+        messages = messages%prependNames("Another_module_m", "anotherProcedure")
+
+        result_ = assertEmpty(messages%toString())
+    end function checkPrependToEmpty
 end module message_list_test
