@@ -48,9 +48,11 @@ contains
         type(MessageList_t), intent(in) :: messages
         type(MessageList_t) :: new_list
 
-        associate(a => self); end associate
-
-        new_list = messages
+        if (allocated(self%messages)) then
+            new_list = self
+        else
+            new_list = messages
+        end if
     end function appendMessages
 
     pure function toString(self) result(string)

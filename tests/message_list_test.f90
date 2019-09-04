@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(3)
+        type(TestItem_t) :: individual_tests(4)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -19,6 +19,8 @@ contains
         individual_tests(3) = it( &
                 "can append multiple to an empty list", &
                 checkAppendMultipleToEmpty)
+        individual_tests(4) = it( &
+                "can append an empty list", checkAppendEmpty)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -40,8 +42,8 @@ contains
 
         type(Result_t) :: result_
 
-        type(MessageList_t) :: message_list
         character(len=*), parameter :: MESSAGE = "Test Message"
+        type(MessageList_t) :: message_list
 
         message_list = message_list%appendMessage(Info( &
                 "Some_module_m", "someProcedure", MESSAGE))
@@ -56,10 +58,10 @@ contains
 
         type(Result_t) :: result_
 
-        type(MessageList_t) :: message_list1
-        type(MessageList_t) :: message_list2
         character(len=*), parameter :: FIRST_MESSAGE = "First Message"
         character(len=*), parameter :: SECOND_MESSAGE = "Second Message"
+        type(MessageList_t) :: message_list1
+        type(MessageList_t) :: message_list2
 
         message_list2 = message_list2%appendMessage(Info( &
                 "Some_module_m", "someProcedure", FIRST_MESSAGE))
@@ -72,4 +74,28 @@ contains
                 assertIncludes(FIRST_MESSAGE, message_list1%toString()) &
                 .and.assertIncludes(SECOND_MESSAGE, message_list1%toString())
     end function checkAppendMultipleToEmpty
+
+    pure function checkAppendEmpty() result(result_)
+        use Message_m, only: Info, Warning
+        use Message_list_m, only: MessageList_t
+        use Vegetables_m, only: Result_t, assertIncludes
+
+        type(Result_t) :: result_
+
+        character(len=*), parameter :: FIRST_MESSAGE = "First Message"
+        character(len=*), parameter :: SECOND_MESSAGE = "Second Message"
+        type(MessageList_t) :: message_list1
+        type(MessageList_t) :: message_list2
+
+        message_list1 = message_list1%appendMessage(Info( &
+                "Some_module_m", "someProcedure", FIRST_MESSAGE))
+        message_list1 = message_list1%appendMessage(Warning( &
+                "Some_module_m", "someProcedure", SECOND_MESSAGE))
+
+        message_list1 = message_list1%appendMessages(message_list2)
+
+        result_ = &
+                assertIncludes(FIRST_MESSAGE, message_list1%toString()) &
+                .and.assertIncludes(SECOND_MESSAGE, message_list1%toString())
+    end function checkAppendEmpty
 end module message_list_test
