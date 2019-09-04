@@ -48,8 +48,21 @@ contains
         type(MessageList_t), intent(in) :: messages
         type(MessageList_t) :: new_list
 
+        integer :: num_new
+        integer :: num_old
+        integer :: total_num
+
         if (allocated(self%messages)) then
-            new_list = self
+            if (allocated(messages%messages)) then
+                num_old = size(self%messages)
+                num_new = size(messages%messages)
+                total_num = num_old + num_new
+                allocate(new_list%messages(total_num))
+                new_list%messages(1:num_old) = self%messages(:)
+                new_list%messages(num_old+1:total_num) = messages%messages(:)
+            else
+                new_list = self
+            end if
         else
             new_list = messages
         end if
