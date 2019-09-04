@@ -17,6 +17,8 @@ module Message_list_m
         private
         procedure, public :: appendMessage
         procedure, public :: appendMessages
+        procedure :: prependNamesCC
+        generic, public :: prependNames => prependNamesCC
         procedure, public :: toString
     end type MessageList_t
 
@@ -67,6 +69,25 @@ contains
             new_list = messages
         end if
     end function appendMessages
+
+    pure function prependNamesCC( &
+            self, module_name, procedure_name) result(messages)
+        class(MessageList_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(MessageList_t) :: messages
+
+        integer :: i
+        integer :: num_messages
+
+        num_messages = size(messages%messages)
+        allocate(messages%messages(num_messages))
+        do i = 1, num_messages
+            allocate(messages%messages(i)%message, source = &
+                    self%messages(i)%message%prependNames( &
+                            module_name, procedure_name))
+        end do
+    end function prependNamesCC
 
     pure function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)

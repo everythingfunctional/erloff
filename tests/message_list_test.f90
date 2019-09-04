@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(6)
+        type(TestItem_t) :: individual_tests(7)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -25,6 +25,8 @@ contains
                 "can combine two empty lists", checkCombineEmpty)
         individual_tests(6) = it( &
                 "can combine two lists", checkCombine)
+        individual_tests(7) = it( &
+                "can prepend names to a list", checkPrepend)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -149,4 +151,28 @@ contains
                 .and.assertIncludes(THIRD_MESSAGE, message_list1%toString()) &
                 .and.assertIncludes(FOURTH_MESSAGE, message_list1%toString())
     end function checkCombine
+
+    pure function checkPrepend() result(result_)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t
+        use Vegetables_m, only: Result_t, assertIncludes
+
+        type(Result_t) :: result_
+
+        character(len=*), parameter :: MODULE_NAME1 = "Some_module_m"
+        character(len=*), parameter :: MODULE_NAME2 = "Another_module_m"
+        character(len=*), parameter :: PROCEDURE_NAME1 = "someProcedure"
+        character(len=*), parameter :: PROCEDURE_NAME2 = "anotherProcedure"
+        type(MessageList_t) :: messages
+
+        messages = messages%appendMessage(Info( &
+                MODULE_NAME1, PROCEDURE_NAME1, "Test Message"))
+        messages = messages%prependNames(MODULE_NAME2, PROCEDURE_NAME2)
+
+        result_ = &
+                assertIncludes(MODULE_NAME1, messages%toString()) &
+                .and.assertIncludes(PROCEDURE_NAME1, messages%toString()) &
+                .and.assertIncludes(MODULE_NAME2, messages%toString()) &
+                .and.assertIncludes(PROCEDURE_NAME2, messages%toString())
+    end function checkPrepend
 end module message_list_test
