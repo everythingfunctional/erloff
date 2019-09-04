@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(4)
+        type(TestItem_t) :: individual_tests(5)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -21,6 +21,8 @@ contains
                 checkAppendMultipleToEmpty)
         individual_tests(4) = it( &
                 "can append an empty list", checkAppendEmpty)
+        individual_tests(5) = it( &
+                "can combine two empty lists", checkCombineEmpty)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -98,4 +100,18 @@ contains
                 assertIncludes(FIRST_MESSAGE, message_list1%toString()) &
                 .and.assertIncludes(SECOND_MESSAGE, message_list1%toString())
     end function checkAppendEmpty
+
+    pure function checkCombineEmpty() result(result_)
+        use Message_list_m, only: MessageList_t
+        use Vegetables_m, only: Result_t, assertEmpty
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: message_list1
+        type(MessageList_t) :: message_list2
+
+        message_list1 = message_list1%appendMessages(message_list2)
+
+        result_ = assertEmpty(message_list1%toString())
+    end function checkCombineEmpty
 end module message_list_test
