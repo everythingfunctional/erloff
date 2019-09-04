@@ -18,7 +18,11 @@ module Message_list_m
         procedure, public :: appendMessage
         procedure, public :: appendMessages
         procedure :: prependNamesCC
-        generic, public :: prependNames => prependNamesCC
+        procedure :: prependNamesCS
+        procedure :: prependNamesSC
+        procedure :: prependNamesSS
+        generic, public :: prependNames => &
+                prependNamesCC, prependNamesCS, prependNamesSC, prependNamesSS
         procedure, public :: toString
     end type MessageList_t
 
@@ -90,6 +94,75 @@ contains
             end do
         end if
     end function prependNamesCC
+
+    pure function prependNamesCS( &
+            self, module_name, procedure_name) result(messages)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(MessageList_t) :: messages
+
+        integer :: i
+        integer :: num_messages
+
+        if (allocated(self%messages)) then
+            num_messages = size(messages%messages)
+            allocate(messages%messages(num_messages))
+            do i = 1, num_messages
+                allocate(messages%messages(i)%message, source = &
+                        self%messages(i)%message%prependNames( &
+                                module_name, procedure_name))
+            end do
+        end if
+    end function prependNamesCS
+
+    pure function prependNamesSC( &
+            self, module_name, procedure_name) result(messages)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        character(len=*), intent(in) :: procedure_name
+        type(MessageList_t) :: messages
+
+        integer :: i
+        integer :: num_messages
+
+        if (allocated(self%messages)) then
+            num_messages = size(messages%messages)
+            allocate(messages%messages(num_messages))
+            do i = 1, num_messages
+                allocate(messages%messages(i)%message, source = &
+                        self%messages(i)%message%prependNames( &
+                                module_name, procedure_name))
+            end do
+        end if
+    end function prependNamesSC
+
+    pure function prependNamesSS( &
+            self, module_name, procedure_name) result(messages)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(MessageList_t) :: messages
+
+        integer :: i
+        integer :: num_messages
+
+        if (allocated(self%messages)) then
+            num_messages = size(messages%messages)
+            allocate(messages%messages(num_messages))
+            do i = 1, num_messages
+                allocate(messages%messages(i)%message, source = &
+                        self%messages(i)%message%prependNames( &
+                                module_name, procedure_name))
+            end do
+        end if
+    end function prependNamesSS
 
     pure function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
