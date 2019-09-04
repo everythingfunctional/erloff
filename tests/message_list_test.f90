@@ -36,45 +36,40 @@ contains
     pure function checkAppendToEmpty() result(result_)
         use Message_m, only: Info
         use Message_list_m, only: MessageList_t
-        use strff, only: NEWLINE
-        use Vegetables_m, only: Result_t, assertEquals
+        use Vegetables_m, only: Result_t, assertIncludes
 
         type(Result_t) :: result_
 
         type(MessageList_t) :: message_list
-        character(len=*), parameter :: EXPECTED_STRING = &
-                "Some_module_m.someProcedure:" // NEWLINE &
-                // "    IN: Test Message"
+        character(len=*), parameter :: MESSAGE = "Test Message"
 
         message_list = message_list%appendMessage(Info( &
-                "Some_module_m", "someProcedure", "Test Message"))
+                "Some_module_m", "someProcedure", MESSAGE))
 
-        result_ = assertEquals(EXPECTED_STRING, message_list%toString())
+        result_ = assertIncludes(MESSAGE, message_list%toString())
     end function checkAppendToEmpty
 
     pure function checkAppendMultipleToEmpty() result(result_)
         use Message_m, only: Info, Warning
         use Message_list_m, only: MessageList_t
-        use strff, only: NEWLINE
-        use Vegetables_m, only: Result_t, assertEquals
+        use Vegetables_m, only: Result_t, assertIncludes
 
         type(Result_t) :: result_
 
         type(MessageList_t) :: message_list1
         type(MessageList_t) :: message_list2
-        character(len=*), parameter :: EXPECTED_STRING = &
-                "Some_module_m.someProcedure:" // NEWLINE &
-                // "    IN: First Message" // NEWLINE &
-                // "Some_module_m.someProcedure:" // NEWLINE &
-                // "    WN: Second Message"
+        character(len=*), parameter :: FIRST_MESSAGE = "First Message"
+        character(len=*), parameter :: SECOND_MESSAGE = "Second Message"
 
         message_list2 = message_list2%appendMessage(Info( &
-                "Some_module_m", "someProcedure", "First Message"))
+                "Some_module_m", "someProcedure", FIRST_MESSAGE))
         message_list2 = message_list2%appendMessage(Warning( &
-                "Some_module_m", "someProcedure", "Second Message"))
+                "Some_module_m", "someProcedure", SECOND_MESSAGE))
 
         message_list1 = message_list1%appendMessages(message_list2)
 
-        result_ = assertEquals(EXPECTED_STRING, message_list1%toString())
+        result_ = &
+                assertIncludes(FIRST_MESSAGE, message_list1%toString()) &
+                .and.assertIncludes(SECOND_MESSAGE, message_list1%toString())
     end function checkAppendMultipleToEmpty
 end module message_list_test
