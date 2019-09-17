@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(10)
+        type(TestItem_t) :: individual_tests(11)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -35,6 +35,9 @@ contains
         individual_tests(10) = it( &
                 "can filter messages by the originating procedure", &
                 checkFilterByOriginatingProcedure)
+        individual_tests(11) = it( &
+                "can filter messages by the originating module", &
+                checkFilterByOriginatingModule)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -255,4 +258,39 @@ contains
                                 var_str("someProcedure"), var_str("anotherProcedure")]), &
                         "someProcedure or anotherProcedure")
     end function checkFilterByOriginatingProcedure
+
+    pure function checkFilterByOriginatingModule() result(result_)
+        use iso_varying_string, only: var_str
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+
+        messages = messages%appendMessage(Info( &
+                "Some_module_m", "someProcedure", "Test message"))
+        messages = messages%appendMessage(Info( &
+                "Another_module_m", "anotherProcedure", "Another message"))
+        messages = messages%appendMessage(Info( &
+                "Yet_another_module_m", &
+                "yetAnotherProcedure", &
+                "Yet another message"))
+
+        result_ = &
+                assertEquals( &
+                        1, &
+                        size(messages.originatingFromModule."Some_module_m"), &
+                        "Some_module_m") &
+                .and.assertEquals( &
+                        1, &
+                        size(messages.originatingFromModule.var_str("Another_module_m")), &
+                        "Another_module_m") &
+                .and.assertEquals( &
+                        2, &
+                        size(messages.originatingFromModules.[ &
+                                var_str("Some_module_m"), var_str("Another_module_m")]), &
+                        "Some_module_m or Another_module_m")
+    end function checkFilterByOriginatingModule
 end module message_list_test

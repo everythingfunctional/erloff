@@ -13,6 +13,9 @@ module Message_list_m
         procedure :: originatedFromProcedure
         generic :: operator(.originatedFromProcedure.) => &
                 originatedFromProcedure
+        procedure :: originatedFromModule
+        generic :: operator(.originatedFromModule.) => &
+                originatedFromModule
     end type MessageItem_t
 
     type, public :: MessageList_t
@@ -40,6 +43,13 @@ module Message_list_m
         procedure :: originatingFromProcedures_
         generic, public :: operator(.originatingFromProcedures.) => &
                 originatingFromProcedures_
+        procedure :: originatingFromModuleC
+        procedure :: originatingFromModuleS
+        generic, public :: operator(.originatingFromModule.) => &
+                originatingFromModuleC, originatingFromModuleS
+        procedure :: originatingFromModules_
+        generic, public :: operator(.originatingFromModules.) => &
+                originatingFromModules_
     end type MessageList_t
 
     interface size
@@ -265,6 +275,50 @@ contains
         end if
     end function originatingFromProcedures_
 
+    pure function originatingFromModuleC(self, module_name) result(new_list)
+        use iso_varying_string, only: var_str
+
+        class(MessageList_t), intent(in) :: self
+        character(len=*), intent(in) :: module_name
+        type(MessageList_t) :: new_list
+
+        new_list = self.originatingFromModules.[var_str(module_name)]
+    end function originatingFromModuleC
+
+    pure function originatingFromModuleS(self, module_name) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        type(MessageList_t) :: new_list
+
+        new_list = self.originatingFromModules.[module_name]
+    end function originatingFromModuleS
+
+    pure function originatingFromModules_(self, module_names) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_names(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(size(self%messages))
+        integer :: i
+        logical :: individual_masks(size(self%messages), size(module_names))
+
+        if (allocated(self%messages)) then
+            do i = 1, size(module_names)
+                individual_masks(:, i) = &
+                        self%messages.originatedFromModule.module_names(i)
+            end do
+            do i = 1, size(self%messages)
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            allocate(new_list%messages(count(final_mask)))
+            new_list%messages = pack(self%messages, mask = final_mask)
+        end if
+    end function originatingFromModules_
+
     pure function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
         use strff, only: join, NEWLINE
@@ -299,6 +353,17 @@ contains
         originatedFromProcedure = &
                 self%message.originatedFromProcedure.procedure_name
     end function originatedFromProcedure
+
+    elemental function originatedFromModule(self, module_name)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageItem_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: module_name
+        logical :: originatedFromModule
+
+        originatedFromModule = &
+                self%message.originatedFromModule.module_name
+    end function originatedFromModule
 
     elemental function itemToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING
