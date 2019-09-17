@@ -11,6 +11,8 @@ module Module_m
         private
         procedure :: moduleEquals
         generic, public :: operator(==) => moduleEquals
+        procedure, public :: toString
+        procedure, public :: repr
     end type Module_t
 
     interface Module_
@@ -47,4 +49,22 @@ contains
 
         moduleEquals = lhs%name == rhs%name
     end function moduleEquals
+
+    pure function toString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Module_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        string = self%name
+    end function toString
+
+    pure function repr(self)
+        use iso_varying_string, only: VARYING_STRING, operator(//)
+
+        class(Module_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        repr = 'Module_t("' // self%name // '")'
+    end function
 end module Module_m

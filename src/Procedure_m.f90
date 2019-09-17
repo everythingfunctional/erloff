@@ -11,6 +11,8 @@ module Procedure_m
         private
         procedure :: procedureEquals
         generic, public :: operator(==) => procedureEquals
+        procedure, public :: toString
+        procedure, public :: repr
     end type Procedure_t
 
     interface Procedure_
@@ -47,4 +49,22 @@ contains
 
         procedureEquals = lhs%name == rhs%name
     end function procedureEquals
+
+    pure function toString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Procedure_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        string = self%name
+    end function toString
+
+    pure function repr(self)
+        use iso_varying_string, only: VARYING_STRING, operator(//)
+
+        class(Procedure_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        repr = 'Procedure_t("' // self%name // '")'
+    end function repr
 end module Procedure_m
