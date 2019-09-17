@@ -211,7 +211,7 @@ contains
                 "Some_module_m", "someProcedure", "Test error"))
 
         result_ = &
-                assertEquals(1, size(messages.ofType.INFO_TYPE), messages%toString()) &
+                assertEquals(1, size(messages.ofType.INFO_TYPE), "INFO") &
                 .and.assertEquals( &
                         2, &
                         size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
