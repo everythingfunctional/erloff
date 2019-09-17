@@ -8,6 +8,8 @@ module Message_list_m
         class(Message_t), allocatable :: message
     contains
         procedure :: toString => itemToString
+        procedure :: itemIsType
+        generic :: operator(.isType.) => itemIsType
     end type MessageItem_t
 
     type, public :: MessageList_t
@@ -24,8 +26,17 @@ module Message_list_m
         generic, public :: prependNames => &
                 prependNamesCC, prependNamesCS, prependNamesSC, prependNamesSS
         procedure, public :: toString
+        procedure :: ofType
+        generic, public :: operator(.ofType.) => ofType
+        procedure :: ofTypes
+        generic, public :: operator(.ofTypes.) => ofTypes
     end type MessageList_t
 
+    interface size
+        module procedure messageListSize
+    end interface size
+
+    public :: size
 contains
     pure function appendMessage(self, message) result(new_list)
         use Message_m, only: Message_t
@@ -164,6 +175,39 @@ contains
         end if
     end function prependNamesSS
 
+    pure function ofType(self, type_tag) result(new_list)
+        use Message_m, only: MessageType_t
+
+        class(MessageList_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        type(MessageList_t) :: new_list
+
+        new_list = self.ofTypes.[type_tag]
+    end function ofType
+
+    pure function ofTypes(self, type_tags) result(new_list)
+        use Message_m, only: MessageType_t
+
+        class(MessageList_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tags(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(size(self%messages))
+        integer :: i
+        logical :: individual_masks(size(self%messages), size(type_tags))
+
+        if (allocated(self%messages)) then
+            do i = 1, size(type_tags)
+                individual_masks(:, i) = self%messages.isType.type_tags(i)
+            end do
+            do i = 1, size(self%messages)
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            allocate(new_list%messages(count(final_mask)))
+            new_list%messages = pack(self%messages, mask = final_mask)
+        end if
+    end function ofTypes
+
     pure function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
         use strff, only: join, NEWLINE
@@ -178,6 +222,16 @@ contains
         end if
     end function toString
 
+    elemental function itemIsType(self, type_tag)
+        use Message_m, only: MessageType_t
+
+        class(MessageItem_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: itemIsType
+
+        itemIsType = self%message.isType.type_tag
+    end function itemIsType
+
     elemental function itemToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING
 
@@ -186,4 +240,15 @@ contains
 
         string = self%message%toString()
     end function itemToString
+
+    pure function messageListSize(list) result(num_messages)
+        type(MessageList_t), intent(in) :: list
+        integer :: num_messages
+
+        if (allocated(list%messages)) then
+            num_messages = size(list%messages)
+        else
+            num_messages = 0
+        end if
+    end function messageListSize
 end module Message_list_m

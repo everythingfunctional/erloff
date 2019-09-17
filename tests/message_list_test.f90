@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(8)
+        type(TestItem_t) :: individual_tests(9)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -30,6 +30,8 @@ contains
         individual_tests(8) = it( &
                 "prepending names to an empty list is still empty", &
                 checkPrependToEmpty)
+        individual_tests(9) = it( &
+                "can filter messages by type", checkFilterByType)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -191,4 +193,28 @@ contains
 
         result_ = assertEmpty(messages%toString())
     end function checkPrependToEmpty
+
+    pure function checkFilterByType() result(result_)
+        use Message_m, only: Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
+        use Message_list_m, only: MessageList_t, size
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+
+        messages = messages%appendMessage(Info( &
+                "Some_module_m", "someProcedure", "Test message"))
+        messages = messages%appendMessage(Warning( &
+                "Some_module_m", "someProcedure", "Test warning"))
+        messages = messages%appendMessage(Fatal( &
+                "Some_module_m", "someProcedure", "Test error"))
+
+        result_ = &
+                assertEquals(1, size(messages.ofType.INFO_TYPE), messages%toString()) &
+                .and.assertEquals( &
+                        2, &
+                        size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
+                        "INFO or WARNING")
+    end function checkFilterByType
 end module message_list_test
