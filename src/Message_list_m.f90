@@ -8,8 +8,11 @@ module Message_list_m
         class(Message_t), allocatable :: message
     contains
         procedure :: toString => itemToString
-        procedure :: itemIsType
-        generic :: operator(.isType.) => itemIsType
+        procedure :: isType
+        generic :: operator(.isType.) => isType
+        procedure :: originatedFromProcedure
+        generic :: operator(.originatedFromProcedure.) => &
+                originatedFromProcedure
     end type MessageItem_t
 
     type, public :: MessageList_t
@@ -30,6 +33,13 @@ module Message_list_m
         generic, public :: operator(.ofType.) => ofType
         procedure :: ofTypes
         generic, public :: operator(.ofTypes.) => ofTypes
+        procedure :: originatingFromProcedureC
+        procedure :: originatingFromProcedureS
+        generic, public :: operator(.originatingFromProcedure.) => &
+                originatingFromProcedureC, originatingFromProcedureS
+        procedure :: originatingFromProcedures_
+        generic, public :: operator(.originatingFromProcedures.) => &
+                originatingFromProcedures_
     end type MessageList_t
 
     interface size
@@ -208,6 +218,53 @@ contains
         end if
     end function ofTypes
 
+    pure function originatingFromProcedureC( &
+            self, procedure_name) result(new_list)
+        use iso_varying_string, only: var_str
+
+        class(MessageList_t), intent(in) :: self
+        character(len=*), intent(in) :: procedure_name
+        type(MessageList_t) :: new_list
+
+        new_list = self.originatingFromProcedures.[var_str(procedure_name)]
+    end function originatingFromProcedureC
+
+    pure function originatingFromProcedureS( &
+            self, procedure_name) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: procedure_name
+        type(MessageList_t) :: new_list
+
+        new_list = self.originatingFromProcedures.[procedure_name]
+    end function originatingFromProcedureS
+
+    pure function originatingFromProcedures_( &
+            self, procedure_names) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: procedure_names(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(size(self%messages))
+        integer :: i
+        logical :: individual_masks(size(self%messages), size(procedure_names))
+
+        if (allocated(self%messages)) then
+            do i = 1, size(procedure_names)
+                individual_masks(:, i) = &
+                        self%messages.originatedFromProcedure.procedure_names(i)
+            end do
+            do i = 1, size(self%messages)
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            allocate(new_list%messages(count(final_mask)))
+            new_list%messages = pack(self%messages, mask = final_mask)
+        end if
+    end function originatingFromProcedures_
+
     pure function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
         use strff, only: join, NEWLINE
@@ -222,15 +279,26 @@ contains
         end if
     end function toString
 
-    elemental function itemIsType(self, type_tag)
+    elemental function isType(self, type_tag)
         use Message_m, only: MessageType_t
 
         class(MessageItem_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tag
-        logical :: itemIsType
+        logical :: isType
 
-        itemIsType = self%message.isType.type_tag
-    end function itemIsType
+        isType = self%message.isType.type_tag
+    end function isType
+
+    elemental function originatedFromProcedure(self, procedure_name)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageItem_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: procedure_name
+        logical :: originatedFromProcedure
+
+        originatedFromProcedure = &
+                self%message.originatedFromProcedure.procedure_name
+    end function originatedFromProcedure
 
     elemental function itemToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING

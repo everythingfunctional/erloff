@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(9)
+        type(TestItem_t) :: individual_tests(10)
 
         individual_tests(1) = it( &
                 "converts to an empty string when it is empty", &
@@ -32,6 +32,9 @@ contains
                 checkPrependToEmpty)
         individual_tests(9) = it( &
                 "can filter messages by type", checkFilterByType)
+        individual_tests(10) = it( &
+                "can filter messages by the originating procedure", &
+                checkFilterByOriginatingProcedure)
         tests = describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -217,4 +220,39 @@ contains
                         size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
                         "INFO or WARNING")
     end function checkFilterByType
+
+    pure function checkFilterByOriginatingProcedure() result(result_)
+        use iso_varying_string, only: var_str
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+
+        messages = messages%appendMessage(Info( &
+                "Some_module_m", "someProcedure", "Test message"))
+        messages = messages%appendMessage(Info( &
+                "Another_module_m", "anotherProcedure", "Another message"))
+        messages = messages%appendMessage(Info( &
+                "Yet_another_module_m", &
+                "yetAnotherProcedure", &
+                "Yet another message"))
+
+        result_ = &
+                assertEquals( &
+                        1, &
+                        size(messages.originatingFromProcedure."someProcedure"), &
+                        "someProcedure") &
+                .and.assertEquals( &
+                        1, &
+                        size(messages.originatingFromProcedure.var_str("anotherProcedure")), &
+                        "anotherProcedure") &
+                .and.assertEquals( &
+                        2, &
+                        size(messages.originatingFromProcedures.[ &
+                                var_str("someProcedure"), var_str("anotherProcedure")]), &
+                        "someProcedure or anotherProcedure")
+    end function checkFilterByOriginatingProcedure
 end module message_list_test
