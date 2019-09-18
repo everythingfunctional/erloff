@@ -38,17 +38,17 @@ contains
 
         type(Result_t) :: result_
 
-        type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
-        type(CallStack_t) :: stack
+        type(Module_t), pointer :: another_module
+        type(Procedure_t), pointer :: another_procedure
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
+        type(CallStack_t), pointer :: stack
 
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        stack = CallStack(the_module, the_procedure)
+        another_module => Module_("Another_m")
+        another_procedure => Procedure_("another")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        stack => CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
@@ -58,6 +58,7 @@ contains
                 .and.assertNot( &
                         stack.originatedFrom.another_module, &
                         stack%repr() // '.originatedFrom.' // another_module%repr())
+        deallocate(stack)
     end function checkOriginatedFromModule
 
     function checkOriginatedFromProcedure() result(result_)
@@ -69,17 +70,17 @@ contains
 
         type(Result_t) :: result_
 
-        type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
-        type(CallStack_t) :: stack
+        type(Module_t), pointer :: another_module
+        type(Procedure_t), pointer :: another_procedure
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
+        type(CallStack_t), pointer :: stack
 
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        stack = CallStack(the_module, the_procedure)
+        another_module => Module_("Another_m")
+        another_procedure => Procedure_("another")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        stack => CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
@@ -89,6 +90,7 @@ contains
                 .and.assertNot( &
                         stack.originatedFrom.another_procedure, &
                         stack%repr() // '.originatedFrom.' // another_procedure%repr())
+        deallocate(stack)
     end function checkOriginatedFromProcedure
 
     function checkContainsModule() result(result_)
@@ -100,19 +102,19 @@ contains
 
         type(Result_t) :: result_
 
-        type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
-        type(Module_t) :: other_module
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
-        type(CallStack_t) :: stack
+        type(Module_t), pointer :: another_module
+        type(Procedure_t), pointer :: another_procedure
+        type(Module_t), pointer :: other_module
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
+        type(CallStack_t), pointer :: stack
 
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_module = Module_("Other_m")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        stack = CallStack(the_module, the_procedure)
+        another_module => Module_("Another_m")
+        another_procedure => Procedure_("another")
+        other_module => Module_("Other_m")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        stack => CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
@@ -122,6 +124,8 @@ contains
                 .and.assertNot( &
                         stack.includes.other_module, &
                         stack%repr() // '.includes.' // other_module%repr())
+        deallocate(stack)
+        deallocate(other_module)
     end function checkContainsModule
 
     function checkContainsProcedure() result(result_)
@@ -133,19 +137,19 @@ contains
 
         type(Result_t) :: result_
 
-        type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
-        type(Procedure_t) :: other_procedure
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
-        type(CallStack_t) :: stack
+        type(Module_t), pointer :: another_module
+        type(Procedure_t), pointer :: another_procedure
+        type(Procedure_t), pointer :: other_procedure
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
+        type(CallStack_t), pointer :: stack
 
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        stack = CallStack(the_module, the_procedure)
+        another_module => Module_("Another_m")
+        another_procedure => Procedure_("another")
+        other_procedure => Procedure_("other")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        stack => CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
@@ -155,6 +159,8 @@ contains
                 .and.assertNot( &
                         stack.includes.other_procedure, &
                         stack%repr() // '.includes.' // other_procedure%repr())
+        deallocate(stack)
+        deallocate(other_procedure)
     end function checkContainsProcedure
 
     function checkStringIncludes() result(result_)
@@ -165,17 +171,17 @@ contains
 
         type(Result_t) :: result_
 
-        type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
-        type(CallStack_t) :: stack
+        type(Module_t), pointer :: another_module
+        type(Procedure_t), pointer :: another_procedure
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
+        type(CallStack_t), pointer :: stack
 
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        stack = CallStack(the_module, the_procedure)
+        another_module => Module_("Another_m")
+        another_procedure => Procedure_("another")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        stack => CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
@@ -183,5 +189,6 @@ contains
                 .and.assertIncludes(the_procedure%toString(), stack%toString()) &
                 .and.assertIncludes(another_module%toString(), stack%toString()) &
                 .and.assertIncludes(another_procedure%toString(), stack%toString())
+        deallocate(stack)
     end function checkStringIncludes
 end module call_stack_test

@@ -26,8 +26,9 @@ contains
         use iso_varying_string, only: assignment(=)
 
         character(len=*), intent(in) :: name
-        type(Module_t) :: ModuleC
+        type(Module_t), pointer :: ModuleC
 
+        allocate(ModuleC)
         ModuleC%name = name
     end function ModuleC
 
@@ -35,8 +36,9 @@ contains
         use iso_varying_string, only: VARYING_STRING
 
         type(VARYING_STRING), intent(in) :: name
-        type(Module_t) :: ModuleS
+        type(Module_t), pointer :: ModuleS
 
+        allocate(ModuleS)
         ModuleS%name = name
     end function ModuleS
 

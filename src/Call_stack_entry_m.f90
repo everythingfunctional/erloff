@@ -7,8 +7,8 @@ module Call_stack_entry_m
 
     type, public :: CallStackEntry_t
         private
-        type(Module_t) :: module
-        type(Procedure_t) :: procedure
+        type(Module_t), pointer :: module
+        type(Procedure_t), pointer :: procedure
     contains
         private
         procedure, public :: toString
@@ -17,20 +17,22 @@ module Call_stack_entry_m
         generic, public :: operator(.isFrom.) => &
                 isFromModule, isFromProcedure
         procedure, public :: repr
+        final :: desctructor
     end type CallStackEntry_t
 
     public :: CallStackEntry
 contains
-    pure function CallStackEntry(module_, procedure_) result(entry_)
+    function CallStackEntry(module_, procedure_) result(entry_)
         use Module_m, only: Module_t
         use Procedure_m, only: Procedure_t
 
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(CallStackEntry_t) :: entry_
+        type(Module_t), pointer, intent(in) :: module_
+        type(Procedure_t), pointer, intent(in) :: procedure_
+        type(CallStackEntry_t), pointer :: entry_
 
-        entry_%module = module_
-        entry_%procedure = procedure_
+        allocate(entry_)
+        entry_%module => module_
+        entry_%procedure => procedure_
     end function CallStackEntry
 
     elemental function toString(self) result(string)
@@ -74,4 +76,11 @@ contains
                 // '    module = ' // self%module%repr() // ', ' // NEWLINE &
                 // '    procedure = ' // self%procedure%repr() // ')'
     end function repr
+
+    subroutine desctructor(self)
+        type(CallStackEntry_t), intent(inout) :: self
+
+        deallocate(self%module)
+        deallocate(self%procedure)
+    end subroutine desctructor
 end module Call_stack_entry_m

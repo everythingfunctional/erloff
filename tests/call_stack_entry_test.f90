@@ -21,7 +21,7 @@ contains
         tests = describe("CallStackEntry_t", individual_tests)
     end function test_call_stack_entry
 
-    pure function checkIsFromModule() result(result_)
+    function checkIsFromModule() result(result_)
         use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
         use iso_varying_string, only: operator(//)
         use Module_m, only: Module_t, Module_
@@ -30,15 +30,15 @@ contains
 
         type(Result_t) :: result_
 
-        type(CallStackEntry_t) :: entry_
-        type(Module_t) :: other_module
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(CallStackEntry_t), pointer :: entry_
+        type(Module_t), pointer :: other_module
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
 
-        other_module = Module_("Other_m")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        entry_ = CallStackEntry(the_module, the_procedure)
+        other_module => Module_("Other_m")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        entry_ => CallStackEntry(the_module, the_procedure)
 
         result_ = &
                 assertThat( &
@@ -47,9 +47,12 @@ contains
                 .and.assertNot( &
                         entry_.isFrom.other_module, &
                         entry_%repr() // '.isFrom.' // other_module%repr())
+
+        deallocate(entry_)
+        deallocate(other_module)
     end function checkIsFromModule
 
-    pure function checkIsFromProcedure() result(result_)
+    function checkIsFromProcedure() result(result_)
         use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
         use iso_varying_string, only: operator(//)
         use Module_m, only: Module_t, Module_
@@ -58,15 +61,15 @@ contains
 
         type(Result_t) :: result_
 
-        type(CallStackEntry_t) :: entry_
-        type(Procedure_t) :: other_procedure
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(CallStackEntry_t), pointer :: entry_
+        type(Procedure_t), pointer :: other_procedure
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
 
-        other_procedure = Procedure_("other")
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        entry_ = CallStackEntry(the_module, the_procedure)
+        other_procedure => Procedure_("other")
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        entry_ => CallStackEntry(the_module, the_procedure)
 
         result_ = &
                 assertThat( &
@@ -75,9 +78,11 @@ contains
                 .and.assertNot( &
                         entry_.isFrom.other_procedure, &
                         entry_%repr() // '.isFrom.' // other_procedure%repr())
+        deallocate(entry_)
+        deallocate(other_procedure)
     end function checkIsFromProcedure
 
-    pure function checkStringIncludes() result(result_)
+    function checkStringIncludes() result(result_)
         use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
         use Module_m, only: Module_t, Module_
         use Procedure_m, only: Procedure_t, Procedure_
@@ -85,16 +90,17 @@ contains
 
         type(Result_t) :: result_
 
-        type(CallStackEntry_t) :: entry_
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(CallStackEntry_t), pointer :: entry_
+        type(Module_t), pointer :: the_module
+        type(Procedure_t), pointer :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        entry_ = CallStackEntry(the_module, the_procedure)
+        the_module => Module_("Some_m")
+        the_procedure => Procedure_("some")
+        entry_ => CallStackEntry(the_module, the_procedure)
 
         result_ = &
                 assertIncludes(the_module%toString(), entry_%toString()) &
                 .and.assertIncludes(the_procedure%toString(), entry_%toString())
+        deallocate(entry_)
     end function checkStringIncludes
 end module call_stack_entry_test

@@ -26,8 +26,9 @@ contains
         use iso_varying_string, only: assignment(=)
 
         character(len=*), intent(in) :: name
-        type(Procedure_t) :: ProcedureC
+        type(Procedure_t), pointer :: ProcedureC
 
+        allocate(ProcedureC)
         ProcedureC%name = name
     end function ProcedureC
 
@@ -35,8 +36,9 @@ contains
         use iso_varying_string, only: VARYING_STRING
 
         type(VARYING_STRING), intent(in) :: name
-        type(Procedure_t) :: ProcedureS
+        type(Procedure_t), pointer :: ProcedureS
 
+        allocate(ProcedureS)
         ProcedureS%name = name
     end function ProcedureS
 

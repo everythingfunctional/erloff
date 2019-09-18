@@ -5,15 +5,15 @@ module Call_stack_m
     private
 
     type :: Node_t
-        type(CallStackEntry_t) :: entry_
+        type(CallStackEntry_t), pointer :: entry_
         type(Node_t), pointer :: next
     end type Node_t
 
     type, public :: CallStack_t
         private
-        integer :: depth = 0
-        type(Node_t), pointer :: head => null()
-        type(Node_t), pointer :: tail => null()
+        integer :: depth
+        type(Node_t), pointer :: head
+        type(Node_t), pointer :: tail
     contains
         private
         procedure, public :: prependNames
@@ -32,17 +32,18 @@ module Call_stack_m
 
     public :: CallStack
 contains
-    pure function CallStack(module_, procedure_)
+    function CallStack(module_, procedure_)
         use Call_stack_entry_m, only: CallStackEntry
         use Module_m, only: Module_t
         use Procedure_m, only: Procedure_t
 
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(CallStack_t) :: CallStack
+        type(Module_t), pointer, intent(in) :: module_
+        type(Procedure_t), pointer, intent(in) :: procedure_
+        type(CallStack_t), pointer :: CallStack
 
+        allocate(CallStack)
         allocate(CallStack%head)
-        CallStack%head%entry_ = CallStackEntry(module_, procedure_)
+        CallStack%head%entry_ => CallStackEntry(module_, procedure_)
         nullify(CallStack%head%next)
         CallStack%tail => CallStack%head
         CallStack%depth = 1
@@ -54,13 +55,13 @@ contains
         use Procedure_m, only: Procedure_t
 
         class(CallStack_t), intent(inout) :: self
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
+        type(Module_t), pointer, intent(in) :: module_
+        type(Procedure_t), pointer, intent(in) :: procedure_
 
         type(Node_t), pointer :: new_head
 
         allocate(new_head)
-        new_head%entry_ = CallStackEntry(module_, procedure_)
+        new_head%entry_ => CallStackEntry(module_, procedure_)
         new_head%next => self%head
         self%head => new_head
         self%depth = self%depth + 1
@@ -176,6 +177,7 @@ contains
         current => self%head
         do while (associated(current))
             next => current%next
+            deallocate(current%entry_)
             deallocate(current)
             current => next
         end do
