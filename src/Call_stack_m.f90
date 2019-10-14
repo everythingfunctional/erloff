@@ -14,6 +14,9 @@ module Call_stack_m
         procedure :: originatedFromProcedure
         generic, public :: operator(.originatedFrom.) => &
                 originatedFromModule, originatedFromProcedure
+        procedure :: includesModule
+        generic, public :: operator(.includes.) => &
+                includesModule
         procedure, public :: repr
     end type CallStack_t
 
@@ -69,6 +72,22 @@ contains
 
         originatedFromProcedure = self%entries(size(self%entries)).isFrom.procedure_
     end function originatedFromProcedure
+
+    function includesModule(self, module_)
+        use Module_m, only: Module_t
+
+        class(CallStack_t), intent(in) :: self
+        type(Module_t), intent(in) :: module_
+        logical :: includesModule
+
+        integer :: i
+        logical :: isFrom(size(self%entries))
+
+        do i = 1, size(self%entries)
+            isFrom(i) = self%entries(i).isFrom.module_
+        end do
+        includesModule = any(isFrom)
+    end function includesModule
 
     function repr(self)
         use iso_varying_string, only: VARYING_STRING, operator(//)
