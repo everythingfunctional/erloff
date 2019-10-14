@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(3)
+        type(TestItem_t) :: individual_tests(4)
 
         individual_tests(1) = it( &
                 "Can tell if it originated from a module", &
@@ -20,6 +20,9 @@ contains
         individual_tests(3) = it( &
                 "Can tell if it contains a module", &
                 checkContainsModule)
+        individual_tests(4) = it( &
+                "Can tell if it contains a procedure", &
+                checkContainsProcedure)
         tests = describe("CallStack_t", individual_tests)
     end function test_call_stack
 
@@ -117,4 +120,37 @@ contains
                         stack.includes.other_module, &
                         stack%repr() // '.includes.' // other_module%repr())
     end function checkContainsModule
+
+    function checkContainsProcedure() result(result_)
+        use Call_stack_m, only: CallStack_t, CallStack
+        use iso_varying_string, only: operator(//)
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(Module_t) :: another_module
+        type(Procedure_t) :: another_procedure
+        type(Procedure_t) :: other_procedure
+        type(Module_t) :: the_module
+        type(Procedure_t) :: the_procedure
+        type(CallStack_t) :: stack
+
+        another_module = Module_("Another_m")
+        another_procedure = Procedure_("another")
+        other_procedure = Procedure_("other")
+        the_module = Module_("Some_m")
+        the_procedure = Procedure_("some")
+        stack = CallStack(the_module, the_procedure)
+        call stack%prependNames(another_module, another_procedure)
+
+        result_ = &
+                assertThat( &
+                        stack.includes.the_procedure, &
+                        stack%repr() // '.includes.' // the_procedure%repr()) &
+                .and.assertNot( &
+                        stack.includes.other_procedure, &
+                        stack%repr() // '.includes.' // other_procedure%repr())
+    end function checkContainsProcedure
 end module call_stack_test
