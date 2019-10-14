@@ -11,6 +11,7 @@ module Call_stack_entry_m
         type(Procedure_t) :: procedure_
     contains
         private
+        procedure, public :: toString
         procedure :: isFromModule
         procedure :: isFromProcedure
         generic, public :: operator(.isFrom.) => &
@@ -31,6 +32,15 @@ contains
         entry_%module_ = module_
         entry_%procedure_ = procedure_
     end function CallStackEntry
+
+    function toString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, operator(//)
+
+        class(CallStackEntry_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        string = self%module_%toString() // "." // self%procedure_%toString()
+    end function toString
 
     function isFromModule(self, module_)
         use Module_m, only: Module_t

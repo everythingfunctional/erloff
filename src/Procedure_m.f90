@@ -11,6 +11,7 @@ module Procedure_m
         private
         procedure :: procedureEquals
         generic, public :: operator(==) => procedureEquals
+        procedure, public :: toString
         procedure, public :: repr
     end type Procedure_t
 
@@ -48,6 +49,15 @@ contains
 
         procedureEquals = lhs%name == rhs%name
     end function procedureEquals
+
+    function toString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(Procedure_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        string = self%name
+    end function toString
 
     function repr(self)
         use iso_varying_string, only: VARYING_STRING, operator(//)
