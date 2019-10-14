@@ -12,8 +12,9 @@ module Call_stack_entry_m
     contains
         private
         procedure :: isFromModule
+        procedure :: isFromProcedure
         generic, public :: operator(.isFrom.) => &
-                isFromModule
+                isFromModule, isFromProcedure
         procedure, public :: repr
     end type CallStackEntry_t
 
@@ -40,6 +41,16 @@ contains
 
         isFromModule = self%module_ == module_
     end function isFromModule
+
+    function isFromProcedure(self, procedure_)
+        use Procedure_m, only: Procedure_t
+
+        class(CallStackEntry_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        logical :: isFromProcedure
+
+        isFromProcedure = self%procedure_ == procedure_
+    end function isFromProcedure
 
     function repr(self)
         use iso_varying_string, only: VARYING_STRING, operator(//)
