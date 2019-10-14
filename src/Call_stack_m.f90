@@ -11,8 +11,9 @@ module Call_stack_m
         private
         procedure, public :: prependNames
         procedure :: originatedFromModule
+        procedure :: originatedFromProcedure
         generic, public :: operator(.originatedFrom.) => &
-                originatedFromModule
+                originatedFromModule, originatedFromProcedure
         procedure, public :: repr
     end type CallStack_t
 
@@ -58,6 +59,16 @@ contains
 
         originatedFromModule = self%entries(size(self%entries)).isFrom.module_
     end function originatedFromModule
+
+    function originatedFromProcedure(self, procedure_)
+        use Procedure_m, only: Procedure_t
+
+        class(CallStack_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        logical :: originatedFromProcedure
+
+        originatedFromProcedure = self%entries(size(self%entries)).isFrom.procedure_
+    end function originatedFromProcedure
 
     function repr(self)
         use iso_varying_string, only: VARYING_STRING, operator(//)
