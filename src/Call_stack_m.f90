@@ -10,6 +10,7 @@ module Call_stack_m
     contains
         private
         procedure, public :: prependNames
+        procedure, public :: toString
         procedure :: originatedFromModule
         procedure :: originatedFromProcedure
         generic, public :: operator(.originatedFrom.) => &
@@ -53,6 +54,22 @@ contains
         self%entries(1) = CallStackEntry(module_, procedure_)
         self%entries(2:) = previous_entries
     end subroutine prependNames
+
+    function toString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING
+        use strff, only: join
+
+        class(CallStack_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        type(VARYING_STRING) :: entry_strings(size(self%entries))
+        integer :: i
+
+        do i = 1, size(self%entries)
+            entry_strings(i) = self%entries(i)%toString()
+        end do
+        string = join(entry_strings, "->")
+    end function toString
 
     function originatedFromModule(self, module_)
         use Module_m, only: Module_t
