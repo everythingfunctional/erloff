@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(3)
+        type(TestItem_t) :: individual_tests(5)
 
         individual_tests(1) = It( &
                 "Can tell whether it is of a given type", checkType)
@@ -19,6 +19,12 @@ contains
         individual_tests(3) = It( &
                 "Can tell which procedure it originated from", &
                 checkOriginatingProcedure)
+        individual_tests(4) = It( &
+                "Can tell which modules it came from", &
+                checkFromModule)
+        individual_tests(5) = It( &
+                "Can tell which procedures it came from", &
+                checkFromProcedure)
         tests = Describe("Message_t", individual_tests)
     end function test_message
 
@@ -206,4 +212,78 @@ contains
                         message.originatedFrom.other_procedure, &
                         message%repr() // '.originatedFrom.' // other_procedure%repr())
     end function checkOriginatingProcedure
+
+    function checkFromModule() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Message_t, Info
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(Module_t) :: another_module
+        type(Procedure_t) :: another_procedure
+        class(Message_t), allocatable :: message
+        type(Module_t) :: other_module
+        type(Module_t) :: the_module
+        type(Procedure_t) :: the_procedure
+
+        the_module = Module_("Some_m")
+        the_procedure = Procedure_("some")
+        another_module = Module_("Another_m")
+        another_procedure = Procedure_("another")
+        other_module = Module_("Other_m")
+        allocate(message, source = Info( &
+                the_module, the_procedure, "Test Message"))
+        call message%prependNames(another_module, another_procedure)
+
+        result_ = &
+                assertThat( &
+                        message.isFrom.the_module, &
+                        message%repr() // '.isFrom.' // the_module%repr()) &
+                .and.assertThat( &
+                        message.isFrom.another_module, &
+                        message%repr() // '.isFrom.' // another_module%repr()) &
+                .and.assertNot( &
+                        message.isFrom.other_module, &
+                        message%repr() // '.isFrom.' // other_module%repr())
+    end function checkFromModule
+
+    function checkFromProcedure() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Message_t, Info
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(Module_t) :: another_module
+        type(Procedure_t) :: another_procedure
+        class(Message_t), allocatable :: message
+        type(Procedure_t) :: other_procedure
+        type(Module_t) :: the_module
+        type(Procedure_t) :: the_procedure
+
+        the_module = Module_("Some_m")
+        the_procedure = Procedure_("some")
+        another_module = Module_("Another_m")
+        another_procedure = Procedure_("another")
+        other_procedure = Procedure_("other")
+        allocate(message, source = Info( &
+                the_module, the_procedure, "Test Message"))
+        call message%prependNames(another_module, another_procedure)
+
+        result_ = &
+                assertThat( &
+                        message.isFrom.the_procedure, &
+                        message%repr() // '.isFrom.' // the_procedure%repr()) &
+                .and.assertThat( &
+                        message.isFrom.another_procedure, &
+                        message%repr() // '.isFrom.' // another_procedure%repr()) &
+                .and.assertNot( &
+                        message.isFrom.other_procedure, &
+                        message%repr() // '.isFrom.' // other_procedure%repr())
+    end function checkFromProcedure
 end module message_test
