@@ -10,6 +10,7 @@ module Message_list_m
 
     type, public :: MessageList_t
         private
+        integer :: length = 0
         type(MessageItem_t), allocatable :: messages(:)
     contains
         private
@@ -24,17 +25,19 @@ contains
         class(MessageList_t), intent(inout) :: self
         class(Message_t), intent(in) :: message
 
-        type(MessageItem_t) :: old_messages(size(self%messages))
+        type(MessageItem_t) :: old_messages(self%length)
 
-        if (allocated(self%messages)) then
-            old_messages = self%messages
-            deallocate(self%messages)
-            allocate(self%messages(size(old_messages) + 1))
-            self%messages(1:size(old_messages)) = old_messages
-            allocate(self%messages(size(self%messages))%message, source = message)
-        else
+        if (self%length == 0) then
             allocate(self%messages(1))
             allocate(self%messages(1)%message, source = message)
+            self%length = 1
+        else
+            self%length = self%length + 1
+            old_messages = self%messages
+            deallocate(self%messages)
+            allocate(self%messages(self%length))
+            self%messages(1:size(old_messages)) = old_messages
+            allocate(self%messages(self%length)%message, source = message)
         end if
     end subroutine appendMessage
 
@@ -48,15 +51,21 @@ contains
         type(Procedure_t), intent(in) :: procedure_
 
         integer :: i
-        type(MessageItem_t) :: old_messages(size(self%messages))
+        type(MessageItem_t) :: old_messages(self%length)
         integer :: num_new_messages
         integer :: num_old_messages
         integer :: total_num_messages
 
-        if (allocated(messages%messages)) then
-            if (allocated(self%messages)) then
-                num_old_messages = size(self%messages)
-                num_new_messages = size(messages%messages)
+        if (.not. messages%length == 0) then
+            if (self%length == 0) then
+                allocate(self%messages, source = messages%messages)
+                self%length = size(self%messages)
+                do i = 1, self%length
+                    call self%messages(i)%message%prependNames(module_, procedure_)
+                end do
+            else
+                num_old_messages = self%length
+                num_new_messages = messages%length
                 total_num_messages = num_old_messages + num_new_messages
                 old_messages = self%messages
                 deallocate(self%messages)
@@ -66,11 +75,7 @@ contains
                 do i = num_old_messages + 1, total_num_messages
                     call self%messages(i)%message%prependNames(module_, procedure_)
                 end do
-            else
-                allocate(self%messages, source = messages%messages)
-                do i = 1, size(self%messages)
-                    call self%messages(i)%message%prependNames(module_, procedure_)
-                end do
+                self%length = total_num_messages
             end if
         end if
     end subroutine appendMessages
@@ -83,15 +88,15 @@ contains
         type(VARYING_STRING) :: string
 
         integer :: i
-        type(VARYING_STRING) :: strings(size(self%messages))
+        type(VARYING_STRING) :: strings(self%length)
 
-        if (allocated(self%messages)) then
-            do i = 1, size(self%messages)
+        if (self%length == 0) then
+            string = ""
+        else
+            do i = 1, self%length
                 strings(i) = self%messages(i)%message%toString()
             end do
             string = join(strings, NEWLINE)
-        else
-            string = ""
         end if
     end function toString
 end module Message_list_m
