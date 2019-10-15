@@ -53,6 +53,13 @@ module Message_m
         procedure :: typeRepr => infoTypeRepr
     end type Info_t
 
+    type, public, extends(Message_t) :: Warning_t
+    contains
+        private
+        procedure :: typeString => warningTypeString
+        procedure :: typeRepr => warningTypeRepr
+    end type Warning_t
+
     abstract interface
         function messageToString_(self) result(string)
             use iso_varying_string, only: VARYING_STRING
@@ -75,6 +82,13 @@ module Message_m
         module procedure infoWithTypeC
         module procedure infoWithTypeS
     end interface Info
+
+    interface Warning
+        module procedure genericWarningC
+        module procedure genericWarningS
+        module procedure warningWithTypeC
+        module procedure warningWithTypeS
+    end interface Warning
 
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
@@ -111,7 +125,7 @@ module Message_m
     type(DebugLevel_t), public, parameter :: DETAILED = DebugLevel_t(3)
     type(DebugLevel_t), public, parameter :: NITTY_GRITTY = DebugLevel_t(4)
 
-    public :: Debug, Info
+    public :: Debug, Info, Warning
 contains
     function genericDebugC(module_, procedure_, level, message) result(debug_)
         use iso_varying_string, only: var_str
@@ -234,6 +248,63 @@ contains
         info_%message = message
     end function infoWithTypeS
 
+    function genericWarningC(module_, procedure_, message) result(warning_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_ = Warning(WARNING_TYPE, module_, procedure_, var_str(message))
+    end function genericWarningC
+
+    function genericWarningS(module_, procedure_, message) result(warning_)
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_ = Warning(WARNING_TYPE, module_, procedure_, message)
+    end function genericWarningS
+
+    function warningWithTypeC(type_tag, module_, procedure_, message) result(warning_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_ = Warning(type_tag, module_, procedure_, var_str(message))
+    end function warningWithTypeC
+
+    function warningWithTypeS(type_tag, module_, procedure_, message) result(warning_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Warning_t) :: warning_
+
+        warning_%message_type = type_tag
+        warning_%call_stack = CallStack(module_, procedure_)
+        warning_%message = message
+    end function warningWithTypeS
+
     function messageTypeToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
 
@@ -297,6 +368,20 @@ contains
         case (DEBUG_TYPE_STRING)
             select type (self)
             class is (Debug_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (INFO_TYPE_STRING)
+            select type (self)
+            class is (Info_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (WARNING_TYPE_STRING)
+            select type (self)
+            class is (Warning_t)
                 isType = .true.
             class default
                 isType = .false.
@@ -373,4 +458,28 @@ contains
 
         repr = INFO_TYPE_STRING
     end function infoTypeRepr
+
+    function warningTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Warning_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self)
+        end associate
+
+        string = "WN: "
+    end function warningTypeString
+
+    function warningTypeRepr(self) result(repr)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Warning_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        associate(a => self)
+        end associate
+
+        repr = WARNING_TYPE_STRING
+    end function warningTypeRepr
 end module Message_m

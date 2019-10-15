@@ -22,12 +22,15 @@ contains
                 Message_t, &
                 Debug, &
                 Info, &
+                Warning, &
                 DEBUG_TYPE, &
                 ERROR_TYPE, &
                 GENERAL, &
                 INFO_TYPE, &
                 INPUTS_TYPE, &
-                UNEQUAL_ARRAY_SIZES_TYPE
+                OUTSIDE_NORMAL_RANGE_TYPE, &
+                UNEQUAL_ARRAY_SIZES_TYPE, &
+                WARNING_TYPE
         use Module_m, only: Module_
         use Procedure_m, only: Procedure_
         use Vegetables_m, only: Result_t, assertNot, assertThat
@@ -36,6 +39,7 @@ contains
 
         class(Message_t), allocatable :: debug_message
         class(Message_t), allocatable :: info_message
+        class(Message_t), allocatable :: warning_message
 
         allocate(debug_message, source = Debug( &
                 INPUTS_TYPE, &
@@ -46,6 +50,12 @@ contains
 
         allocate(info_message, source = Info( &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
+                Module_("Some_m"), &
+                Procedure_("some"), &
+                "Test Message"))
+
+        allocate(warning_message, source = Warning( &
+                OUTSIDE_NORMAL_RANGE_TYPE, &
                 Module_("Some_m"), &
                 Procedure_("some"), &
                 "Test Message"))
@@ -62,6 +72,18 @@ contains
                         debug_message%repr() // ".isType." // INFO_TYPE%repr()) &
                 .and.assertNot( &
                         debug_message.isType.ERROR_TYPE, &
-                        debug_message%repr() // ".isType." // ERROR_TYPE%repr())
+                        debug_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                .and.assertThat( &
+                        warning_message.isType.WARNING_TYPE, &
+                        warning_message%repr() // ".isType." // WARNING_TYPE%repr()) &
+                .and.assertThat( &
+                        warning_message.isType.OUTSIDE_NORMAL_RANGE_TYPE, &
+                        warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE_TYPE%repr()) &
+                .and.assertNot( &
+                        warning_message.isType.INFO_TYPE, &
+                        warning_message%repr() // ".isType." // INFO_TYPE%repr()) &
+                .and.assertNot( &
+                        warning_message.isType.ERROR_TYPE, &
+                        warning_message%repr() // ".isType." // ERROR_TYPE%repr())
     end function checkType
 end module message_test
