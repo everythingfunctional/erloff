@@ -24,6 +24,7 @@ contains
                 Info, &
                 Warning, &
                 Fatal, &
+                Internal, &
                 DEBUG_TYPE, &
                 ERROR_TYPE, &
                 FATAL_TYPE, &
@@ -33,6 +34,7 @@ contains
                 INTERNAL_TYPE, &
                 OUTSIDE_NORMAL_RANGE_TYPE, &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
+                UNKNOWN_TYPE_TYPE, &
                 WARNING_TYPE
         use Module_m, only: Module_
         use Procedure_m, only: Procedure_
@@ -44,6 +46,7 @@ contains
         class(Message_t), allocatable :: info_message
         class(Message_t), allocatable :: warning_message
         class(Message_t), allocatable :: fatal_message
+        class(Message_t), allocatable :: internal_message
 
         allocate(debug_message, source = Debug( &
                 INPUTS_TYPE, &
@@ -66,6 +69,12 @@ contains
 
         allocate(fatal_message, source = Fatal( &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
+                Module_("Some_m"), &
+                Procedure_("some"), &
+                "Test Message"))
+
+        allocate(internal_message, source = Internal( &
+                UNKNOWN_TYPE_TYPE, &
                 Module_("Some_m"), &
                 Procedure_("some"), &
                 "Test Message"))
@@ -106,6 +115,15 @@ contains
                         fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &
                 .and.assertNot( &
                         fatal_message.isType.INTERNAL_TYPE, &
-                        fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr())
+                        fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
+                .and.assertThat( &
+                        internal_message.isType.ERROR_TYPE, &
+                        internal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                .and.assertThat( &
+                        internal_message.isType.INTERNAL_TYPE, &
+                        internal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
+                .and.assertThat( &
+                        internal_message.isType.UNKNOWN_TYPE_TYPE, &
+                        internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())
     end function checkType
 end module message_test

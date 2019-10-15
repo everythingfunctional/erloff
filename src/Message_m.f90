@@ -70,6 +70,13 @@ module Message_m
         procedure :: typeRepr => fatalTypeRepr
     end type Fatal_t
 
+    type, public, extends(Error_t) :: Internal_t
+    contains
+        private
+        procedure :: typeString => internalTypeString
+        procedure :: typeRepr => internalTypeRepr
+    end type Internal_t
+
     abstract interface
         function messageToString_(self) result(string)
             use iso_varying_string, only: VARYING_STRING
@@ -107,6 +114,13 @@ module Message_m
         module procedure fatalWithTypeS
     end interface Fatal
 
+    interface Internal
+        module procedure genericInternalC
+        module procedure genericInternalS
+        module procedure internalWithTypeC
+        module procedure internalWithTypeS
+    end interface Internal
+
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
     character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
@@ -142,7 +156,7 @@ module Message_m
     type(DebugLevel_t), public, parameter :: DETAILED = DebugLevel_t(3)
     type(DebugLevel_t), public, parameter :: NITTY_GRITTY = DebugLevel_t(4)
 
-    public :: Debug, Info, Warning, Fatal
+    public :: Debug, Info, Warning, Fatal, Internal
 contains
     function genericDebugC(module_, procedure_, level, message) result(debug_)
         use iso_varying_string, only: var_str
@@ -379,6 +393,63 @@ contains
         fatal_%message = message
     end function fatalWithTypeS
 
+    function genericInternalC(module_, procedure_, message) result(internal_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_ = Internal(INTERNAL_TYPE, module_, procedure_, var_str(message))
+    end function genericInternalC
+
+    function genericInternalS(module_, procedure_, message) result(internal_)
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_ = Internal(INTERNAL_TYPE, module_, procedure_, message)
+    end function genericInternalS
+
+    function internalWithTypeC(type_tag, module_, procedure_, message) result(internal_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_ = Internal(type_tag, module_, procedure_, var_str(message))
+    end function internalWithTypeC
+
+    function internalWithTypeS(type_tag, module_, procedure_, message) result(internal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Internal_t) :: internal_
+
+        internal_%message_type = type_tag
+        internal_%call_stack = CallStack(module_, procedure_)
+        internal_%message = message
+    end function internalWithTypeS
+
     function messageTypeToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
 
@@ -470,6 +541,13 @@ contains
         case (FATAL_TYPE_STRING)
             select type (self)
             class is (Fatal_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (INTERNAL_TYPE_STRING)
+            select type (self)
+            class is (Internal_t)
                 isType = .true.
             class default
                 isType = .false.
@@ -594,4 +672,28 @@ contains
 
         repr = FATAL_TYPE_STRING
     end function fatalTypeRepr
+
+    function internalTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Internal_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self)
+        end associate
+
+        string = "IE: "
+    end function internalTypeString
+
+    function internalTypeRepr(self) result(repr)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Internal_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        associate(a => self)
+        end associate
+
+        repr = INTERNAL_TYPE_STRING
+    end function internalTypeRepr
 end module Message_m
