@@ -33,6 +33,10 @@ module Message_m
         procedure :: isFromProcedure
         generic, public :: operator(.isFrom.) => &
                 isFromModule, isFromProcedure
+        procedure :: cameThroughModule
+        procedure :: cameThroughProcedure
+        generic, public :: operator(.cameThrough.) => &
+                cameThroughModule, cameThroughProcedure
         procedure, public :: repr => messageRepr
         procedure(messageToString_), deferred :: typeRepr
     end type Message_t
@@ -604,6 +608,30 @@ contains
 
         is_from = self%call_stack.includes.procedure_
     end function isFromProcedure
+
+    function cameThroughModule(self, module_) result(came_through)
+        use Module_m, only: Module_t
+
+        class(Message_t), intent(in) :: self
+        type(Module_t), intent(in) :: module_
+        logical :: came_through
+
+        came_through = &
+                (.not.(self.originatedFrom.module_)) &
+                .and.(self.isFrom.module_)
+    end function cameThroughModule
+
+    function cameThroughProcedure(self, procedure_) result(came_through)
+        use Procedure_m, only: Procedure_t
+
+        class(Message_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        logical :: came_through
+
+        came_through = &
+                (.not.(self.originatedFrom.procedure_)) &
+                .and.(self.isFrom.procedure_)
+    end function cameThroughProcedure
 
     function messageRepr(self) result(repr)
         use iso_varying_string, only: VARYING_STRING, operator(//)

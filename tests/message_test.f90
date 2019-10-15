@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(5)
+        type(TestItem_t) :: individual_tests(7)
 
         individual_tests(1) = It( &
                 "Can tell whether it is of a given type", checkType)
@@ -25,6 +25,12 @@ contains
         individual_tests(5) = It( &
                 "Can tell which procedures it came from", &
                 checkFromProcedure)
+        individual_tests(6) = It( &
+                "Can tell which modules it came through", &
+                checkThroughModule)
+        individual_tests(7) = It( &
+                "Can tell which procedures it came through", &
+                checkThroughProcedure)
         tests = Describe("Message_t", individual_tests)
     end function test_message
 
@@ -286,4 +292,78 @@ contains
                         message.isFrom.other_procedure, &
                         message%repr() // '.isFrom.' // other_procedure%repr())
     end function checkFromProcedure
+
+    function checkThroughModule() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Message_t, Info
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(Module_t) :: another_module
+        type(Procedure_t) :: another_procedure
+        class(Message_t), allocatable :: message
+        type(Module_t) :: other_module
+        type(Module_t) :: the_module
+        type(Procedure_t) :: the_procedure
+
+        the_module = Module_("Some_m")
+        the_procedure = Procedure_("some")
+        another_module = Module_("Another_m")
+        another_procedure = Procedure_("another")
+        other_module = Module_("Other_m")
+        allocate(message, source = Info( &
+                the_module, the_procedure, "Test Message"))
+        call message%prependNames(another_module, another_procedure)
+
+        result_ = &
+                assertNot( &
+                        message.cameThrough.the_module, &
+                        message%repr() // '.cameThrough.' // the_module%repr()) &
+                .and.assertThat( &
+                        message.cameThrough.another_module, &
+                        message%repr() // '.cameThrough.' // another_module%repr()) &
+                .and.assertNot( &
+                        message.cameThrough.other_module, &
+                        message%repr() // '.cameThrough.' // other_module%repr())
+    end function checkThroughModule
+
+    function checkThroughProcedure() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Message_t, Info
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(Module_t) :: another_module
+        type(Procedure_t) :: another_procedure
+        class(Message_t), allocatable :: message
+        type(Procedure_t) :: other_procedure
+        type(Module_t) :: the_module
+        type(Procedure_t) :: the_procedure
+
+        the_module = Module_("Some_m")
+        the_procedure = Procedure_("some")
+        another_module = Module_("Another_m")
+        another_procedure = Procedure_("another")
+        other_procedure = Procedure_("other")
+        allocate(message, source = Info( &
+                the_module, the_procedure, "Test Message"))
+        call message%prependNames(another_module, another_procedure)
+
+        result_ = &
+                assertNot( &
+                        message.cameThrough.the_procedure, &
+                        message%repr() // '.cameThrough.' // the_procedure%repr()) &
+                .and.assertThat( &
+                        message.cameThrough.another_procedure, &
+                        message%repr() // '.cameThrough.' // another_procedure%repr()) &
+                .and.assertNot( &
+                        message.cameThrough.other_procedure, &
+                        message%repr() // '.cameThrough.' // other_procedure%repr())
+    end function checkThroughProcedure
 end module message_test
