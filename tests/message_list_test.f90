@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(6)
+        type(TestItem_t) :: individual_tests(7)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -26,6 +26,8 @@ contains
                 "Can combine two empty lists", checkCombineEmpty)
         individual_tests(6) = It( &
                 "Can combine two lists", checkCombine)
+        individual_tests(7) = It( &
+                "Can filter messages by type", checkFilterByType)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -173,4 +175,30 @@ contains
                 .and.assertIncludes(message3%toString(), message_list1%toString()) &
                 .and.assertIncludes(message4%toString(), message_list1%toString())
     end function checkCombine
+
+    function checkFilterByType() result(result_)
+        use Message_m, only: Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_
+        use Procedure_m, only: Procedure_
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Test message"))
+        call messages%appendMessage(Warning( &
+                Module_("Some_m"), Procedure_("some"), "Test warning"))
+        call messages%appendMessage(Fatal( &
+                Module_("Some_m"), Procedure_("some"), "Test error"))
+
+        result_ = &
+                assertEquals(1, size(messages.ofType.INFO_TYPE), "INFO") &
+                .and.assertEquals( &
+                        2, &
+                        size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
+                        "INFO or WARNING")
+    end function checkFilterByType
 end module message_list_test
