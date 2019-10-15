@@ -23,11 +23,14 @@ contains
                 Debug, &
                 Info, &
                 Warning, &
+                Fatal, &
                 DEBUG_TYPE, &
                 ERROR_TYPE, &
+                FATAL_TYPE, &
                 GENERAL, &
                 INFO_TYPE, &
                 INPUTS_TYPE, &
+                INTERNAL_TYPE, &
                 OUTSIDE_NORMAL_RANGE_TYPE, &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
                 WARNING_TYPE
@@ -40,6 +43,7 @@ contains
         class(Message_t), allocatable :: debug_message
         class(Message_t), allocatable :: info_message
         class(Message_t), allocatable :: warning_message
+        class(Message_t), allocatable :: fatal_message
 
         allocate(debug_message, source = Debug( &
                 INPUTS_TYPE, &
@@ -56,6 +60,12 @@ contains
 
         allocate(warning_message, source = Warning( &
                 OUTSIDE_NORMAL_RANGE_TYPE, &
+                Module_("Some_m"), &
+                Procedure_("some"), &
+                "Test Message"))
+
+        allocate(fatal_message, source = Fatal( &
+                UNEQUAL_ARRAY_SIZES_TYPE, &
                 Module_("Some_m"), &
                 Procedure_("some"), &
                 "Test Message"))
@@ -84,6 +94,18 @@ contains
                         warning_message%repr() // ".isType." // INFO_TYPE%repr()) &
                 .and.assertNot( &
                         warning_message.isType.ERROR_TYPE, &
-                        warning_message%repr() // ".isType." // ERROR_TYPE%repr())
+                        warning_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                .and.assertThat( &
+                        fatal_message.isType.ERROR_TYPE, &
+                        fatal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                .and.assertThat( &
+                        fatal_message.isType.FATAL_TYPE, &
+                        fatal_message%repr() // ".isType." // FATAL_TYPE%repr()) &
+                .and.assertThat( &
+                        fatal_message.isType.UNEQUAL_ARRAY_SIZES_TYPE, &
+                        fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &
+                .and.assertNot( &
+                        fatal_message.isType.INTERNAL_TYPE, &
+                        fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr())
     end function checkType
 end module message_test

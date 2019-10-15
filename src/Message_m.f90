@@ -60,6 +60,16 @@ module Message_m
         procedure :: typeRepr => warningTypeRepr
     end type Warning_t
 
+    type, public, abstract, extends(Message_t) :: Error_t
+    end type Error_t
+
+    type, public, extends(Error_t) :: Fatal_t
+    contains
+        private
+        procedure :: typeString => fatalTypeString
+        procedure :: typeRepr => fatalTypeRepr
+    end type Fatal_t
+
     abstract interface
         function messageToString_(self) result(string)
             use iso_varying_string, only: VARYING_STRING
@@ -89,6 +99,13 @@ module Message_m
         module procedure warningWithTypeC
         module procedure warningWithTypeS
     end interface Warning
+
+    interface Fatal
+        module procedure genericFatalC
+        module procedure genericFatalS
+        module procedure fatalWithTypeC
+        module procedure fatalWithTypeS
+    end interface Fatal
 
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
@@ -125,7 +142,7 @@ module Message_m
     type(DebugLevel_t), public, parameter :: DETAILED = DebugLevel_t(3)
     type(DebugLevel_t), public, parameter :: NITTY_GRITTY = DebugLevel_t(4)
 
-    public :: Debug, Info, Warning
+    public :: Debug, Info, Warning, Fatal
 contains
     function genericDebugC(module_, procedure_, level, message) result(debug_)
         use iso_varying_string, only: var_str
@@ -305,6 +322,63 @@ contains
         warning_%message = message
     end function warningWithTypeS
 
+    function genericFatalC(module_, procedure_, message) result(fatal_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_ = Fatal(FATAL_TYPE, module_, procedure_, var_str(message))
+    end function genericFatalC
+
+    function genericFatalS(module_, procedure_, message) result(fatal_)
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_ = Fatal(FATAL_TYPE, module_, procedure_, message)
+    end function genericFatalS
+
+    function fatalWithTypeC(type_tag, module_, procedure_, message) result(fatal_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_ = Fatal(type_tag, module_, procedure_, var_str(message))
+    end function fatalWithTypeC
+
+    function fatalWithTypeS(type_tag, module_, procedure_, message) result(fatal_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Fatal_t) :: fatal_
+
+        fatal_%message_type = type_tag
+        fatal_%call_stack = CallStack(module_, procedure_)
+        fatal_%message = message
+    end function fatalWithTypeS
+
     function messageTypeToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
 
@@ -382,6 +456,20 @@ contains
         case (WARNING_TYPE_STRING)
             select type (self)
             class is (Warning_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (ERROR_TYPE_STRING)
+            select type (self)
+            class is (Error_t)
+                isType = .true.
+            class default
+                isType = .false.
+            end select
+        case (FATAL_TYPE_STRING)
+            select type (self)
+            class is (Fatal_t)
                 isType = .true.
             class default
                 isType = .false.
@@ -482,4 +570,28 @@ contains
 
         repr = WARNING_TYPE_STRING
     end function warningTypeRepr
+
+    function fatalTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Fatal_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self)
+        end associate
+
+        string = "FE: "
+    end function fatalTypeString
+
+    function fatalTypeRepr(self) result(repr)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Fatal_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        associate(a => self)
+        end associate
+
+        repr = FATAL_TYPE_STRING
+    end function fatalTypeRepr
 end module Message_m
