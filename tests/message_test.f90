@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(7)
+        type(TestItem_t) :: individual_tests(8)
 
         individual_tests(1) = It( &
                 "Can tell whether it is of a given type", checkType)
@@ -31,6 +31,9 @@ contains
         individual_tests(7) = It( &
                 "Can tell which procedures it came through", &
                 checkThroughProcedure)
+        individual_tests(8) = It( &
+                "Can tell lots about its contents", &
+                checkContents)
         tests = Describe("Message_t", individual_tests)
     end function test_message
 
@@ -366,4 +369,63 @@ contains
                         message.cameThrough.other_procedure, &
                         message%repr() // '.cameThrough.' // other_procedure%repr())
     end function checkThroughProcedure
+
+    function checkContents() result(result_)
+        use iso_varying_string, only: VARYING_STRING, operator(//), var_str
+        use Message_m, only: Message_t, Info
+        use Module_m, only: Module_
+        use Procedure_m, only: Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        class(Message_t), allocatable :: message
+        type(VARYING_STRING) :: includesAnyStrings1(2)
+        type(VARYING_STRING) :: includesAnyStrings2(2)
+        type(VARYING_STRING) :: includesAnyStrings3(2)
+        type(VARYING_STRING) :: includesAllStrings1(2)
+        type(VARYING_STRING) :: includesAllStrings2(2)
+        type(VARYING_STRING) :: includesAllStrings3(2)
+
+        allocate(message, source = Info( &
+                Module_("Some_m"), Procedure_("some"), "Test Message Content"))
+        includesAnyStrings1(1) = var_str("Test")
+        includesAnyStrings1(2) = var_str("else")
+        includesAnyStrings2(1) = var_str("Test")
+        includesAnyStrings2(2) = var_str("Content")
+        includesAnyStrings3(1) = var_str("test")
+        includesAnyStrings3(2) = var_str("else")
+        includesAllStrings1(1) = var_str("Test")
+        includesAllStrings1(2) = var_str("Message")
+        includesAllStrings2(1) = var_str("test")
+        includesAllStrings2(2) = var_str("Message")
+        includesAllStrings3(1) = var_str("Test")
+        includesAllStrings3(2) = var_str("message")
+
+        result_ = &
+                assertThat( &
+                        message.includes."Test", &
+                        message%repr() // '.includes."Test"') &
+                .and.assertNot( &
+                        message.includes."test", &
+                        message%repr() // '.includes."test"') &
+                .and.assertThat( &
+                        message.includesAnyOf.includesAnyStrings1, &
+                        message%repr() // '.includesAnyOf.[var_str("Test"), var_str("else")]') &
+                .and.assertThat( &
+                        message.includesAnyOf.includesAnyStrings2, &
+                        message%repr() // '.includesAnyOf.[var_str("Test"), var_str("Content")]') &
+                .and.assertNot( &
+                        message.includesAnyOf.includesAnyStrings3, &
+                        message%repr() // '.includesAnyOf.[var_str("test"), var_str("else")]') &
+                .and.assertThat( &
+                        message.includesAllOf.includesAllStrings1, &
+                        message%repr() // '.includesAllOf.[var_str("Test"), var_str("Message")]') &
+                .and.assertNot( &
+                        message.includesAllOf.includesAllStrings2, &
+                        message%repr() // '.includesAllOf.[var_str("test"), var_str("Message")]') &
+                .and.assertNot( &
+                        message.includesAllOf.includesAllStrings3, &
+                        message%repr() // '.includesAllOf.[var_str("Test"), var_str("message")]')
+    end function checkContents
 end module message_test
