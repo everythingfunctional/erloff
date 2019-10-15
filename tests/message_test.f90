@@ -21,11 +21,13 @@ contains
         use Message_m, only: &
                 Message_t, &
                 Debug, &
+                Info, &
                 DEBUG_TYPE, &
                 ERROR_TYPE, &
                 GENERAL, &
                 INFO_TYPE, &
-                INPUTS_TYPE
+                INPUTS_TYPE, &
+                UNEQUAL_ARRAY_SIZES_TYPE
         use Module_m, only: Module_
         use Procedure_m, only: Procedure_
         use Vegetables_m, only: Result_t, assertNot, assertThat
@@ -33,12 +35,19 @@ contains
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: debug_message
+        class(Message_t), allocatable :: info_message
 
         allocate(debug_message, source = Debug( &
                 INPUTS_TYPE, &
                 Module_("Some_m"), &
                 Procedure_("some"), &
                 GENERAL, &
+                "Test Message"))
+
+        allocate(info_message, source = Info( &
+                UNEQUAL_ARRAY_SIZES_TYPE, &
+                Module_("Some_m"), &
+                Procedure_("some"), &
                 "Test Message"))
 
         result_ = &

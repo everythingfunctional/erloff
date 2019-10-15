@@ -46,6 +46,13 @@ module Message_m
         procedure :: typeRepr => debugTypeRepr
     end type Debug_t
 
+    type, public, extends(Message_t) :: Info_t
+    contains
+        private
+        procedure :: typeString => infoTypeString
+        procedure :: typeRepr => infoTypeRepr
+    end type Info_t
+
     abstract interface
         function messageToString_(self) result(string)
             use iso_varying_string, only: VARYING_STRING
@@ -61,6 +68,13 @@ module Message_m
         module procedure debugWithTypeC
         module procedure debugWithTypeS
     end interface Debug
+
+    interface Info
+        module procedure genericInfoC
+        module procedure genericInfoS
+        module procedure infoWithTypeC
+        module procedure infoWithTypeS
+    end interface Info
 
     character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
@@ -97,7 +111,7 @@ module Message_m
     type(DebugLevel_t), public, parameter :: DETAILED = DebugLevel_t(3)
     type(DebugLevel_t), public, parameter :: NITTY_GRITTY = DebugLevel_t(4)
 
-    public :: Debug
+    public :: Debug, Info
 contains
     function genericDebugC(module_, procedure_, level, message) result(debug_)
         use iso_varying_string, only: var_str
@@ -162,6 +176,63 @@ contains
         debug_%level = level
         debug_%message = message
     end function debugWithTypeS
+
+    function genericInfoC(module_, procedure_, message) result(info_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_ = Info(INFO_TYPE, module_, procedure_, var_str(message))
+    end function genericInfoC
+
+    function genericInfoS(module_, procedure_, message) result(info_)
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_ = Info(INFO_TYPE, module_, procedure_, message)
+    end function genericInfoS
+
+    function infoWithTypeC(type_tag, module_, procedure_, message) result(info_)
+        use iso_varying_string, only: var_str
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_ = Info(type_tag, module_, procedure_, var_str(message))
+    end function infoWithTypeC
+
+    function infoWithTypeS(type_tag, module_, procedure_, message) result(info_)
+        use Call_stack_m, only: CallStack
+        use iso_varying_string, only: VARYING_STRING
+        use Module_m, only: Module_t
+        use Procedure_m, only: Procedure_t
+
+        type(MessageType_t), intent(in) :: type_tag
+        type(Module_t), intent(in) :: module_
+        type(Procedure_t), intent(in) :: procedure_
+        type(VARYING_STRING), intent(in) :: message
+        type(Info_t) :: info_
+
+        info_%message_type = type_tag
+        info_%call_stack = CallStack(module_, procedure_)
+        info_%message = message
+    end function infoWithTypeS
 
     function messageTypeToString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
@@ -278,4 +349,28 @@ contains
 
         repr = DEBUG_TYPE_STRING // '(level = ' // self%level%toString() // ')'
     end function debugTypeRepr
+
+    function infoTypeString(self) result(string)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Info_t), intent(in) :: self
+        type(VARYING_STRING) :: string
+
+        associate(a => self)
+        end associate
+
+        string = "IN: "
+    end function infoTypeString
+
+    function infoTypeRepr(self) result(repr)
+        use iso_varying_string, only: VARYING_STRING, assignment(=)
+
+        class(Info_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        associate(a => self)
+        end associate
+
+        repr = INFO_TYPE_STRING
+    end function infoTypeRepr
 end module Message_m
