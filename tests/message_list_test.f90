@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(14)
+        type(TestItem_t) :: individual_tests(15)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -49,6 +49,9 @@ contains
         individual_tests(14) = It( &
                 "Can filter messages based on their contents", &
                 checkFilterByContents)
+        individual_tests(15) = It( &
+                "Can tell if it has a message of a given type", &
+                checkForType)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -777,4 +780,29 @@ contains
                         size(messages.includingAllOf.[test_string1, test_string2]), &
                         'containingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
     end function checkFilterByContents
+
+    function checkForType() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info, INFO_TYPE
+        use Message_list_m, only: MessageList_t
+        use Module_m, only: Module_
+        use Procedure_m, only: Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: empty_list
+        type(MessageList_t) :: messages
+
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Test Message"))
+
+        result_ = &
+                assertNot( &
+                        empty_list.hasType.INFO_TYPE, &
+                        empty_list%repr() // ".hasType." // INFO_TYPE%repr()) &
+                .and.assertThat( &
+                        messages.hasType.INFO_TYPE, &
+                        messages%repr() // ".hasType." // INFO_TYPE%repr())
+    end function checkForType
 end module message_list_test

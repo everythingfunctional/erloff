@@ -54,7 +54,10 @@ module Message_list_m
         generic, public :: operator(.includingAnyOf.) => includingAnyOf
         procedure :: includingAllOf
         generic, public :: operator(.includingAllOf.) => includingAllOf
+        procedure :: hasType
+        generic, public :: operator(.hasType.) => hasType
         procedure, public :: toString
+        procedure, public :: repr
     end type MessageList_t
 
     interface size
@@ -486,6 +489,16 @@ contains
         end if
     end function includingAllOf
 
+    function hasType(self, type_tag)
+        use Message_m, only: MessageType_t
+
+        class(MessageList_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: hasType
+
+        hasType = size(self.ofType.type_tag) > 0
+    end function hasType
+
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
         use strff, only: join, NEWLINE
@@ -505,6 +518,27 @@ contains
             string = join(strings, NEWLINE)
         end if
     end function toString
+
+    function repr(self)
+        use iso_varying_string, only: VARYING_STRING, operator(//)
+        use strff, only: hangingIndent, indent, join, NEWLINE
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING) :: repr
+
+        integer :: i
+        type(VARYING_STRING) :: strings(self%length)
+
+        do i = 1, self%length
+            strings(i) = self%messages(i)%message%repr()
+        end do
+
+        repr = hangingIndent( &
+                "MessageList_t(" // NEWLINE &
+                    // "messages = [" // NEWLINE &
+                    // indent(join(strings, "," // NEWLINE), 4) // NEWLINE // "]", &
+                4) // NEWLINE // ")"
+    end function repr
 
     function messageListSize(self) result(length)
         class(MessageList_t), intent(in) :: self
