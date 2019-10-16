@@ -56,6 +56,10 @@ module Message_list_m
         generic, public :: operator(.includingAllOf.) => includingAllOf
         procedure :: hasType
         generic, public :: operator(.hasType.) => hasType
+        procedure :: hasAnyOriginatingFromModule
+        procedure :: hasAnyOriginatingFromProcedure
+        generic, public :: operator(.hasAnyOriginatingFrom.) => &
+                hasAnyOriginatingFromModule, hasAnyOriginatingFromProcedure
         procedure, public :: toString
         procedure, public :: repr
     end type MessageList_t
@@ -498,6 +502,26 @@ contains
 
         hasType = size(self.ofType.type_tag) > 0
     end function hasType
+
+    function hasAnyOriginatingFromModule(self, module_) result(has_any)
+        use Module_m, only: Module_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Module_t), intent(in) :: module_
+        logical :: has_any
+
+        has_any = size(self.originatingFrom.module_) > 0
+    end function hasAnyOriginatingFromModule
+
+    function hasAnyOriginatingFromProcedure(self, procedure_) result(has_any)
+        use Procedure_m, only: Procedure_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        logical :: has_any
+
+        has_any = size(self.originatingFrom.procedure_) > 0
+    end function hasAnyOriginatingFromProcedure
 
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)

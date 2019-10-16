@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(15)
+        type(TestItem_t) :: individual_tests(17)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -52,6 +52,12 @@ contains
         individual_tests(15) = It( &
                 "Can tell if it has a message of a given type", &
                 checkForType)
+        individual_tests(16) = It( &
+                "Can tell if it has a message originating from a module", &
+                checkForOriginatingModule)
+        individual_tests(17) = It( &
+                "Can tell if it has a message originating from a procedure", &
+                checkForOriginatingProcedure)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -805,4 +811,78 @@ contains
                         messages.hasType.INFO_TYPE, &
                         messages%repr() // ".hasType." // INFO_TYPE%repr())
     end function checkForType
+
+    function checkForOriginatingModule() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: empty_list
+        type(MessageList_t) :: messages
+
+        type(Module_t) :: module1
+        type(Module_t) :: module2
+        type(Procedure_t) :: procedure1
+        type(Procedure_t) :: procedure2
+
+        module1 = Module_("Some_m")
+        module2 = Module_("Another_m")
+        procedure1 = Procedure_("some")
+        procedure2 = Procedure_("another")
+
+        call messages%appendMessage(Info( &
+                module1, procedure1, "Test message"))
+        call messages%appendMessage(Info( &
+                module2, procedure2, "Another message"))
+
+        result_ = &
+                assertNot( &
+                        empty_list.hasAnyOriginatingFrom.module1, &
+                        empty_list%repr() // ".hasAnyOriginatingFrom." // module1%repr()) &
+                .and.assertThat( &
+                        messages.hasAnyOriginatingFrom.module1, &
+                        messages%repr() // ".hasAnyOriginatingFrom." // module1%repr())
+    end function checkForOriginatingModule
+
+    function checkForOriginatingProcedure() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: empty_list
+        type(MessageList_t) :: messages
+
+        type(Module_t) :: module1
+        type(Module_t) :: module2
+        type(Procedure_t) :: procedure1
+        type(Procedure_t) :: procedure2
+
+        module1 = Module_("Some_m")
+        module2 = Module_("Another_m")
+        procedure1 = Procedure_("some")
+        procedure2 = Procedure_("another")
+
+        call messages%appendMessage(Info( &
+                module1, procedure1, "Test message"))
+        call messages%appendMessage(Info( &
+                module2, procedure2, "Another message"))
+
+        result_ = &
+                assertNot( &
+                        empty_list.hasAnyOriginatingFrom.procedure1, &
+                        empty_list%repr() // ".hasAnyOriginatingFrom." // procedure1%repr()) &
+                .and.assertThat( &
+                        messages.hasAnyOriginatingFrom.procedure1, &
+                        messages%repr() // ".hasAnyOriginatingFrom." // procedure1%repr())
+    end function checkForOriginatingProcedure
 end module message_list_test
