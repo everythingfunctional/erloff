@@ -29,6 +29,15 @@ module Message_list_m
                 originatingFromModules, &
                 originatingFromProcedure, &
                 originatingFromProcedures
+        procedure :: comingThroughModule
+        procedure :: comingThroughModules
+        procedure :: comingThroughProcedure
+        procedure :: comingThroughProcedures
+        generic, public :: operator(.comingThrough.) => &
+                comingThroughModule, &
+                comingThroughModules, &
+                comingThroughProcedure, &
+                comingThroughProcedures
         procedure, public :: toString
     end type MessageList_t
 
@@ -224,6 +233,90 @@ contains
             end if
         end if
     end function originatingFromProcedures
+
+    function comingThroughModule(self, module_) result(new_list)
+        use Module_m, only: Module_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Module_t), intent(in) :: module_
+        type(MessageList_t) :: new_list
+
+        new_list = self.comingThrough.[module_]
+    end function comingThroughModule
+
+    function comingThroughModules(self, modules) result(new_list)
+        use Module_m, only: Module_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Module_t), intent(in) :: modules(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(self%length)
+        integer :: i, j
+        logical :: individual_masks(self%length, size(modules))
+        integer :: num_modules
+        integer :: num_output
+
+        if (.not. self%length == 0) then
+            num_modules = size(modules)
+            do i = 1, num_modules
+                do j = 1, self%length
+                    individual_masks(j, i) = self%messages(j)%message.cameThrough.modules(i)
+                end do
+            end do
+            do i = 1, self%length
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            num_output = count(final_mask)
+            if (num_output > 0) then
+                allocate(new_list%messages(num_output))
+                new_list%length = num_output
+                new_list%messages = pack(self%messages, mask=final_mask)
+            end if
+        end if
+    end function comingThroughModules
+
+    function comingThroughProcedure(self, procedure_) result(new_list)
+        use Procedure_m, only: Procedure_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        type(MessageList_t) :: new_list
+
+        new_list = self.comingThrough.[procedure_]
+    end function comingThroughProcedure
+
+    function comingThroughProcedures(self, procedures) result(new_list)
+        use Procedure_m, only: Procedure_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedures(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(self%length)
+        integer :: i, j
+        logical :: individual_masks(self%length, size(procedures))
+        integer :: num_output
+        integer :: num_procedures
+
+        if (.not. self%length == 0) then
+            num_procedures = size(procedures)
+            do i = 1, num_procedures
+                do j = 1, self%length
+                    individual_masks(j, i) = self%messages(j)%message.cameThrough.procedures(i)
+                end do
+            end do
+            do i = 1, self%length
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            num_output = count(final_mask)
+            if (num_output > 0) then
+                allocate(new_list%messages(num_output))
+                new_list%length = num_output
+                new_list%messages = pack(self%messages, mask=final_mask)
+            end if
+        end if
+    end function comingThroughProcedures
 
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
