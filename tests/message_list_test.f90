@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(11)
+        type(TestItem_t) :: individual_tests(13)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -40,6 +40,12 @@ contains
         individual_tests(11) = It( &
                 "Can filter messages by procedures passed through", &
                 checkFilterByProceduresThrough)
+        individual_tests(12) = It( &
+                "Can filter messages by the modules they are from", &
+                checkFilterByModulesFrom)
+        individual_tests(13) = It( &
+                "Can filter messages by the procedures they are from", &
+                checkFilterByProceduresFrom)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -513,4 +519,210 @@ contains
                         size(top_level_messages.comingThrough.[branch1_middle_procedure, branch2_middle_procedure]), &
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresThrough
+
+    function checkFilterByModulesFrom() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: branch1_bottom_messages
+        type(MessageList_t) :: branch1_middle_messages
+        type(MessageList_t) :: branch2_bottom_messages
+        type(MessageList_t) :: branch2_middle_messages
+        type(MessageList_t) :: branch3_bottom_messages
+        type(MessageList_t) :: branch3_middle_messages
+        type(MessageList_t) :: top_level_messages
+        type(Module_t) :: branch1_bottom_module
+        type(Module_t) :: branch1_middle_module
+        type(Module_t) :: branch2_bottom_module
+        type(Module_t) :: branch2_middle_module
+        type(Module_t) :: branch3_bottom_module
+        type(Module_t) :: branch3_middle_module
+        type(Module_t) :: top_level_module
+        type(Procedure_t) :: branch1_bottom_procedure
+        type(Procedure_t) :: branch1_middle_procedure
+        type(Procedure_t) :: branch2_bottom_procedure
+        type(Procedure_t) :: branch2_middle_procedure
+        type(Procedure_t) :: branch3_bottom_procedure
+        type(Procedure_t) :: branch3_middle_procedure
+        type(Procedure_t) :: top_level_procedure
+
+        branch1_bottom_module = Module_("Branch1_originating_m")
+        branch1_middle_module = Module_("Branch1_middle_m")
+        branch2_bottom_module = Module_("Branch2_originating_m")
+        branch2_middle_module = Module_("Branch2_middle_m")
+        branch3_bottom_module = Module_("Branch3_originating_m")
+        branch3_middle_module = Module_("Branch3_middle_m")
+        top_level_module = Module_("Top_level_m")
+        branch1_bottom_procedure = Procedure_("branch1Originating")
+        branch1_middle_procedure = Procedure_("branch1Middle")
+        branch2_bottom_procedure = Procedure_("branch2Originating")
+        branch2_middle_procedure = Procedure_("branch2Middle")
+        branch3_bottom_procedure = Procedure_("branch3Originating")
+        branch3_middle_procedure = Procedure_("branch3Middle")
+        top_level_procedure = Procedure_("topLevel")
+
+        call branch1_bottom_messages%appendMessage(Info( &
+                branch1_bottom_module, &
+                branch1_bottom_procedure, &
+                "message"))
+        call branch1_middle_messages%appendMessages( &
+                branch1_bottom_messages, &
+                branch1_middle_module, &
+                branch1_middle_procedure)
+        call branch2_bottom_messages%appendMessage(Info( &
+                branch2_bottom_module, &
+                branch2_bottom_procedure, &
+                "message"))
+        call branch2_middle_messages%appendMessages( &
+                branch2_bottom_messages, &
+                branch2_middle_module, &
+                branch2_middle_procedure)
+        call branch3_bottom_messages%appendMessage(Info( &
+                branch3_bottom_module, &
+                branch3_bottom_procedure, &
+                "message"))
+        call branch3_middle_messages%appendMessages( &
+                branch3_bottom_messages, &
+                branch3_middle_module, &
+                branch3_middle_procedure)
+        call top_level_messages%appendMessages( &
+                branch1_middle_messages, &
+                top_level_module, &
+                top_level_procedure)
+        call top_level_messages%appendMessages( &
+                branch2_middle_messages, &
+                top_level_module, &
+                top_level_procedure)
+        call top_level_messages%appendMessages( &
+                branch3_middle_messages, &
+                top_level_module, &
+                top_level_procedure)
+
+        result_ = &
+                assertEquals( &
+                        1, &
+                        size(top_level_messages.from.branch1_bottom_module), &
+                        branch1_bottom_module%repr()) &
+                .and.assertEquals( &
+                        1, &
+                        size(top_level_messages.from.branch1_middle_module), &
+                        branch1_middle_module%repr()) &
+                .and.assertEquals( &
+                        1, &
+                        size(top_level_messages.from.branch2_middle_module), &
+                        branch2_middle_module%repr()) &
+                .and.assertEquals( &
+                        2, &
+                        size(top_level_messages.from.[branch1_middle_module, branch2_middle_module]), &
+                        branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
+    end function checkFilterByModulesFrom
+
+    function checkFilterByProceduresFrom() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: branch1_bottom_messages
+        type(MessageList_t) :: branch1_middle_messages
+        type(MessageList_t) :: branch2_bottom_messages
+        type(MessageList_t) :: branch2_middle_messages
+        type(MessageList_t) :: branch3_bottom_messages
+        type(MessageList_t) :: branch3_middle_messages
+        type(MessageList_t) :: top_level_messages
+        type(Module_t) :: branch1_bottom_module
+        type(Module_t) :: branch1_middle_module
+        type(Module_t) :: branch2_bottom_module
+        type(Module_t) :: branch2_middle_module
+        type(Module_t) :: branch3_bottom_module
+        type(Module_t) :: branch3_middle_module
+        type(Module_t) :: top_level_module
+        type(Procedure_t) :: branch1_bottom_procedure
+        type(Procedure_t) :: branch1_middle_procedure
+        type(Procedure_t) :: branch2_bottom_procedure
+        type(Procedure_t) :: branch2_middle_procedure
+        type(Procedure_t) :: branch3_bottom_procedure
+        type(Procedure_t) :: branch3_middle_procedure
+        type(Procedure_t) :: top_level_procedure
+
+        branch1_bottom_module = Module_("Branch1_originating_m")
+        branch1_middle_module = Module_("Branch1_middle_m")
+        branch2_bottom_module = Module_("Branch2_originating_m")
+        branch2_middle_module = Module_("Branch2_middle_m")
+        branch3_bottom_module = Module_("Branch3_originating_m")
+        branch3_middle_module = Module_("Branch3_middle_m")
+        top_level_module = Module_("Top_level_m")
+        branch1_bottom_procedure = Procedure_("branch1Originating")
+        branch1_middle_procedure = Procedure_("branch1Middle")
+        branch2_bottom_procedure = Procedure_("branch2Originating")
+        branch2_middle_procedure = Procedure_("branch2Middle")
+        branch3_bottom_procedure = Procedure_("branch3Originating")
+        branch3_middle_procedure = Procedure_("branch3Middle")
+        top_level_procedure = Procedure_("topLevel")
+
+        call branch1_bottom_messages%appendMessage(Info( &
+                branch1_bottom_module, &
+                branch1_bottom_procedure, &
+                "message"))
+        call branch1_middle_messages%appendMessages( &
+                branch1_bottom_messages, &
+                branch1_middle_module, &
+                branch1_middle_procedure)
+        call branch2_bottom_messages%appendMessage(Info( &
+                branch2_bottom_module, &
+                branch2_bottom_procedure, &
+                "message"))
+        call branch2_middle_messages%appendMessages( &
+                branch2_bottom_messages, &
+                branch2_middle_module, &
+                branch2_middle_procedure)
+        call branch3_bottom_messages%appendMessage(Info( &
+                branch3_bottom_module, &
+                branch3_bottom_procedure, &
+                "message"))
+        call branch3_middle_messages%appendMessages( &
+                branch3_bottom_messages, &
+                branch3_middle_module, &
+                branch3_middle_procedure)
+        call top_level_messages%appendMessages( &
+                branch1_middle_messages, &
+                top_level_module, &
+                top_level_procedure)
+        call top_level_messages%appendMessages( &
+                branch2_middle_messages, &
+                top_level_module, &
+                top_level_procedure)
+        call top_level_messages%appendMessages( &
+                branch3_middle_messages, &
+                top_level_module, &
+                top_level_procedure)
+
+        result_ = &
+                assertEquals( &
+                        1, &
+                        size(top_level_messages.from.branch1_bottom_procedure), &
+                        branch1_bottom_procedure%repr()) &
+                .and.assertEquals( &
+                        1, &
+                        size(top_level_messages.from.branch1_middle_procedure), &
+                        branch1_middle_procedure%repr()) &
+                .and.assertEquals( &
+                        1, &
+                        size(top_level_messages.from.branch2_middle_procedure), &
+                        branch2_middle_procedure%repr()) &
+                .and.assertEquals( &
+                        2, &
+                        size(top_level_messages.from.[branch1_middle_procedure, branch2_middle_procedure]), &
+                        branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
+    end function checkFilterByProceduresFrom
 end module message_list_test
