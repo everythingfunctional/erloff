@@ -60,6 +60,10 @@ module Message_list_m
         procedure :: hasAnyOriginatingFromProcedure
         generic, public :: operator(.hasAnyOriginatingFrom.) => &
                 hasAnyOriginatingFromModule, hasAnyOriginatingFromProcedure
+        procedure :: hasAnyComingThroughModule
+        procedure :: hasAnyComingThroughProcedure
+        generic, public :: operator(.hasAnyComingThrough.) => &
+                hasAnyComingThroughModule, hasAnyComingThroughProcedure
         procedure, public :: toString
         procedure, public :: repr
     end type MessageList_t
@@ -522,6 +526,26 @@ contains
 
         has_any = size(self.originatingFrom.procedure_) > 0
     end function hasAnyOriginatingFromProcedure
+
+    function hasAnyComingThroughModule(self, module_) result(has_any)
+        use Module_m, only: Module_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Module_t), intent(in) :: module_
+        logical :: has_any
+
+        has_any = size(self.comingThrough.module_) > 0
+    end function hasAnyComingThroughModule
+
+    function hasAnyComingThroughProcedure(self, procedure_) result(has_any)
+        use Procedure_m, only: Procedure_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        logical :: has_any
+
+        has_any = size(self.comingThrough.procedure_) > 0
+    end function hasAnyComingThroughProcedure
 
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
