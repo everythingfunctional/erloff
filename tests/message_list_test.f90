@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(13)
+        type(TestItem_t) :: individual_tests(14)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -46,6 +46,9 @@ contains
         individual_tests(13) = It( &
                 "Can filter messages by the procedures they are from", &
                 checkFilterByProceduresFrom)
+        individual_tests(14) = It( &
+                "Can filter messages based on their contents", &
+                checkFilterByContents)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -725,4 +728,53 @@ contains
                         size(top_level_messages.from.[branch1_middle_procedure, branch2_middle_procedure]), &
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresFrom
+
+    function checkFilterByContents() result(result_)
+        use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_
+        use Procedure_m, only: Procedure_
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+        type(VARYING_STRING) :: test_string1
+        type(VARYING_STRING) :: test_string2
+
+        test_string1 = "Hello"
+        test_string2 = "Test"
+
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Hello Test"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Goodbye Test"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Example Message"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Simple Message"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Test Message"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Hello Message"))
+
+        result_ = &
+                assertEquals( &
+                        2, &
+                        size(messages.including."Hello"), &
+                        'containing "Hello"') &
+                .and.assertEquals( &
+                        3, &
+                        size(messages.including.test_string2), &
+                        'containing "' // test_string2 // '"') &
+                .and.assertEquals( &
+                        4, &
+                        size(messages.includingAnyOf.[test_string1, test_string2]), &
+                        'containingAnyOf "' // test_string1 // '" or "' // test_string2 // '"') &
+                .and.assertEquals( &
+                        1, &
+                        size(messages.includingAllOf.[test_string1, test_string2]), &
+                        'containingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
+    end function checkFilterByContents
 end module message_list_test

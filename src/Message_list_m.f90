@@ -47,6 +47,13 @@ module Message_list_m
                 fromModules, &
                 fromProcedure, &
                 fromProcedures
+        procedure :: includingC
+        procedure :: includingS
+        generic, public :: operator(.including.) => includingC, includingS
+        procedure :: includingAnyOf
+        generic, public :: operator(.includingAnyOf.) => includingAnyOf
+        procedure :: includingAllOf
+        generic, public :: operator(.includingAllOf.) => includingAllOf
         procedure, public :: toString
     end type MessageList_t
 
@@ -410,6 +417,74 @@ contains
             end if
         end if
     end function fromProcedures
+
+    function includingC(self, string) result(new_list)
+        use iso_varying_string, only: var_str
+
+        class(MessageList_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        type(MessageList_t) :: new_list
+
+        new_list = self.including.var_str(string)
+    end function includingC
+
+    function includingS(self, string) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: string
+        type(MessageList_t) :: new_list
+
+        new_list = self.includingAnyOf.[string]
+    end function includingS
+
+    function includingAnyOf(self, strings) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: strings(:)
+        type(MessageList_t) :: new_list
+
+        integer :: i
+        logical :: mask(self%length)
+        integer :: num_output
+
+        if (.not. self%length == 0) then
+            do i = 1, self%length
+                mask(i) = self%messages(i)%message.includesAnyOf.strings
+            end do
+            num_output = count(mask)
+            if (num_output > 0) then
+                allocate(new_list%messages(num_output))
+                new_list%messages = pack(self%messages, mask = mask)
+                new_list%length = num_output
+            end if
+        end if
+    end function includingAnyOf
+
+    function includingAllOf(self, strings) result(new_list)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: strings(:)
+        type(MessageList_t) :: new_list
+
+        integer :: i
+        logical :: mask(self%length)
+        integer :: num_output
+
+        if (.not. self%length == 0) then
+            do i = 1, self%length
+                mask(i) = self%messages(i)%message.includesAllOf.strings
+            end do
+            num_output = count(mask)
+            if (num_output > 0) then
+                allocate(new_list%messages(num_output))
+                new_list%messages = pack(self%messages, mask = mask)
+                new_list%length = num_output
+            end if
+        end if
+    end function includingAllOf
 
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
