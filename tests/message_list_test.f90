@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(21)
+        type(TestItem_t) :: individual_tests(22)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -70,6 +70,9 @@ contains
         individual_tests(21) = It( &
                 "Can tell if it has a message comming from a procedure", &
                 checkForFromProcedure)
+        individual_tests(22) = It( &
+                "Can tell if it has a message with some contents", &
+                checkForContents)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -784,19 +787,19 @@ contains
                 assertEquals( &
                         2, &
                         size(messages.including."Hello"), &
-                        'containing "Hello"') &
+                        'including "Hello"') &
                 .and.assertEquals( &
                         3, &
                         size(messages.including.test_string2), &
-                        'containing "' // test_string2 // '"') &
+                        'including "' // test_string2 // '"') &
                 .and.assertEquals( &
                         4, &
                         size(messages.includingAnyOf.[test_string1, test_string2]), &
-                        'containingAnyOf "' // test_string1 // '" or "' // test_string2 // '"') &
+                        'includingAnyOf "' // test_string1 // '" or "' // test_string2 // '"') &
                 .and.assertEquals( &
                         1, &
                         size(messages.includingAllOf.[test_string1, test_string2]), &
-                        'containingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
+                        'includingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
     end function checkFilterByContents
 
     function checkForType() result(result_)
@@ -1269,4 +1272,51 @@ contains
                         top_level_messages.hasAnyFrom.branch1_bottom_procedure, &
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_bottom_procedure%repr())
     end function checkForFromProcedure
+
+    function checkForContents() result(result_)
+        use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_
+        use Procedure_m, only: Procedure_
+        use Vegetables_m, only: Result_t, assertNot, assertThat
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+        type(VARYING_STRING) :: test_string1
+        type(VARYING_STRING) :: test_string2
+        type(VARYING_STRING) :: test_string3
+
+        test_string1 = "Hello"
+        test_string2 = "Test"
+        test_string3 = "Other"
+
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Hello Test"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Goodbye Test"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Example Message"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Simple Message"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Test Message"))
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), Procedure_("some"), "Hello Message"))
+
+        result_ = &
+                assertThat( &
+                        messages.hasAnyIncluding."Hello", &
+                        messages%repr() // '.hasAnyIncluding."Hello"') &
+                .and.assertNot( &
+                        messages.hasAnyIncluding.test_string3, &
+                        messages%repr() // '.hasAnyIncluding."' // test_string3 // '"') &
+                .and.assertThat( &
+                        messages.hasAnyIncludingAnyOf.[test_string1, test_string2], &
+                        messages%repr() // '.hasAnyIncludingAnyOf."' // test_string1 // '" or "' // test_string2 // '"') &
+                .and.assertThat( &
+                        messages.hasAnyIncludingAllOf.[test_string1, test_string2], &
+                        messages%repr() // '.hasAnyIncludingAllOf."' // test_string1 // '" or "' // test_string2 // '"')
+    end function checkForContents
 end module message_list_test

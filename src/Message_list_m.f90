@@ -68,6 +68,16 @@ module Message_list_m
         procedure :: hasAnyFromProcedure
         generic, public :: operator(.hasAnyFrom.) => &
                 hasAnyFromModule, hasAnyFromProcedure
+        procedure :: hasAnyIncludingC
+        procedure :: hasAnyIncludingS
+        generic, public :: operator(.hasAnyIncluding.) => &
+                hasAnyIncludingC, hasAnyIncludingS
+        procedure :: hasAnyIncludingAnyOf
+        generic, public :: operator(.hasAnyIncludingAnyOf.) => &
+                hasAnyIncludingAnyOf
+        procedure :: hasAnyIncludingAllOf
+        generic, public :: operator(.hasAnyIncludingAllOf.) => &
+                hasAnyIncludingAllOf
         procedure, public :: toString
         procedure, public :: repr
     end type MessageList_t
@@ -570,6 +580,44 @@ contains
 
         has_any = size(self.from.procedure_) > 0
     end function hasAnyFromProcedure
+
+    function hasAnyIncludingC(self, string) result(has_any)
+        class(MessageList_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        logical :: has_any
+
+        has_any = size(self.including.string) > 0
+    end function hasAnyIncludingC
+
+    function hasAnyIncludingS(self, string) result(has_any)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: string
+        logical :: has_any
+
+        has_any = size(self.including.string) > 0
+    end function hasAnyIncludingS
+
+    function hasAnyIncludingAnyOf(self, strings) result(has_any)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: strings(:)
+        logical :: has_any
+
+        has_any = size(self.includingAnyOf.strings) > 0
+    end function hasAnyIncludingAnyOf
+
+    function hasAnyIncludingAllOf(self, strings) result(has_any)
+        use iso_varying_string, only: VARYING_STRING
+
+        class(MessageList_t), intent(in) :: self
+        type(VARYING_STRING), intent(in) :: strings(:)
+        logical :: has_any
+
+        has_any = size(self.includingAllOf.strings) > 0
+    end function hasAnyIncludingAllOf
 
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)
