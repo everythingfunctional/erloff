@@ -20,6 +20,15 @@ module Message_list_m
         generic, public :: operator(.ofType.) => ofType
         procedure :: ofTypes
         generic, public :: operator(.ofTypes.) => ofTypes
+        procedure :: originatingFromModule
+        procedure :: originatingFromModules
+        procedure :: originatingFromProcedure
+        procedure :: originatingFromProcedures
+        generic, public :: operator(.originatingFrom.) => &
+                originatingFromModule, &
+                originatingFromModules, &
+                originatingFromProcedure, &
+                originatingFromProcedures
         procedure, public :: toString
     end type MessageList_t
 
@@ -131,6 +140,90 @@ contains
             end if
         end if
     end function ofTypes
+
+    function originatingFromModule(self, module_) result(new_list)
+        use Module_m, only: Module_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Module_t), intent(in) :: module_
+        type(MessageList_t) :: new_list
+
+        new_list = self.originatingFrom.[module_]
+    end function originatingFromModule
+
+    function originatingFromModules(self, modules) result(new_list)
+        use Module_m, only: Module_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Module_t), intent(in) :: modules(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(self%length)
+        integer :: i, j
+        logical :: individual_masks(self%length, size(modules))
+        integer :: num_modules
+        integer :: num_output
+
+        if (.not. self%length == 0) then
+            num_modules = size(modules)
+            do i = 1, num_modules
+                do j = 1, self%length
+                    individual_masks(j, i) = self%messages(j)%message.originatedFrom.modules(i)
+                end do
+            end do
+            do i = 1, self%length
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            num_output = count(final_mask)
+            if (num_output > 0) then
+                allocate(new_list%messages(num_output))
+                new_list%length = num_output
+                new_list%messages = pack(self%messages, mask=final_mask)
+            end if
+        end if
+    end function originatingFromModules
+
+    function originatingFromProcedure(self, procedure_) result(new_list)
+        use Procedure_m, only: Procedure_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedure_
+        type(MessageList_t) :: new_list
+
+        new_list = self.originatingFrom.[procedure_]
+    end function originatingFromProcedure
+
+    function originatingFromProcedures(self, procedures) result(new_list)
+        use Procedure_m, only: Procedure_t
+
+        class(MessageList_t), intent(in) :: self
+        type(Procedure_t), intent(in) :: procedures(:)
+        type(MessageList_t) :: new_list
+
+        logical :: final_mask(self%length)
+        integer :: i, j
+        logical :: individual_masks(self%length, size(procedures))
+        integer :: num_output
+        integer :: num_procedures
+
+        if (.not. self%length == 0) then
+            num_procedures = size(procedures)
+            do i = 1, num_procedures
+                do j = 1, self%length
+                    individual_masks(j, i) = self%messages(j)%message.originatedFrom.procedures(i)
+                end do
+            end do
+            do i = 1, self%length
+                final_mask(i) = any(individual_masks(i, :))
+            end do
+            num_output = count(final_mask)
+            if (num_output > 0) then
+                allocate(new_list%messages(num_output))
+                new_list%length = num_output
+                new_list%messages = pack(self%messages, mask=final_mask)
+            end if
+        end if
+    end function originatingFromProcedures
 
     function toString(self) result(string)
         use iso_varying_string, only: VARYING_STRING, assignment(=)

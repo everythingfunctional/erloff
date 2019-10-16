@@ -9,7 +9,7 @@ contains
 
         type(TestItem_t) :: tests
 
-        type(TestItem_t) :: individual_tests(7)
+        type(TestItem_t) :: individual_tests(9)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -28,6 +28,12 @@ contains
                 "Can combine two lists", checkCombine)
         individual_tests(7) = It( &
                 "Can filter messages by type", checkFilterByType)
+        individual_tests(8) = It( &
+                "Can filter messages by the originating module", &
+                checkFilterByOriginatingModule)
+        individual_tests(9) = It( &
+                "Can filter messages by the originating procedure", &
+                checkFilterByOriginatingProcedure)
         tests = Describe("MessageList_t", individual_tests)
     end function test_message_list
 
@@ -201,4 +207,86 @@ contains
                         size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
                         "INFO or WARNING")
     end function checkFilterByType
+
+    function checkFilterByOriginatingModule() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_t, Module_
+        use Procedure_m, only: Procedure_
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+        type(Module_t) :: module1
+        type(Module_t) :: module2
+        type(Module_t) :: module3
+
+        module1 = Module_("Some_m")
+        module2 = Module_("Another_m")
+        module3 = Module_("Yet_another_m")
+
+        call messages%appendMessage(Info( &
+                module1, Procedure_("some"), "Test message"))
+        call messages%appendMessage(Info( &
+                module2, Procedure_("another"), "Another message"))
+        call messages%appendMessage(Info( &
+                module3, Procedure_("yetAnother"), "Yet another message"))
+
+        result_ = &
+                assertEquals( &
+                        1, &
+                        size(messages.originatingFrom.module1), &
+                        module1%repr()) &
+                .and.assertEquals( &
+                        1, &
+                        size(messages.originatingFrom.module2), &
+                        module2%repr()) &
+                .and.assertEquals( &
+                        2, &
+                        size(messages.originatingFrom.[module1, module2]), &
+                        module1%repr() // " or " // module2%repr())
+    end function checkFilterByOriginatingModule
+
+    function checkFilterByOriginatingProcedure() result(result_)
+        use iso_varying_string, only: operator(//)
+        use Message_m, only: Info
+        use Message_list_m, only: MessageList_t, size
+        use Module_m, only: Module_
+        use Procedure_m, only: Procedure_t, Procedure_
+        use Vegetables_m, only: Result_t, assertEquals
+
+        type(Result_t) :: result_
+
+        type(MessageList_t) :: messages
+        type(Procedure_t) :: procedure1
+        type(Procedure_t) :: procedure2
+        type(Procedure_t) :: procedure3
+
+        procedure1 = Procedure_("some")
+        procedure2 = Procedure_("another")
+        procedure3 = Procedure_("yetAnother")
+
+        call messages%appendMessage(Info( &
+                Module_("Some_m"), procedure1, "Test message"))
+        call messages%appendMessage(Info( &
+                Module_("Another_m"), procedure2, "Another message"))
+        call messages%appendMessage(Info( &
+                Module_("Yet_another_m"), procedure3, "Yet another message"))
+
+        result_ = &
+                assertEquals( &
+                        1, &
+                        size(messages.originatingFrom.procedure1), &
+                        procedure1%repr()) &
+                .and.assertEquals( &
+                        1, &
+                        size(messages.originatingFrom.procedure2), &
+                        procedure2%repr()) &
+                .and.assertEquals( &
+                        2, &
+                        size(messages.originatingFrom.[procedure1, procedure2]), &
+                        procedure1%repr() // " or " // procedure2%repr())
+    end function checkFilterByOriginatingProcedure
 end module message_list_test
