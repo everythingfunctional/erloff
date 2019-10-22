@@ -54,6 +54,7 @@ module Error_list_m
         generic, public :: operator(.includingAnyOf.) => includingAnyOf
         procedure :: includingAllOf
         generic, public :: operator(.includingAllOf.) => includingAllOf
+        procedure, public :: hasAny
         procedure :: hasType
         generic, public :: operator(.hasType.) => hasType
         procedure :: hasAnyOriginatingFromModule
@@ -510,6 +511,13 @@ contains
             end if
         end if
     end function includingAllOf
+
+    function hasAny(self)
+        class(ErrorList_t), intent(in) :: self
+        logical :: hasAny
+
+        hasAny = size(self) > 0
+    end function hasAny
 
     function hasType(self, type_tag)
         use Message_m, only: MessageType_t
