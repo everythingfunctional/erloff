@@ -29,6 +29,7 @@ module erloff
             FATAL_TYPE, &
             INTERNAL_TYPE, &
             INPUTS_TYPE, &
+            NOT_FOUND_TYPE, &
             OUTPUTS_TYPE, &
             OUTSIDE_NORMAL_RANGE_TYPE, &
             UNEQUAL_ARRAY_SIZES_TYPE, &
