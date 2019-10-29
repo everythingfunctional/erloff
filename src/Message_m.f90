@@ -164,6 +164,8 @@ module Message_m
             "Inputs")
     type(MessageType_t), parameter, public :: NOT_FOUND_TYPE = MessageType_t( &
             "Not Found")
+    type(MessageType_t), parameter, public :: OUT_OF_BOUNDS_TYPE = MessageType_t( &
+            "Out of Bounds")
     type(MessageType_t), parameter, public :: OUTPUTS_TYPE = MessageType_t( &
             "Outputs")
     type(MessageType_t), parameter, public :: OUTSIDE_NORMAL_RANGE_TYPE = &

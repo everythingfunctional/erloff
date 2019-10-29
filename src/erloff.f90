@@ -30,6 +30,7 @@ module erloff
             INTERNAL_TYPE, &
             INPUTS_TYPE, &
             NOT_FOUND_TYPE, &
+            OUT_OF_BOUNDS_TYPE, &
             OUTPUTS_TYPE, &
             OUTSIDE_NORMAL_RANGE_TYPE, &
             UNEQUAL_ARRAY_SIZES_TYPE, &
