@@ -2,6 +2,7 @@ module erloff
     use Error_list_m, only: ErrorList_t, size
     use Message_m, only: &
             ! Types
+            MessageType_t, &
             Message_t, &
             Debug_t, &
             Info_t, &

@@ -162,6 +162,8 @@ module Message_m
             INTERNAL_TYPE_STRING)
     type(MessageType_t), parameter, public :: INPUTS_TYPE = MessageType_t( &
             "Inputs")
+    type(MessageType_t), parameter, public :: NOT_FOUND_TYPE = MessageType_t( &
+            "Not Found")
     type(MessageType_t), parameter, public :: OUTPUTS_TYPE = MessageType_t( &
             "Outputs")
     type(MessageType_t), parameter, public :: OUTSIDE_NORMAL_RANGE_TYPE = &
