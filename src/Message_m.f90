@@ -1,6 +1,10 @@
 module Message_m
-    use Call_stack_m, only: CallStack_t
-    use iso_varying_string, only: VARYING_STRING
+    use Call_stack_m, only: CallStack_t, CallStack
+    use iso_varying_string, only: &
+            VARYING_STRING, assignment(=), operator(//), var_str
+    use Module_m, only: Module_t
+    use Procedure_m, only: Procedure_t
+    use strff, only: operator(.includes.), hangingIndent, toString, NEWLINE
 
     implicit none
     private
@@ -99,8 +103,7 @@ module Message_m
 
     abstract interface
         function messageToString_(self) result(string)
-            use iso_varying_string, only: VARYING_STRING
-            import Message_t
+            import Message_t, VARYING_STRING
             class(Message_t), intent(in) :: self
             type(VARYING_STRING) :: string
         end function messageToString_
@@ -183,10 +186,6 @@ module Message_m
     public :: Debug, Info, Warning, Fatal, Internal
 contains
     function genericDebugC(module_, procedure_, level, message) result(debug_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(DebugLevel_t), intent(in) :: level
@@ -197,10 +196,6 @@ contains
     end function genericDebugC
 
     function genericDebugS(module_, procedure_, level, message) result(debug_)
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(DebugLevel_t), intent(in) :: level
@@ -212,10 +207,6 @@ contains
 
     function debugWithTypeC( &
             type_tag, module_, procedure_, level, message) result(debug_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -228,11 +219,6 @@ contains
 
     function debugWithTypeS( &
             type_tag, module_, procedure_, level, message) result(debug_)
-        use Call_stack_m, only: CallStack
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -247,10 +233,6 @@ contains
     end function debugWithTypeS
 
     function genericInfoC(module_, procedure_, message) result(info_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -260,10 +242,6 @@ contains
     end function genericInfoC
 
     function genericInfoS(module_, procedure_, message) result(info_)
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -273,10 +251,6 @@ contains
     end function genericInfoS
 
     function infoWithTypeC(type_tag, module_, procedure_, message) result(info_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -287,11 +261,6 @@ contains
     end function infoWithTypeC
 
     function infoWithTypeS(type_tag, module_, procedure_, message) result(info_)
-        use Call_stack_m, only: CallStack
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -304,10 +273,6 @@ contains
     end function infoWithTypeS
 
     function genericWarningC(module_, procedure_, message) result(warning_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -317,10 +282,6 @@ contains
     end function genericWarningC
 
     function genericWarningS(module_, procedure_, message) result(warning_)
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -330,10 +291,6 @@ contains
     end function genericWarningS
 
     function warningWithTypeC(type_tag, module_, procedure_, message) result(warning_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -344,11 +301,6 @@ contains
     end function warningWithTypeC
 
     function warningWithTypeS(type_tag, module_, procedure_, message) result(warning_)
-        use Call_stack_m, only: CallStack
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -361,10 +313,6 @@ contains
     end function warningWithTypeS
 
     function genericFatalC(module_, procedure_, message) result(fatal_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -374,10 +322,6 @@ contains
     end function genericFatalC
 
     function genericFatalS(module_, procedure_, message) result(fatal_)
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -387,10 +331,6 @@ contains
     end function genericFatalS
 
     function fatalWithTypeC(type_tag, module_, procedure_, message) result(fatal_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -401,11 +341,6 @@ contains
     end function fatalWithTypeC
 
     function fatalWithTypeS(type_tag, module_, procedure_, message) result(fatal_)
-        use Call_stack_m, only: CallStack
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -418,10 +353,6 @@ contains
     end function fatalWithTypeS
 
     function genericInternalC(module_, procedure_, message) result(internal_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -431,10 +362,6 @@ contains
     end function genericInternalC
 
     function genericInternalS(module_, procedure_, message) result(internal_)
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -444,10 +371,6 @@ contains
     end function genericInternalS
 
     function internalWithTypeC(type_tag, module_, procedure_, message) result(internal_)
-        use iso_varying_string, only: var_str
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -458,11 +381,6 @@ contains
     end function internalWithTypeC
 
     function internalWithTypeS(type_tag, module_, procedure_, message) result(internal_)
-        use Call_stack_m, only: CallStack
-        use iso_varying_string, only: VARYING_STRING
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -475,8 +393,6 @@ contains
     end function internalWithTypeS
 
     function messageTypeToString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(MessageType_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -495,8 +411,6 @@ contains
     end function messageTypeToString
 
     function messageTypeRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(MessageType_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -504,9 +418,6 @@ contains
     end function messageTypeRepr
 
     subroutine prependNames(self, module_, procedure_)
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         class(Message_t), intent(inout) :: self
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -515,9 +426,6 @@ contains
     end subroutine prependNames
 
     function messageToString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-        use strff, only: hangingIndent, NEWLINE
-
         class(Message_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -582,8 +490,6 @@ contains
     end function isType
 
     function originatedFromModule(self, module_) result(originated_from)
-        use Module_m, only: Module_t
-
         class(Message_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: originated_from
@@ -592,8 +498,6 @@ contains
     end function originatedFromModule
 
     function originatedFromProcedure(self, procedure_) result(originated_from)
-        use Procedure_m, only: Procedure_t
-
         class(Message_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: originated_from
@@ -602,8 +506,6 @@ contains
     end function originatedFromProcedure
 
     function isFromModule(self, module_) result(is_from)
-        use Module_m, only: Module_t
-
         class(Message_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: is_from
@@ -612,8 +514,6 @@ contains
     end function isFromModule
 
     function isFromProcedure(self, procedure_) result(is_from)
-        use Procedure_m, only: Procedure_t
-
         class(Message_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: is_from
@@ -622,8 +522,6 @@ contains
     end function isFromProcedure
 
     function cameThroughModule(self, module_) result(came_through)
-        use Module_m, only: Module_t
-
         class(Message_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: came_through
@@ -634,8 +532,6 @@ contains
     end function cameThroughModule
 
     function cameThroughProcedure(self, procedure_) result(came_through)
-        use Procedure_m, only: Procedure_t
-
         class(Message_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: came_through
@@ -646,8 +542,6 @@ contains
     end function cameThroughProcedure
 
     function includesC(self, string) result(includes)
-        use iso_varying_string, only: var_str
-
         class(Message_t), intent(in) :: self
         character(len=*), intent(in) :: string
         logical :: includes
@@ -656,9 +550,6 @@ contains
     end function includesC
 
     function includesS(self, string) result(includes)
-        use iso_varying_string, only: VARYING_STRING
-        use strff, only: operator(.includes.)
-
         class(Message_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: string
         logical :: includes
@@ -667,8 +558,6 @@ contains
     end function includesS
 
     function includesAnyOf(self, strings) result(includes)
-        use iso_varying_string, only: VARYING_STRING
-
         class(Message_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: includes
@@ -683,8 +572,6 @@ contains
     end function includesAnyOf
 
     function includesAllOf(self, strings) result(includes)
-        use iso_varying_string, only: VARYING_STRING
-
         class(Message_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: includes
@@ -699,9 +586,6 @@ contains
     end function includesAllOf
 
     function messageRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-        use strff, only: hangingIndent, NEWLINE
-
         class(Message_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -715,9 +599,6 @@ contains
     end function messageRepr
 
     function debugLevelToString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING
-        use strff, only: toString
-
         class(DebugLevel_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -725,8 +606,6 @@ contains
     end function debugLevelToString
 
     function debugTypeString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-
         class(Debug_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -734,8 +613,6 @@ contains
     end function debugTypeString
 
     function debugTypeRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-
         class(Debug_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -743,8 +620,6 @@ contains
     end function debugTypeRepr
 
     function infoTypeString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Info_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -755,8 +630,6 @@ contains
     end function infoTypeString
 
     function infoTypeRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Info_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -767,8 +640,6 @@ contains
     end function infoTypeRepr
 
     function warningTypeString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Warning_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -779,8 +650,6 @@ contains
     end function warningTypeString
 
     function warningTypeRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Warning_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -791,8 +660,6 @@ contains
     end function warningTypeRepr
 
     function fatalTypeString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Fatal_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -803,8 +670,6 @@ contains
     end function fatalTypeString
 
     function fatalTypeRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Fatal_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -815,8 +680,6 @@ contains
     end function fatalTypeRepr
 
     function internalTypeString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Internal_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -827,8 +690,6 @@ contains
     end function internalTypeString
 
     function internalTypeRepr(self) result(repr)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-
         class(Internal_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

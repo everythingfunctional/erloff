@@ -1,5 +1,6 @@
 module Procedure_m
-    use iso_varying_string, only: VARYING_STRING
+    use iso_varying_string, only: &
+            VARYING_STRING, operator(//), operator(==), var_str
 
     implicit none
     private
@@ -23,8 +24,6 @@ module Procedure_m
     public :: Procedure_
 contains
     function ProcedureC(name)
-        use iso_varying_string, only: var_str
-
         character(len=*), intent(in) :: name
         type(Procedure_t) :: ProcedureC
 
@@ -32,8 +31,6 @@ contains
     end function ProcedureC
 
     function ProcedureS(name)
-        use iso_varying_string, only: VARYING_STRING
-
         type(VARYING_STRING), intent(in) :: name
         type(Procedure_t) :: ProcedureS
 
@@ -41,8 +38,6 @@ contains
     end function ProcedureS
 
     function procedureEquals(lhs, rhs)
-        use iso_varying_string, only: operator(==)
-
         class(Procedure_t), intent(in) :: lhs
         type(Procedure_t), intent(in) :: rhs
         logical :: procedureEquals
@@ -51,8 +46,6 @@ contains
     end function procedureEquals
 
     function toString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING
-
         class(Procedure_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -60,8 +53,6 @@ contains
     end function toString
 
     function repr(self)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-
         class(Procedure_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

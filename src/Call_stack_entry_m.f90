@@ -1,6 +1,8 @@
 module Call_stack_entry_m
+    use iso_varying_string, only: VARYING_STRING, operator(//)
     use Module_m, only: Module_t
     use Procedure_m, only: Procedure_t
+    use strff, only: hangingIndent, indent, NEWLINE
 
     implicit none
     private
@@ -22,9 +24,6 @@ module Call_stack_entry_m
     public :: CallStackEntry
 contains
     function CallStackEntry(module_, procedure_) result(entry_)
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(CallStackEntry_t) :: entry_
@@ -34,8 +33,6 @@ contains
     end function CallStackEntry
 
     function toString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-
         class(CallStackEntry_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -43,8 +40,6 @@ contains
     end function toString
 
     function isFromModule(self, module_)
-        use Module_m, only: Module_t
-
         class(CallStackEntry_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: isFromModule
@@ -53,8 +48,6 @@ contains
     end function isFromModule
 
     function isFromProcedure(self, procedure_)
-        use Procedure_m, only: Procedure_t
-
         class(CallStackEntry_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: isFromProcedure
@@ -63,9 +56,6 @@ contains
     end function isFromProcedure
 
     function repr(self)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-        use strff, only: hangingIndent, indent, NEWLINE
-
         class(CallStackEntry_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

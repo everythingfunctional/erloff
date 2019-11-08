@@ -1,5 +1,9 @@
 module Call_stack_m
-    use Call_stack_entry_m, only: CallStackEntry_t
+    use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
+    use iso_varying_string, only: VARYING_STRING, operator(//)
+    use Module_m, only: Module_t
+    use Procedure_m, only: Procedure_t
+    use strff, only: hangingIndent, indent, join, NEWLINE
 
     implicit none
     private
@@ -25,10 +29,6 @@ module Call_stack_m
     public :: CallStack
 contains
     function CallStack(module_, procedure_)
-        use Call_stack_entry_m, only: CallStackEntry
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(CallStack_t) :: CallStack
@@ -38,10 +38,6 @@ contains
     end function CallStack
 
     subroutine prependNames(self, module_, procedure_)
-        use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         class(CallStack_t), intent(inout) :: self
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -56,9 +52,6 @@ contains
     end subroutine prependNames
 
     function toString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING
-        use strff, only: join
-
         class(CallStack_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -72,8 +65,6 @@ contains
     end function toString
 
     function originatedFromModule(self, module_)
-        use Module_m, only: Module_t
-
         class(CallStack_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: originatedFromModule
@@ -82,8 +73,6 @@ contains
     end function originatedFromModule
 
     function originatedFromProcedure(self, procedure_)
-        use Procedure_m, only: Procedure_t
-
         class(CallStack_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: originatedFromProcedure
@@ -92,8 +81,6 @@ contains
     end function originatedFromProcedure
 
     function includesModule(self, module_)
-        use Module_m, only: Module_t
-
         class(CallStack_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: includesModule
@@ -108,8 +95,6 @@ contains
     end function includesModule
 
     function includesProcedure(self, procedure_)
-        use Procedure_m, only: Procedure_t
-
         class(CallStack_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: includesProcedure
@@ -124,9 +109,6 @@ contains
     end function includesProcedure
 
     function repr(self)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-        use strff, only: hangingIndent, indent, join, NEWLINE
-
         class(CallStack_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

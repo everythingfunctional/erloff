@@ -1,12 +1,23 @@
 module call_stack_entry_test
+    use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
+    use iso_varying_string, only: operator(//)
+    use Module_m, only: Module_t, Module_
+    use Procedure_m, only: Procedure_t, Procedure_
+    use Vegetables_m, only: &
+            Result_t, &
+            TestItem_t, &
+            assertIncludes, &
+            assertNot, &
+            assertThat, &
+            Describe, &
+            It
+
     implicit none
     private
 
     public :: test_call_stack_entry
 contains
     function test_call_stack_entry() result(tests)
-        use Vegetables_m, only: TestItem_t, Describe, It
-
         type(TestItem_t) :: tests
 
         type(TestItem_t) :: individual_tests(3)
@@ -22,12 +33,6 @@ contains
     end function test_call_stack_entry
 
     function checkIsFromModule() result(result_)
-        use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_
@@ -50,12 +55,6 @@ contains
     end function checkIsFromModule
 
     function checkIsFromProcedure() result(result_)
-        use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_
@@ -79,12 +78,6 @@ contains
     end function checkIsFromProcedure
 
     function checkStringIncludes() result(result_)
-        use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertIncludes
-
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_

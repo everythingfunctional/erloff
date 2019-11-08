@@ -1,5 +1,6 @@
 module Module_m
-    use iso_varying_string, only: VARYING_STRING
+    use iso_varying_string, only: &
+            VARYING_STRING, operator(//), operator(==), var_str
 
     implicit none
     private
@@ -23,8 +24,6 @@ module Module_m
     public :: Module_
 contains
     function ModuleC(name)
-        use iso_varying_string, only: var_str
-
         character(len=*), intent(in) :: name
         type(Module_t) :: ModuleC
 
@@ -32,8 +31,6 @@ contains
     end function ModuleC
 
     function ModuleS(name)
-        use iso_varying_string, only: VARYING_STRING
-
         type(VARYING_STRING), intent(in) :: name
         type(Module_t) :: ModuleS
 
@@ -41,8 +38,6 @@ contains
     end function ModuleS
 
     function moduleEquals(lhs, rhs)
-        use iso_varying_string, only: operator(==)
-
         class(Module_t), intent(in) :: lhs
         type(Module_t), intent(in) :: rhs
         logical :: moduleEquals
@@ -51,8 +46,6 @@ contains
     end function moduleEquals
 
     function toString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING
-
         class(Module_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -60,8 +53,6 @@ contains
     end function toString
 
     function repr(self)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-
         class(Module_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

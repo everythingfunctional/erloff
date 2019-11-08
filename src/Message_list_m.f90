@@ -1,5 +1,10 @@
 module Message_list_m
-    use Message_m, only: Message_t
+    use iso_varying_string, only: &
+            VARYING_STRING, assignment(=), operator(//), var_str
+    use Message_m, only: Message_t, MessageType_t
+    use Module_m, only: Module_t
+    use Procedure_m, only: Procedure_t
+    use strff, only: hangingIndent, indent, join, NEWLINE
 
     implicit none
     private
@@ -89,8 +94,6 @@ module Message_list_m
     public :: size
 contains
     subroutine appendMessage(self, message)
-        use Message_m, only: Message_t
-
         class(MessageList_t), intent(inout) :: self
         class(Message_t), intent(in) :: message
 
@@ -111,9 +114,6 @@ contains
     end subroutine appendMessage
 
     subroutine appendMessages(self, messages, module_, procedure_)
-        use Module_m, only: Module_t
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(inout) :: self
         type(MessageList_t), intent(in) :: messages
         type(Module_t), intent(in) :: module_
@@ -150,8 +150,6 @@ contains
     end subroutine appendMessages
 
     function ofType(self, type_tag) result(new_list)
-        use Message_m, only: MessageType_t
-
         class(MessageList_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tag
         type(MessageList_t) :: new_list
@@ -160,8 +158,6 @@ contains
     end function ofType
 
     function ofTypes(self, type_tags) result(new_list)
-        use Message_m, only: MessageType_t
-
         class(MessageList_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tags(:)
         type(MessageList_t) :: new_list
@@ -192,8 +188,6 @@ contains
     end function ofTypes
 
     function originatingFromModule(self, module_) result(new_list)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         type(MessageList_t) :: new_list
@@ -202,8 +196,6 @@ contains
     end function originatingFromModule
 
     function originatingFromModules(self, modules) result(new_list)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
@@ -234,8 +226,6 @@ contains
     end function originatingFromModules
 
     function originatingFromProcedure(self, procedure_) result(new_list)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         type(MessageList_t) :: new_list
@@ -244,8 +234,6 @@ contains
     end function originatingFromProcedure
 
     function originatingFromProcedures(self, procedures) result(new_list)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
@@ -276,8 +264,6 @@ contains
     end function originatingFromProcedures
 
     function comingThroughModule(self, module_) result(new_list)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         type(MessageList_t) :: new_list
@@ -286,8 +272,6 @@ contains
     end function comingThroughModule
 
     function comingThroughModules(self, modules) result(new_list)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
@@ -318,8 +302,6 @@ contains
     end function comingThroughModules
 
     function comingThroughProcedure(self, procedure_) result(new_list)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         type(MessageList_t) :: new_list
@@ -328,8 +310,6 @@ contains
     end function comingThroughProcedure
 
     function comingThroughProcedures(self, procedures) result(new_list)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
@@ -360,8 +340,6 @@ contains
     end function comingThroughProcedures
 
     function fromModule(self, module_) result(new_list)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         type(MessageList_t) :: new_list
@@ -370,8 +348,6 @@ contains
     end function fromModule
 
     function fromModules(self, modules) result(new_list)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
@@ -402,8 +378,6 @@ contains
     end function fromModules
 
     function fromProcedure(self, procedure_) result(new_list)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         type(MessageList_t) :: new_list
@@ -412,8 +386,6 @@ contains
     end function fromProcedure
 
     function fromProcedures(self, procedures) result(new_list)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
@@ -444,8 +416,6 @@ contains
     end function fromProcedures
 
     function includingC(self, string) result(new_list)
-        use iso_varying_string, only: var_str
-
         class(MessageList_t), intent(in) :: self
         character(len=*), intent(in) :: string
         type(MessageList_t) :: new_list
@@ -454,8 +424,6 @@ contains
     end function includingC
 
     function includingS(self, string) result(new_list)
-        use iso_varying_string, only: VARYING_STRING
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: string
         type(MessageList_t) :: new_list
@@ -464,8 +432,6 @@ contains
     end function includingS
 
     function includingAnyOf(self, strings) result(new_list)
-        use iso_varying_string, only: VARYING_STRING
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         type(MessageList_t) :: new_list
@@ -488,8 +454,6 @@ contains
     end function includingAnyOf
 
     function includingAllOf(self, strings) result(new_list)
-        use iso_varying_string, only: VARYING_STRING
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         type(MessageList_t) :: new_list
@@ -512,8 +476,6 @@ contains
     end function includingAllOf
 
     function hasType(self, type_tag)
-        use Message_m, only: MessageType_t
-
         class(MessageList_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tag
         logical :: hasType
@@ -522,8 +484,6 @@ contains
     end function hasType
 
     function hasAnyOriginatingFromModule(self, module_) result(has_any)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: has_any
@@ -532,8 +492,6 @@ contains
     end function hasAnyOriginatingFromModule
 
     function hasAnyOriginatingFromProcedure(self, procedure_) result(has_any)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: has_any
@@ -542,8 +500,6 @@ contains
     end function hasAnyOriginatingFromProcedure
 
     function hasAnyComingThroughModule(self, module_) result(has_any)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: has_any
@@ -552,8 +508,6 @@ contains
     end function hasAnyComingThroughModule
 
     function hasAnyComingThroughProcedure(self, procedure_) result(has_any)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: has_any
@@ -562,8 +516,6 @@ contains
     end function hasAnyComingThroughProcedure
 
     function hasAnyFromModule(self, module_) result(has_any)
-        use Module_m, only: Module_t
-
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: has_any
@@ -572,8 +524,6 @@ contains
     end function hasAnyFromModule
 
     function hasAnyFromProcedure(self, procedure_) result(has_any)
-        use Procedure_m, only: Procedure_t
-
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: has_any
@@ -590,8 +540,6 @@ contains
     end function hasAnyIncludingC
 
     function hasAnyIncludingS(self, string) result(has_any)
-        use iso_varying_string, only: VARYING_STRING
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: string
         logical :: has_any
@@ -600,8 +548,6 @@ contains
     end function hasAnyIncludingS
 
     function hasAnyIncludingAnyOf(self, strings) result(has_any)
-        use iso_varying_string, only: VARYING_STRING
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: has_any
@@ -610,8 +556,6 @@ contains
     end function hasAnyIncludingAnyOf
 
     function hasAnyIncludingAllOf(self, strings) result(has_any)
-        use iso_varying_string, only: VARYING_STRING
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: has_any
@@ -620,9 +564,6 @@ contains
     end function hasAnyIncludingAllOf
 
     function toString(self) result(string)
-        use iso_varying_string, only: VARYING_STRING, assignment(=)
-        use strff, only: join, NEWLINE
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -640,9 +581,6 @@ contains
     end function toString
 
     function repr(self)
-        use iso_varying_string, only: VARYING_STRING, operator(//)
-        use strff, only: hangingIndent, indent, join, NEWLINE
-
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

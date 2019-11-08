@@ -1,12 +1,39 @@
 module message_test
+    use iso_varying_string, only: VARYING_STRING, operator(//), var_str
+    use Message_m, only: &
+            Message_t, &
+            Debug, &
+            Info, &
+            Warning, &
+            Fatal, &
+            Internal, &
+            DEBUG_TYPE, &
+            ERROR_TYPE, &
+            FATAL_TYPE, &
+            GENERAL, &
+            INFO_TYPE, &
+            INPUTS_TYPE, &
+            INTERNAL_TYPE, &
+            OUTSIDE_NORMAL_RANGE_TYPE, &
+            UNEQUAL_ARRAY_SIZES_TYPE, &
+            UNKNOWN_TYPE_TYPE, &
+            WARNING_TYPE
+    use Module_m, only: Module_t, Module_
+    use Procedure_m, only: Procedure_t, Procedure_
+    use Vegetables_m, only: &
+            Result_t, &
+            TestItem_t, &
+            Describe, &
+            assertNot, &
+            assertThat, &
+            It
+
     implicit none
     private
 
     public :: test_message
 contains
     function test_message() result(tests)
-        use Vegetables_m, only: TestItem_t, Describe, It
-
         type(TestItem_t) :: tests
 
         type(TestItem_t) :: individual_tests(8)
@@ -38,29 +65,6 @@ contains
     end function test_message
 
     function checkType() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: &
-                Message_t, &
-                Debug, &
-                Info, &
-                Warning, &
-                Fatal, &
-                Internal, &
-                DEBUG_TYPE, &
-                ERROR_TYPE, &
-                FATAL_TYPE, &
-                GENERAL, &
-                INFO_TYPE, &
-                INPUTS_TYPE, &
-                INTERNAL_TYPE, &
-                OUTSIDE_NORMAL_RANGE_TYPE, &
-                UNEQUAL_ARRAY_SIZES_TYPE, &
-                UNKNOWN_TYPE_TYPE, &
-                WARNING_TYPE
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: debug_message
@@ -149,12 +153,6 @@ contains
     end function checkType
 
     function checkOriginatingModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -186,12 +184,6 @@ contains
     end function checkOriginatingModule
 
     function checkOriginatingProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -223,12 +215,6 @@ contains
     end function checkOriginatingProcedure
 
     function checkFromModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -260,12 +246,6 @@ contains
     end function checkFromModule
 
     function checkFromProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -297,12 +277,6 @@ contains
     end function checkFromProcedure
 
     function checkThroughModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -334,12 +308,6 @@ contains
     end function checkThroughModule
 
     function checkThroughProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -371,12 +339,6 @@ contains
     end function checkThroughProcedure
 
     function checkContents() result(result_)
-        use iso_varying_string, only: VARYING_STRING, operator(//), var_str
-        use Message_m, only: Message_t, Info
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message

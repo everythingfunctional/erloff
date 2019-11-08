@@ -1,12 +1,27 @@
 module message_list_test
+    use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
+    use Message_m, only: &
+            Message_t, Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
+    use Message_list_m, only: MessageList_t, size
+    use Module_m, only: Module_t, Module_
+    use Procedure_m, only: Procedure_t, Procedure_
+    use Vegetables_m, only: &
+            Result_t, &
+            TestItem_t, &
+            assertEmpty, &
+            assertEquals, &
+            assertIncludes, &
+            assertNot, &
+            assertThat, &
+            Describe, &
+            It
+
     implicit none
     private
 
     public :: test_message_list
 contains
     function test_message_list() result(tests)
-        use Vegetables_m, only: TestItem_t, Describe, It
-
         type(TestItem_t) :: tests
 
         type(TestItem_t) :: individual_tests(22)
@@ -77,9 +92,6 @@ contains
     end function test_message_list
 
     function checkEmptyToString() result(result_)
-        use Message_list_m, only: MessageList_t
-        use Vegetables_m, only: Result_t, assertEmpty
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: message_list
@@ -88,12 +100,6 @@ contains
     end function checkEmptyToString
 
     function checkAppendToEmpty() result(result_)
-        use Message_m, only: Message_t, Info
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertIncludes
-
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message
@@ -107,12 +113,6 @@ contains
     end function checkAppendToEmpty
 
     function checkAppendMultipleToEmpty() result(result_)
-        use Message_m, only: Message_t, Info, Warning
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertIncludes
-
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message1
@@ -136,12 +136,6 @@ contains
     end function checkAppendMultipleToEmpty
 
     function checkAppendEmpty() result(result_)
-        use Message_m, only: Message_t, Info, Warning
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertIncludes
-
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message1
@@ -165,11 +159,6 @@ contains
     end function checkAppendEmpty
 
     function checkCombineEmpty() result(result_)
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertEmpty
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: message_list1
@@ -182,12 +171,6 @@ contains
     end function checkCombineEmpty
 
     function checkCombine() result(result_)
-        use Message_m, only: Message_t, Info, Warning
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertIncludes
-
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message1
@@ -222,12 +205,6 @@ contains
     end function checkCombine
 
     function checkFilterByType() result(result_)
-        use Message_m, only: Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -248,13 +225,6 @@ contains
     end function checkFilterByType
 
     function checkFilterByOriginatingModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -295,13 +265,6 @@ contains
     end function checkFilterByOriginatingModule
 
     function checkFilterByOriginatingProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -342,13 +305,6 @@ contains
     end function checkFilterByOriginatingProcedure
 
     function checkFilterByModulesThrough() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -445,13 +401,6 @@ contains
     end function checkFilterByModulesThrough
 
     function checkFilterByProceduresThrough() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -548,13 +497,6 @@ contains
     end function checkFilterByProceduresThrough
 
     function checkFilterByModulesFrom() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -651,13 +593,6 @@ contains
     end function checkFilterByModulesFrom
 
     function checkFilterByProceduresFrom() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -754,13 +689,6 @@ contains
     end function checkFilterByProceduresFrom
 
     function checkFilterByContents() result(result_)
-        use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertEquals
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -803,13 +731,6 @@ contains
     end function checkFilterByContents
 
     function checkForType() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info, INFO_TYPE
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: empty_list
@@ -828,13 +749,6 @@ contains
     end function checkForType
 
     function checkForOriginatingModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: empty_list
@@ -865,13 +779,6 @@ contains
     end function checkForOriginatingModule
 
     function checkForOriginatingProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: empty_list
@@ -902,13 +809,6 @@ contains
     end function checkForOriginatingProcedure
 
     function checkForThroughModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -995,13 +895,6 @@ contains
     end function checkForThroughModule
 
     function checkForThroughProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -1088,13 +981,6 @@ contains
     end function checkForThroughProcedure
 
     function checkForFromModule() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -1181,13 +1067,6 @@ contains
     end function checkForFromModule
 
     function checkForFromProcedure() result(result_)
-        use iso_varying_string, only: operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -1274,13 +1153,6 @@ contains
     end function checkForFromProcedure
 
     function checkForContents() result(result_)
-        use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-        use Message_m, only: Info
-        use Message_list_m, only: MessageList_t, size
-        use Module_m, only: Module_
-        use Procedure_m, only: Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages

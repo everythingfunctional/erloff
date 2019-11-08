@@ -1,12 +1,23 @@
 module call_stack_test
+    use Call_stack_m, only: CallStack_t, CallStack
+    use iso_varying_string, only: operator(//)
+    use Module_m, only: Module_t, Module_
+    use Procedure_m, only: Procedure_t, Procedure_
+    use Vegetables_m, only: &
+            Result_t, &
+            TestItem_t, &
+            assertIncludes, &
+            assertNot, &
+            assertThat, &
+            describe, &
+            it
+
     implicit none
     private
 
     public :: test_call_stack
 contains
     function test_call_stack() result(tests)
-        use Vegetables_m, only: TestItem_t, describe, it
-
         type(TestItem_t) :: tests
 
         type(TestItem_t) :: individual_tests(5)
@@ -30,12 +41,6 @@ contains
     end function test_call_stack
 
     function checkOriginatedFromModule() result(result_)
-        use Call_stack_m, only: CallStack_t, CallStack
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -61,12 +66,6 @@ contains
     end function checkOriginatedFromModule
 
     function checkOriginatedFromProcedure() result(result_)
-        use Call_stack_m, only: CallStack_t, CallStack
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -92,12 +91,6 @@ contains
     end function checkOriginatedFromProcedure
 
     function checkContainsModule() result(result_)
-        use Call_stack_m, only: CallStack_t, CallStack
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -125,12 +118,6 @@ contains
     end function checkContainsModule
 
     function checkContainsProcedure() result(result_)
-        use Call_stack_m, only: CallStack_t, CallStack
-        use iso_varying_string, only: operator(//)
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertNot, assertThat
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -158,11 +145,6 @@ contains
     end function checkContainsProcedure
 
     function checkStringIncludes() result(result_)
-        use Call_stack_m, only: CallStack_t, CallStack
-        use Module_m, only: Module_t, Module_
-        use Procedure_m, only: Procedure_t, Procedure_
-        use Vegetables_m, only: Result_t, assertIncludes
-
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
