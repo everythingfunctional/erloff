@@ -23,7 +23,7 @@ module Call_stack_entry_m
 
     public :: CallStackEntry
 contains
-    function CallStackEntry(module_, procedure_) result(entry_)
+    pure function CallStackEntry(module_, procedure_) result(entry_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(CallStackEntry_t) :: entry_
@@ -32,14 +32,14 @@ contains
         entry_%procedure_ = procedure_
     end function CallStackEntry
 
-    function toString(self) result(string)
+    elemental function toString(self) result(string)
         class(CallStackEntry_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
         string = self%module_%toString() // "." // self%procedure_%toString()
     end function toString
 
-    function isFromModule(self, module_)
+    elemental function isFromModule(self, module_)
         class(CallStackEntry_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: isFromModule
@@ -47,7 +47,7 @@ contains
         isFromModule = self%module_ == module_
     end function isFromModule
 
-    function isFromProcedure(self, procedure_)
+    elemental function isFromProcedure(self, procedure_)
         class(CallStackEntry_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: isFromProcedure
@@ -55,7 +55,7 @@ contains
         isFromProcedure = self%procedure_ == procedure_
     end function isFromProcedure
 
-    function repr(self)
+    elemental function repr(self)
         class(CallStackEntry_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

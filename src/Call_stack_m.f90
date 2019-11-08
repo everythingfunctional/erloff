@@ -28,7 +28,7 @@ module Call_stack_m
 
     public :: CallStack
 contains
-    function CallStack(module_, procedure_)
+    pure function CallStack(module_, procedure_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(CallStack_t) :: CallStack
@@ -37,7 +37,7 @@ contains
         CallStack%entries(1) = CallStackEntry(module_, procedure_)
     end function CallStack
 
-    subroutine prependNames(self, module_, procedure_)
+    pure subroutine prependNames(self, module_, procedure_)
         class(CallStack_t), intent(inout) :: self
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -51,20 +51,14 @@ contains
         self%entries(2:) = previous_entries
     end subroutine prependNames
 
-    function toString(self) result(string)
+    pure function toString(self) result(string)
         class(CallStack_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        type(VARYING_STRING) :: entry_strings(size(self%entries))
-        integer :: i
-
-        do i = 1, size(self%entries)
-            entry_strings(i) = self%entries(i)%toString()
-        end do
-        string = join(entry_strings, "->")
+        string = join(self%entries%toString(), "->")
     end function toString
 
-    function originatedFromModule(self, module_)
+    pure function originatedFromModule(self, module_)
         class(CallStack_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: originatedFromModule
@@ -72,7 +66,7 @@ contains
         originatedFromModule = self%entries(size(self%entries)).isFrom.module_
     end function originatedFromModule
 
-    function originatedFromProcedure(self, procedure_)
+    pure function originatedFromProcedure(self, procedure_)
         class(CallStack_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: originatedFromProcedure
@@ -80,50 +74,31 @@ contains
         originatedFromProcedure = self%entries(size(self%entries)).isFrom.procedure_
     end function originatedFromProcedure
 
-    function includesModule(self, module_)
+    pure function includesModule(self, module_)
         class(CallStack_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: includesModule
 
-        integer :: i
-        logical :: isFrom(size(self%entries))
-
-        do i = 1, size(self%entries)
-            isFrom(i) = self%entries(i).isFrom.module_
-        end do
-        includesModule = any(isFrom)
+        includesModule = any(self%entries.isFrom.module_)
     end function includesModule
 
-    function includesProcedure(self, procedure_)
+    pure function includesProcedure(self, procedure_)
         class(CallStack_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: includesProcedure
 
-        integer :: i
-        logical :: isFrom(size(self%entries))
-
-        do i = 1, size(self%entries)
-            isFrom(i) = self%entries(i).isFrom.procedure_
-        end do
-        includesProcedure = any(isFrom)
+        includesProcedure = any(self%entries.isFrom.procedure_)
     end function includesProcedure
 
-    function repr(self)
+    pure function repr(self)
         class(CallStack_t), intent(in) :: self
         type(VARYING_STRING) :: repr
-
-        type(VARYING_STRING) :: entry_strings(size(self%entries))
-        integer :: i
-
-        do i = 1, size(self%entries)
-            entry_strings = self%entries(i)%repr()
-        end do
 
         repr = hangingIndent( &
                 "CallStack_t(" // NEWLINE &
                     // "entries = [" // NEWLINE &
                     // indent( &
-                            join(entry_strings, "," // NEWLINE), &
+                            join(self%entries%repr(), "," // NEWLINE), &
                             4) // NEWLINE // "]", &
                 4) // NEWLINE // ")"
     end function repr

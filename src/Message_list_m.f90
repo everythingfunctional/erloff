@@ -93,7 +93,7 @@ module Message_list_m
 
     public :: size
 contains
-    subroutine appendMessage(self, message)
+    pure subroutine appendMessage(self, message)
         class(MessageList_t), intent(inout) :: self
         class(Message_t), intent(in) :: message
 
@@ -113,7 +113,7 @@ contains
         end if
     end subroutine appendMessage
 
-    subroutine appendMessages(self, messages, module_, procedure_)
+    pure subroutine appendMessages(self, messages, module_, procedure_)
         class(MessageList_t), intent(inout) :: self
         type(MessageList_t), intent(in) :: messages
         type(Module_t), intent(in) :: module_
@@ -149,7 +149,7 @@ contains
         end if
     end subroutine appendMessages
 
-    function ofType(self, type_tag) result(new_list)
+    pure function ofType(self, type_tag) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tag
         type(MessageList_t) :: new_list
@@ -157,7 +157,7 @@ contains
         new_list = self.ofTypes.[type_tag]
     end function ofType
 
-    function ofTypes(self, type_tags) result(new_list)
+    pure function ofTypes(self, type_tags) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tags(:)
         type(MessageList_t) :: new_list
@@ -187,7 +187,7 @@ contains
         end if
     end function ofTypes
 
-    function originatingFromModule(self, module_) result(new_list)
+    pure function originatingFromModule(self, module_) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         type(MessageList_t) :: new_list
@@ -195,7 +195,7 @@ contains
         new_list = self.originatingFrom.[module_]
     end function originatingFromModule
 
-    function originatingFromModules(self, modules) result(new_list)
+    pure function originatingFromModules(self, modules) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
@@ -225,7 +225,7 @@ contains
         end if
     end function originatingFromModules
 
-    function originatingFromProcedure(self, procedure_) result(new_list)
+    pure function originatingFromProcedure(self, procedure_) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         type(MessageList_t) :: new_list
@@ -233,7 +233,7 @@ contains
         new_list = self.originatingFrom.[procedure_]
     end function originatingFromProcedure
 
-    function originatingFromProcedures(self, procedures) result(new_list)
+    pure function originatingFromProcedures(self, procedures) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
@@ -263,7 +263,7 @@ contains
         end if
     end function originatingFromProcedures
 
-    function comingThroughModule(self, module_) result(new_list)
+    pure function comingThroughModule(self, module_) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         type(MessageList_t) :: new_list
@@ -271,7 +271,7 @@ contains
         new_list = self.comingThrough.[module_]
     end function comingThroughModule
 
-    function comingThroughModules(self, modules) result(new_list)
+    pure function comingThroughModules(self, modules) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
@@ -301,7 +301,7 @@ contains
         end if
     end function comingThroughModules
 
-    function comingThroughProcedure(self, procedure_) result(new_list)
+    pure function comingThroughProcedure(self, procedure_) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         type(MessageList_t) :: new_list
@@ -309,7 +309,7 @@ contains
         new_list = self.comingThrough.[procedure_]
     end function comingThroughProcedure
 
-    function comingThroughProcedures(self, procedures) result(new_list)
+    pure function comingThroughProcedures(self, procedures) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
@@ -339,7 +339,7 @@ contains
         end if
     end function comingThroughProcedures
 
-    function fromModule(self, module_) result(new_list)
+    pure function fromModule(self, module_) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         type(MessageList_t) :: new_list
@@ -347,7 +347,7 @@ contains
         new_list = self.from.[module_]
     end function fromModule
 
-    function fromModules(self, modules) result(new_list)
+    pure function fromModules(self, modules) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
@@ -377,7 +377,7 @@ contains
         end if
     end function fromModules
 
-    function fromProcedure(self, procedure_) result(new_list)
+    pure function fromProcedure(self, procedure_) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         type(MessageList_t) :: new_list
@@ -385,7 +385,7 @@ contains
         new_list = self.from.[procedure_]
     end function fromProcedure
 
-    function fromProcedures(self, procedures) result(new_list)
+    pure function fromProcedures(self, procedures) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
@@ -415,7 +415,7 @@ contains
         end if
     end function fromProcedures
 
-    function includingC(self, string) result(new_list)
+    pure function includingC(self, string) result(new_list)
         class(MessageList_t), intent(in) :: self
         character(len=*), intent(in) :: string
         type(MessageList_t) :: new_list
@@ -423,7 +423,7 @@ contains
         new_list = self.including.var_str(string)
     end function includingC
 
-    function includingS(self, string) result(new_list)
+    pure function includingS(self, string) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: string
         type(MessageList_t) :: new_list
@@ -431,7 +431,7 @@ contains
         new_list = self.includingAnyOf.[string]
     end function includingS
 
-    function includingAnyOf(self, strings) result(new_list)
+    pure function includingAnyOf(self, strings) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         type(MessageList_t) :: new_list
@@ -453,7 +453,7 @@ contains
         end if
     end function includingAnyOf
 
-    function includingAllOf(self, strings) result(new_list)
+    pure function includingAllOf(self, strings) result(new_list)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         type(MessageList_t) :: new_list
@@ -475,7 +475,7 @@ contains
         end if
     end function includingAllOf
 
-    function hasType(self, type_tag)
+    pure function hasType(self, type_tag)
         class(MessageList_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tag
         logical :: hasType
@@ -483,7 +483,7 @@ contains
         hasType = size(self.ofType.type_tag) > 0
     end function hasType
 
-    function hasAnyOriginatingFromModule(self, module_) result(has_any)
+    pure function hasAnyOriginatingFromModule(self, module_) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: has_any
@@ -491,7 +491,7 @@ contains
         has_any = size(self.originatingFrom.module_) > 0
     end function hasAnyOriginatingFromModule
 
-    function hasAnyOriginatingFromProcedure(self, procedure_) result(has_any)
+    pure function hasAnyOriginatingFromProcedure(self, procedure_) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: has_any
@@ -499,7 +499,7 @@ contains
         has_any = size(self.originatingFrom.procedure_) > 0
     end function hasAnyOriginatingFromProcedure
 
-    function hasAnyComingThroughModule(self, module_) result(has_any)
+    pure function hasAnyComingThroughModule(self, module_) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: has_any
@@ -507,7 +507,7 @@ contains
         has_any = size(self.comingThrough.module_) > 0
     end function hasAnyComingThroughModule
 
-    function hasAnyComingThroughProcedure(self, procedure_) result(has_any)
+    pure function hasAnyComingThroughProcedure(self, procedure_) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: has_any
@@ -515,7 +515,7 @@ contains
         has_any = size(self.comingThrough.procedure_) > 0
     end function hasAnyComingThroughProcedure
 
-    function hasAnyFromModule(self, module_) result(has_any)
+    pure function hasAnyFromModule(self, module_) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: has_any
@@ -523,7 +523,7 @@ contains
         has_any = size(self.from.module_) > 0
     end function hasAnyFromModule
 
-    function hasAnyFromProcedure(self, procedure_) result(has_any)
+    pure function hasAnyFromProcedure(self, procedure_) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: has_any
@@ -531,7 +531,7 @@ contains
         has_any = size(self.from.procedure_) > 0
     end function hasAnyFromProcedure
 
-    function hasAnyIncludingC(self, string) result(has_any)
+    pure function hasAnyIncludingC(self, string) result(has_any)
         class(MessageList_t), intent(in) :: self
         character(len=*), intent(in) :: string
         logical :: has_any
@@ -539,7 +539,7 @@ contains
         has_any = size(self.including.string) > 0
     end function hasAnyIncludingC
 
-    function hasAnyIncludingS(self, string) result(has_any)
+    pure function hasAnyIncludingS(self, string) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: string
         logical :: has_any
@@ -547,7 +547,7 @@ contains
         has_any = size(self.including.string) > 0
     end function hasAnyIncludingS
 
-    function hasAnyIncludingAnyOf(self, strings) result(has_any)
+    pure function hasAnyIncludingAnyOf(self, strings) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: has_any
@@ -555,7 +555,7 @@ contains
         has_any = size(self.includingAnyOf.strings) > 0
     end function hasAnyIncludingAnyOf
 
-    function hasAnyIncludingAllOf(self, strings) result(has_any)
+    pure function hasAnyIncludingAllOf(self, strings) result(has_any)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: has_any
@@ -563,7 +563,7 @@ contains
         has_any = size(self.includingAllOf.strings) > 0
     end function hasAnyIncludingAllOf
 
-    function toString(self) result(string)
+    pure function toString(self) result(string)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -580,7 +580,7 @@ contains
         end if
     end function toString
 
-    function repr(self)
+    pure function repr(self)
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -598,7 +598,7 @@ contains
                 4) // NEWLINE // ")"
     end function repr
 
-    function messageListSize(self) result(length)
+    pure function messageListSize(self) result(length)
         class(MessageList_t), intent(in) :: self
         integer :: length
 

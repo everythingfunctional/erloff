@@ -64,7 +64,7 @@ contains
         tests = Describe("Message_t", individual_tests)
     end function test_message
 
-    function checkType() result(result_)
+    pure function checkType() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: debug_message
@@ -152,7 +152,7 @@ contains
                         internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())
     end function checkType
 
-    function checkOriginatingModule() result(result_)
+    pure function checkOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -183,7 +183,7 @@ contains
                         message%repr() // '.originatedFrom.' // other_module%repr())
     end function checkOriginatingModule
 
-    function checkOriginatingProcedure() result(result_)
+    pure function checkOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -214,7 +214,7 @@ contains
                         message%repr() // '.originatedFrom.' // other_procedure%repr())
     end function checkOriginatingProcedure
 
-    function checkFromModule() result(result_)
+    pure function checkFromModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -245,7 +245,7 @@ contains
                         message%repr() // '.isFrom.' // other_module%repr())
     end function checkFromModule
 
-    function checkFromProcedure() result(result_)
+    pure function checkFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -276,7 +276,7 @@ contains
                         message%repr() // '.isFrom.' // other_procedure%repr())
     end function checkFromProcedure
 
-    function checkThroughModule() result(result_)
+    pure function checkThroughModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -307,7 +307,7 @@ contains
                         message%repr() // '.cameThrough.' // other_module%repr())
     end function checkThroughModule
 
-    function checkThroughProcedure() result(result_)
+    pure function checkThroughProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -338,7 +338,7 @@ contains
                         message%repr() // '.cameThrough.' // other_procedure%repr())
     end function checkThroughProcedure
 
-    function checkContents() result(result_)
+    pure function checkContents() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message

@@ -102,7 +102,7 @@ module Message_m
     end type Internal_t
 
     abstract interface
-        function messageToString_(self) result(string)
+        pure function messageToString_(self) result(string)
             import Message_t, VARYING_STRING
             class(Message_t), intent(in) :: self
             type(VARYING_STRING) :: string
@@ -185,7 +185,7 @@ module Message_m
 
     public :: Debug, Info, Warning, Fatal, Internal
 contains
-    function genericDebugC(module_, procedure_, level, message) result(debug_)
+    pure function genericDebugC(module_, procedure_, level, message) result(debug_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(DebugLevel_t), intent(in) :: level
@@ -195,7 +195,7 @@ contains
         debug_ = Debug(DEBUG_TYPE, module_, procedure_, level, var_str(message))
     end function genericDebugC
 
-    function genericDebugS(module_, procedure_, level, message) result(debug_)
+    pure function genericDebugS(module_, procedure_, level, message) result(debug_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(DebugLevel_t), intent(in) :: level
@@ -205,7 +205,7 @@ contains
         debug_ = Debug(DEBUG_TYPE, module_, procedure_, level, message)
     end function genericDebugS
 
-    function debugWithTypeC( &
+    pure function debugWithTypeC( &
             type_tag, module_, procedure_, level, message) result(debug_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
@@ -217,7 +217,7 @@ contains
         debug_ = Debug(type_tag, module_, procedure_, level, var_str(message))
     end function debugWithTypeC
 
-    function debugWithTypeS( &
+    pure function debugWithTypeS( &
             type_tag, module_, procedure_, level, message) result(debug_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
@@ -232,7 +232,7 @@ contains
         debug_%message = message
     end function debugWithTypeS
 
-    function genericInfoC(module_, procedure_, message) result(info_)
+    pure function genericInfoC(module_, procedure_, message) result(info_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -241,7 +241,7 @@ contains
         info_ = Info(INFO_TYPE, module_, procedure_, var_str(message))
     end function genericInfoC
 
-    function genericInfoS(module_, procedure_, message) result(info_)
+    pure function genericInfoS(module_, procedure_, message) result(info_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -250,7 +250,7 @@ contains
         info_ = Info(INFO_TYPE, module_, procedure_, message)
     end function genericInfoS
 
-    function infoWithTypeC(type_tag, module_, procedure_, message) result(info_)
+    pure function infoWithTypeC(type_tag, module_, procedure_, message) result(info_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -260,7 +260,7 @@ contains
         info_ = Info(type_tag, module_, procedure_, var_str(message))
     end function infoWithTypeC
 
-    function infoWithTypeS(type_tag, module_, procedure_, message) result(info_)
+    pure function infoWithTypeS(type_tag, module_, procedure_, message) result(info_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -272,7 +272,7 @@ contains
         info_%message = message
     end function infoWithTypeS
 
-    function genericWarningC(module_, procedure_, message) result(warning_)
+    pure function genericWarningC(module_, procedure_, message) result(warning_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -281,7 +281,7 @@ contains
         warning_ = Warning(WARNING_TYPE, module_, procedure_, var_str(message))
     end function genericWarningC
 
-    function genericWarningS(module_, procedure_, message) result(warning_)
+    pure function genericWarningS(module_, procedure_, message) result(warning_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -290,7 +290,7 @@ contains
         warning_ = Warning(WARNING_TYPE, module_, procedure_, message)
     end function genericWarningS
 
-    function warningWithTypeC(type_tag, module_, procedure_, message) result(warning_)
+    pure function warningWithTypeC(type_tag, module_, procedure_, message) result(warning_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -300,7 +300,7 @@ contains
         warning_ = Warning(type_tag, module_, procedure_, var_str(message))
     end function warningWithTypeC
 
-    function warningWithTypeS(type_tag, module_, procedure_, message) result(warning_)
+    pure function warningWithTypeS(type_tag, module_, procedure_, message) result(warning_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -312,7 +312,7 @@ contains
         warning_%message = message
     end function warningWithTypeS
 
-    function genericFatalC(module_, procedure_, message) result(fatal_)
+    pure function genericFatalC(module_, procedure_, message) result(fatal_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -321,7 +321,7 @@ contains
         fatal_ = Fatal(FATAL_TYPE, module_, procedure_, var_str(message))
     end function genericFatalC
 
-    function genericFatalS(module_, procedure_, message) result(fatal_)
+    pure function genericFatalS(module_, procedure_, message) result(fatal_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -330,7 +330,7 @@ contains
         fatal_ = Fatal(FATAL_TYPE, module_, procedure_, message)
     end function genericFatalS
 
-    function fatalWithTypeC(type_tag, module_, procedure_, message) result(fatal_)
+    pure function fatalWithTypeC(type_tag, module_, procedure_, message) result(fatal_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -340,7 +340,7 @@ contains
         fatal_ = Fatal(type_tag, module_, procedure_, var_str(message))
     end function fatalWithTypeC
 
-    function fatalWithTypeS(type_tag, module_, procedure_, message) result(fatal_)
+    pure function fatalWithTypeS(type_tag, module_, procedure_, message) result(fatal_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -352,7 +352,7 @@ contains
         fatal_%message = message
     end function fatalWithTypeS
 
-    function genericInternalC(module_, procedure_, message) result(internal_)
+    pure function genericInternalC(module_, procedure_, message) result(internal_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -361,7 +361,7 @@ contains
         internal_ = Internal(INTERNAL_TYPE, module_, procedure_, var_str(message))
     end function genericInternalC
 
-    function genericInternalS(module_, procedure_, message) result(internal_)
+    pure function genericInternalS(module_, procedure_, message) result(internal_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -370,7 +370,7 @@ contains
         internal_ = Internal(INTERNAL_TYPE, module_, procedure_, message)
     end function genericInternalS
 
-    function internalWithTypeC(type_tag, module_, procedure_, message) result(internal_)
+    pure function internalWithTypeC(type_tag, module_, procedure_, message) result(internal_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -380,7 +380,7 @@ contains
         internal_ = Internal(type_tag, module_, procedure_, var_str(message))
     end function internalWithTypeC
 
-    function internalWithTypeS(type_tag, module_, procedure_, message) result(internal_)
+    pure function internalWithTypeS(type_tag, module_, procedure_, message) result(internal_)
         type(MessageType_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -392,7 +392,7 @@ contains
         internal_%message = message
     end function internalWithTypeS
 
-    function messageTypeToString(self) result(string)
+    pure function messageTypeToString(self) result(string)
         class(MessageType_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -410,14 +410,14 @@ contains
         end select
     end function messageTypeToString
 
-    function messageTypeRepr(self) result(repr)
+    pure function messageTypeRepr(self) result(repr)
         class(MessageType_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
         repr = "MessageType(" // trim(self%description) // ")"
     end function messageTypeRepr
 
-    subroutine prependNames(self, module_, procedure_)
+    pure subroutine prependNames(self, module_, procedure_)
         class(Message_t), intent(inout) :: self
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -425,7 +425,7 @@ contains
         call self%call_stack%prependNames(module_, procedure_)
     end subroutine prependNames
 
-    function messageToString(self) result(string)
+    pure function messageToString(self) result(string)
         class(Message_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -436,7 +436,7 @@ contains
                 4)
     end function messageToString
 
-    function isType(self, type_tag)
+    pure function isType(self, type_tag)
         class(Message_t), intent(in) :: self
         type(MessageType_t), intent(in) :: type_tag
         logical :: isType
@@ -489,7 +489,7 @@ contains
         end select
     end function isType
 
-    function originatedFromModule(self, module_) result(originated_from)
+    pure function originatedFromModule(self, module_) result(originated_from)
         class(Message_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: originated_from
@@ -497,7 +497,7 @@ contains
         originated_from = self%call_stack.originatedFrom.module_
     end function originatedFromModule
 
-    function originatedFromProcedure(self, procedure_) result(originated_from)
+    pure function originatedFromProcedure(self, procedure_) result(originated_from)
         class(Message_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: originated_from
@@ -505,7 +505,7 @@ contains
         originated_from = self%call_stack.originatedFrom.procedure_
     end function originatedFromProcedure
 
-    function isFromModule(self, module_) result(is_from)
+    pure function isFromModule(self, module_) result(is_from)
         class(Message_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: is_from
@@ -513,7 +513,7 @@ contains
         is_from = self%call_stack.includes.module_
     end function isFromModule
 
-    function isFromProcedure(self, procedure_) result(is_from)
+    pure function isFromProcedure(self, procedure_) result(is_from)
         class(Message_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: is_from
@@ -521,7 +521,7 @@ contains
         is_from = self%call_stack.includes.procedure_
     end function isFromProcedure
 
-    function cameThroughModule(self, module_) result(came_through)
+    pure function cameThroughModule(self, module_) result(came_through)
         class(Message_t), intent(in) :: self
         type(Module_t), intent(in) :: module_
         logical :: came_through
@@ -531,7 +531,7 @@ contains
                 .and.(self.isFrom.module_)
     end function cameThroughModule
 
-    function cameThroughProcedure(self, procedure_) result(came_through)
+    pure function cameThroughProcedure(self, procedure_) result(came_through)
         class(Message_t), intent(in) :: self
         type(Procedure_t), intent(in) :: procedure_
         logical :: came_through
@@ -541,7 +541,7 @@ contains
                 .and.(self.isFrom.procedure_)
     end function cameThroughProcedure
 
-    function includesC(self, string) result(includes)
+    pure function includesC(self, string) result(includes)
         class(Message_t), intent(in) :: self
         character(len=*), intent(in) :: string
         logical :: includes
@@ -549,7 +549,7 @@ contains
         includes = self.includes.var_str(string)
     end function includesC
 
-    function includesS(self, string) result(includes)
+    pure function includesS(self, string) result(includes)
         class(Message_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: string
         logical :: includes
@@ -557,7 +557,7 @@ contains
         includes = self%message.includes.string
     end function includesS
 
-    function includesAnyOf(self, strings) result(includes)
+    pure function includesAnyOf(self, strings) result(includes)
         class(Message_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: includes
@@ -571,7 +571,7 @@ contains
         includes = any(includes_)
     end function includesAnyOf
 
-    function includesAllOf(self, strings) result(includes)
+    pure function includesAllOf(self, strings) result(includes)
         class(Message_t), intent(in) :: self
         type(VARYING_STRING), intent(in) :: strings(:)
         logical :: includes
@@ -585,7 +585,7 @@ contains
         includes = all(includes_)
     end function includesAllOf
 
-    function messageRepr(self) result(repr)
+    pure function messageRepr(self) result(repr)
         class(Message_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -598,28 +598,28 @@ contains
                 4) // NEWLINE // ')'
     end function messageRepr
 
-    function debugLevelToString(self) result(string)
+    pure function debugLevelToString(self) result(string)
         class(DebugLevel_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
         string = toString(self%level)
     end function debugLevelToString
 
-    function debugTypeString(self) result(string)
+    pure function debugTypeString(self) result(string)
         class(Debug_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
         string = "DB-" // self%level%toString() // ": "
     end function debugTypeString
 
-    function debugTypeRepr(self) result(repr)
+    pure function debugTypeRepr(self) result(repr)
         class(Debug_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
         repr = DEBUG_TYPE_STRING // '(level = ' // self%level%toString() // ')'
     end function debugTypeRepr
 
-    function infoTypeString(self) result(string)
+    pure function infoTypeString(self) result(string)
         class(Info_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -629,7 +629,7 @@ contains
         string = "IN: "
     end function infoTypeString
 
-    function infoTypeRepr(self) result(repr)
+    pure function infoTypeRepr(self) result(repr)
         class(Info_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -639,7 +639,7 @@ contains
         repr = INFO_TYPE_STRING
     end function infoTypeRepr
 
-    function warningTypeString(self) result(string)
+    pure function warningTypeString(self) result(string)
         class(Warning_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -649,7 +649,7 @@ contains
         string = "WN: "
     end function warningTypeString
 
-    function warningTypeRepr(self) result(repr)
+    pure function warningTypeRepr(self) result(repr)
         class(Warning_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -659,7 +659,7 @@ contains
         repr = WARNING_TYPE_STRING
     end function warningTypeRepr
 
-    function fatalTypeString(self) result(string)
+    pure function fatalTypeString(self) result(string)
         class(Fatal_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -669,7 +669,7 @@ contains
         string = "FE: "
     end function fatalTypeString
 
-    function fatalTypeRepr(self) result(repr)
+    pure function fatalTypeRepr(self) result(repr)
         class(Fatal_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
@@ -679,7 +679,7 @@ contains
         repr = FATAL_TYPE_STRING
     end function fatalTypeRepr
 
-    function internalTypeString(self) result(string)
+    pure function internalTypeString(self) result(string)
         class(Internal_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
@@ -689,7 +689,7 @@ contains
         string = "IE: "
     end function internalTypeString
 
-    function internalTypeRepr(self) result(repr)
+    pure function internalTypeRepr(self) result(repr)
         class(Internal_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

@@ -40,7 +40,7 @@ contains
         tests = describe("CallStack_t", individual_tests)
     end function test_call_stack
 
-    function checkOriginatedFromModule() result(result_)
+    pure function checkOriginatedFromModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -65,7 +65,7 @@ contains
                         stack%repr() // '.originatedFrom.' // another_module%repr())
     end function checkOriginatedFromModule
 
-    function checkOriginatedFromProcedure() result(result_)
+    pure function checkOriginatedFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -90,7 +90,7 @@ contains
                         stack%repr() // '.originatedFrom.' // another_procedure%repr())
     end function checkOriginatedFromProcedure
 
-    function checkContainsModule() result(result_)
+    pure function checkContainsModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -117,7 +117,7 @@ contains
                         stack%repr() // '.includes.' // other_module%repr())
     end function checkContainsModule
 
-    function checkContainsProcedure() result(result_)
+    pure function checkContainsProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -144,7 +144,7 @@ contains
                         stack%repr() // '.includes.' // other_procedure%repr())
     end function checkContainsProcedure
 
-    function checkStringIncludes() result(result_)
+    pure function checkStringIncludes() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module

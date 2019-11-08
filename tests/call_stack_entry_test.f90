@@ -32,7 +32,7 @@ contains
         tests = Describe("CallStackEntry_t", individual_tests)
     end function test_call_stack_entry
 
-    function checkIsFromModule() result(result_)
+    pure function checkIsFromModule() result(result_)
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_
@@ -54,7 +54,7 @@ contains
                         entry_%repr() // '.isFrom.' // other_module%repr())
     end function checkIsFromModule
 
-    function checkIsFromProcedure() result(result_)
+    pure function checkIsFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_
@@ -77,7 +77,7 @@ contains
                         entry_%repr() // '.isFrom.' // other_procedure%repr())
     end function checkIsFromProcedure
 
-    function checkStringIncludes() result(result_)
+    pure function checkStringIncludes() result(result_)
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_

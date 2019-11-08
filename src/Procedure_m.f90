@@ -23,21 +23,21 @@ module Procedure_m
 
     public :: Procedure_
 contains
-    function ProcedureC(name)
+    pure function ProcedureC(name)
         character(len=*), intent(in) :: name
         type(Procedure_t) :: ProcedureC
 
         ProcedureC = Procedure_(var_str(name))
     end function ProcedureC
 
-    function ProcedureS(name)
+    pure function ProcedureS(name)
         type(VARYING_STRING), intent(in) :: name
         type(Procedure_t) :: ProcedureS
 
         ProcedureS%name = name
     end function ProcedureS
 
-    function procedureEquals(lhs, rhs)
+    pure function procedureEquals(lhs, rhs)
         class(Procedure_t), intent(in) :: lhs
         type(Procedure_t), intent(in) :: rhs
         logical :: procedureEquals
@@ -45,14 +45,14 @@ contains
         procedureEquals = lhs%name == rhs%name
     end function procedureEquals
 
-    function toString(self) result(string)
+    pure function toString(self) result(string)
         class(Procedure_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
         string = self%name
     end function toString
 
-    function repr(self)
+    pure function repr(self)
         class(Procedure_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

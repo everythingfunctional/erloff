@@ -23,21 +23,21 @@ module Module_m
 
     public :: Module_
 contains
-    function ModuleC(name)
+    pure function ModuleC(name)
         character(len=*), intent(in) :: name
         type(Module_t) :: ModuleC
 
         ModuleC = Module_(var_str(name))
     end function ModuleC
 
-    function ModuleS(name)
+    pure function ModuleS(name)
         type(VARYING_STRING), intent(in) :: name
         type(Module_t) :: ModuleS
 
         ModuleS%name = name
     end function ModuleS
 
-    function moduleEquals(lhs, rhs)
+    pure function moduleEquals(lhs, rhs)
         class(Module_t), intent(in) :: lhs
         type(Module_t), intent(in) :: rhs
         logical :: moduleEquals
@@ -45,14 +45,14 @@ contains
         moduleEquals = lhs%name == rhs%name
     end function moduleEquals
 
-    function toString(self) result(string)
+    pure function toString(self) result(string)
         class(Module_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
         string = self%name
     end function toString
 
-    function repr(self)
+    pure function repr(self)
         class(Module_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 

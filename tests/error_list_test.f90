@@ -96,7 +96,7 @@ contains
         tests = Describe("ErrorList_t", individual_tests)
     end function test_error_list
 
-    function checkEmptyToString() result(result_)
+    pure function checkEmptyToString() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: error_list
@@ -104,7 +104,7 @@ contains
         result_ = assertEmpty(error_list%toString())
     end function checkEmptyToString
 
-    function checkAppendToEmpty() result(result_)
+    pure function checkAppendToEmpty() result(result_)
         type(Result_t) :: result_
 
         class(Error_t), allocatable :: error
@@ -117,7 +117,7 @@ contains
         result_ = assertIncludes(error%toString(), error_list%toString())
     end function checkAppendToEmpty
 
-    function checkAppendMultipleToEmpty() result(result_)
+    pure function checkAppendMultipleToEmpty() result(result_)
         type(Result_t) :: result_
 
         class(Error_t), allocatable :: error1
@@ -140,7 +140,7 @@ contains
                 .and.assertIncludes(error2%toString(), error_list2%toString())
     end function checkAppendMultipleToEmpty
 
-    function checkAppendEmpty() result(result_)
+    pure function checkAppendEmpty() result(result_)
         type(Result_t) :: result_
 
         class(Error_t), allocatable :: error1
@@ -163,7 +163,7 @@ contains
                 .and.assertIncludes(error2%toString(), error_list1%toString())
     end function checkAppendEmpty
 
-    function checkCombineEmpty() result(result_)
+    pure function checkCombineEmpty() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: error_list1
@@ -175,7 +175,7 @@ contains
         result_ = assertEmpty(error_list1%toString())
     end function checkCombineEmpty
 
-    function checkCombine() result(result_)
+    pure function checkCombine() result(result_)
         type(Result_t) :: result_
 
         class(Error_t), allocatable :: error1
@@ -209,7 +209,7 @@ contains
                 .and.assertIncludes(error4%toString(), error_list1%toString())
     end function checkCombine
 
-    function checkFilterByType() result(result_)
+    pure function checkFilterByType() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: errors
@@ -229,7 +229,7 @@ contains
                         "INTERNAL or UNKNOWN_TYPE")
     end function checkFilterByType
 
-    function checkFilterByOriginatingModule() result(result_)
+    pure function checkFilterByOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: errors
@@ -269,7 +269,7 @@ contains
                         module1%repr() // " or " // module2%repr())
     end function checkFilterByOriginatingModule
 
-    function checkFilterByOriginatingProcedure() result(result_)
+    pure function checkFilterByOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: errors
@@ -309,7 +309,7 @@ contains
                         procedure1%repr() // " or " // procedure2%repr())
     end function checkFilterByOriginatingProcedure
 
-    function checkFilterByModulesThrough() result(result_)
+    pure function checkFilterByModulesThrough() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -405,7 +405,7 @@ contains
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
     end function checkFilterByModulesThrough
 
-    function checkFilterByProceduresThrough() result(result_)
+    pure function checkFilterByProceduresThrough() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -501,7 +501,7 @@ contains
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresThrough
 
-    function checkFilterByModulesFrom() result(result_)
+    pure function checkFilterByModulesFrom() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -597,7 +597,7 @@ contains
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
     end function checkFilterByModulesFrom
 
-    function checkFilterByProceduresFrom() result(result_)
+    pure function checkFilterByProceduresFrom() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -693,7 +693,7 @@ contains
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresFrom
 
-    function checkFilterByContents() result(result_)
+    pure function checkFilterByContents() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: errors
@@ -735,7 +735,7 @@ contains
                         'includingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
     end function checkFilterByContents
 
-    function checkForType() result(result_)
+    pure function checkForType() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: empty_list
@@ -753,7 +753,7 @@ contains
                         errors%repr() // ".hasType." // FATAL_TYPE%repr())
     end function checkForType
 
-    function checkForOriginatingModule() result(result_)
+    pure function checkForOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: empty_list
@@ -783,7 +783,7 @@ contains
                         errors%repr() // ".hasAnyOriginatingFrom." // module1%repr())
     end function checkForOriginatingModule
 
-    function checkForOriginatingProcedure() result(result_)
+    pure function checkForOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: empty_list
@@ -813,7 +813,7 @@ contains
                         errors%repr() // ".hasAnyOriginatingFrom." // procedure1%repr())
     end function checkForOriginatingProcedure
 
-    function checkForThroughModule() result(result_)
+    pure function checkForThroughModule() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -899,7 +899,7 @@ contains
                         top_level_errors%repr() // ".hasAnyCominghThrough." // branch1_bottom_module%repr())
     end function checkForThroughModule
 
-    function checkForThroughProcedure() result(result_)
+    pure function checkForThroughProcedure() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -985,7 +985,7 @@ contains
                         top_level_errors%repr() // ".hasAnyCominghThrough." // branch1_bottom_procedure%repr())
     end function checkForThroughProcedure
 
-    function checkForFromModule() result(result_)
+    pure function checkForFromModule() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -1071,7 +1071,7 @@ contains
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_bottom_module%repr())
     end function checkForFromModule
 
-    function checkForFromProcedure() result(result_)
+    pure function checkForFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: branch1_bottom_errors
@@ -1157,7 +1157,7 @@ contains
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_bottom_procedure%repr())
     end function checkForFromProcedure
 
-    function checkForContents() result(result_)
+    pure function checkForContents() result(result_)
         type(Result_t) :: result_
 
         type(ErrorList_t) :: errors
