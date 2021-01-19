@@ -2,18 +2,15 @@ module erloff
     use Error_list_m, only: ErrorList_t, size
     use Message_m, only: &
             ! Types
-            Info_t, &
             Warning_t, &
             Error_t, &
             Fatal_t, &
             Internal_t, &
             ! Message constructors
-            Info, &
             Warning, &
             Fatal, &
             Internal, &
             ! Message types
-            INFO_TYPE, &
             WARNING_TYPE, &
             ERROR_TYPE, &
             FATAL_TYPE, &
@@ -28,6 +25,7 @@ module erloff
     use Message_list_m, only: MessageList_t, size
     use erloff_debug_m, only: Debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL, MEDIUM, DETAILED, NITTY_GRITTY
+    use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use erloff_module_m, only: module_t

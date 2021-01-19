@@ -1,8 +1,9 @@
 module message_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
     use Message_m, only: &
-            Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
+            Fatal, Warning, WARNING_TYPE
     use Message_list_m, only: MessageList_t, size
+    use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
@@ -106,7 +107,7 @@ contains
         class(Message_t), allocatable :: message
         type(MessageList_t) :: message_list
 
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
         call message_list%appendMessage(message)
 
@@ -121,7 +122,7 @@ contains
         type(MessageList_t) :: message_list1
         type(MessageList_t) :: message_list2
 
-        allocate(message1, source = Info( &
+        allocate(message1, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "First Message"))
         allocate(message2, source = Warning( &
                 module_t("Some_m"), procedure_t("some"), "Second Message"))
@@ -144,7 +145,7 @@ contains
         type(MessageList_t) :: message_list1
         type(MessageList_t) :: message_list2
 
-        allocate(message1, source = Info( &
+        allocate(message1, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "First Message"))
         allocate(message2, source = Warning( &
                 module_t("Some_m"), procedure_t("some"), "Second Message"))
@@ -181,14 +182,14 @@ contains
         type(MessageList_t) :: message_list1
         type(MessageList_t) :: message_list2
 
-        allocate(message1, source = Info( &
+        allocate(message1, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "First Message"))
         allocate(message2, source = Warning( &
                 module_t("Some_m"), procedure_t("some"), "Second Message"))
         call message_list1%appendMessage(message1)
         call message_list1%appendMessage(message2)
 
-        allocate(message3, source = Info( &
+        allocate(message3, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "Third Message"))
         allocate(message4, source = Warning( &
                 module_t("Some_m"), procedure_t("some"), "Fourth Message"))
@@ -210,7 +211,7 @@ contains
 
         type(MessageList_t) :: messages
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test message"))
         call messages%appendMessage(Warning( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
@@ -218,10 +219,10 @@ contains
                 module_t("Some_m"), procedure_t("some"), "Test error"))
 
         result_ = &
-                assert_Equals(1, size(messages.ofType.INFO_TYPE), "INFO") &
+                assert_Equals(1, size(messages.ofType.INFO), "INFO") &
                 .and.assert_Equals( &
                         2, &
-                        size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
+                        size(messages.ofTypes.[INFO, WARNING_TYPE]), &
                         "INFO or WARNING")
     end function checkFilterByType
 
@@ -243,11 +244,11 @@ contains
         procedure2 = procedure_t("another")
         procedure3 = procedure_t("yetAnother")
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module2, procedure2, "Another message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module3, procedure3, "Yet another message"))
 
         result_ = &
@@ -283,11 +284,11 @@ contains
         procedure2 = procedure_t("another")
         procedure3 = procedure_t("yetAnother")
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module2, procedure2, "Another message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module3, procedure3, "Yet another message"))
 
         result_ = &
@@ -345,7 +346,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -353,7 +354,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -361,7 +362,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -441,7 +442,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -449,7 +450,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -457,7 +458,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -537,7 +538,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -545,7 +546,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -553,7 +554,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -633,7 +634,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -641,7 +642,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -649,7 +650,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -699,17 +700,17 @@ contains
         test_string1 = "Hello"
         test_string2 = "Test"
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Test"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Goodbye Test"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Example Message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Simple Message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Message"))
 
         result_ = &
@@ -737,16 +738,16 @@ contains
         type(MessageList_t) :: empty_list
         type(MessageList_t) :: messages
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
 
         result_ = &
                 assert_Not( &
-                        empty_list.hasType.INFO_TYPE, &
-                        empty_list%repr() // ".hasType." // INFO_TYPE%repr()) &
+                        empty_list.hasType.INFO, &
+                        empty_list%repr() // ".hasType." // INFO%repr()) &
                 .and.assert_That( &
-                        messages.hasType.INFO_TYPE, &
-                        messages%repr() // ".hasType." // INFO_TYPE%repr())
+                        messages.hasType.INFO, &
+                        messages%repr() // ".hasType." // INFO%repr())
     end function checkForType
 
     pure function checkForOriginatingModule() result(result_)
@@ -765,9 +766,9 @@ contains
         procedure1 = procedure_t("some")
         procedure2 = procedure_t("another")
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module2, procedure2, "Another message"))
 
         result_ = &
@@ -795,9 +796,9 @@ contains
         procedure1 = procedure_t("some")
         procedure2 = procedure_t("another")
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module2, procedure2, "Another message"))
 
         result_ = &
@@ -849,7 +850,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -857,7 +858,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -865,7 +866,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -935,7 +936,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -943,7 +944,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -951,7 +952,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -1021,7 +1022,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -1029,7 +1030,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -1037,7 +1038,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -1107,7 +1108,7 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(Info( &
+        call branch1_bottom_messages%appendMessage(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
@@ -1115,7 +1116,7 @@ contains
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(Info( &
+        call branch2_bottom_messages%appendMessage(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
@@ -1123,7 +1124,7 @@ contains
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(Info( &
+        call branch3_bottom_messages%appendMessage(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
@@ -1165,17 +1166,17 @@ contains
         test_string2 = "Test"
         test_string3 = "Other"
 
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Test"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Goodbye Test"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Example Message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Simple Message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
-        call messages%appendMessage(Info( &
+        call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Message"))
 
         result_ = &

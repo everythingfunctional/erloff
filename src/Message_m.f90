@@ -12,14 +12,6 @@ module Message_m
     implicit none
     private
 
-    type, public, extends(Message_t) :: Info_t
-    contains
-        private
-        procedure, public :: type_string => infoTypeString
-        procedure, public :: typeRepr => infoTypeRepr
-        procedure, public :: is_type => infoIsType
-    end type Info_t
-
     type, public, extends(Message_t) :: Warning_t
     contains
         private
@@ -50,13 +42,6 @@ module Message_m
         procedure, public :: is_type => internalIsType
     end type Internal_t
 
-    interface Info
-        module procedure genericInfoC
-        module procedure genericInfoS
-        module procedure infoWithTypeC
-        module procedure infoWithTypeS
-    end interface Info
-
     interface Warning
         module procedure genericWarningC
         module procedure genericWarningS
@@ -78,14 +63,11 @@ module Message_m
         module procedure internalWithTypeS
     end interface Internal
 
-    character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
     character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
     character(len=*), parameter :: ERROR_TYPE_STRING = "Error_t"
     character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
     character(len=*), parameter :: INTERNAL_TYPE_STRING = "Internal_t"
 
-    type(message_type_t), parameter, public :: INFO_TYPE = message_type_t( &
-            INFO_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: WARNING_TYPE = message_type_t( &
             WARNING_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: ERROR_TYPE = message_type_t( &
@@ -109,48 +91,8 @@ module Message_m
     type(message_type_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
             message_type_t("Unknown Type Encountered")
 
-    public :: Info, Warning, Fatal, Internal
+    public :: Warning, Fatal, Internal
 contains
-    pure function genericInfoC(module_, procedure_, message) result(info_)
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        character(len=*), intent(in) :: message
-        type(Info_t) :: info_
-
-        info_ = Info(INFO_TYPE, module_, procedure_, var_str(message))
-    end function genericInfoC
-
-    pure function genericInfoS(module_, procedure_, message) result(info_)
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(VARYING_STRING), intent(in) :: message
-        type(Info_t) :: info_
-
-        info_ = Info(INFO_TYPE, module_, procedure_, message)
-    end function genericInfoS
-
-    pure function infoWithTypeC(type_tag, module_, procedure_, message) result(info_)
-        type(message_type_t), intent(in) :: type_tag
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        character(len=*), intent(in) :: message
-        type(Info_t) :: info_
-
-        info_ = Info(type_tag, module_, procedure_, var_str(message))
-    end function infoWithTypeC
-
-    pure function infoWithTypeS(type_tag, module_, procedure_, message) result(info_)
-        type(message_type_t), intent(in) :: type_tag
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(VARYING_STRING), intent(in) :: message
-        type(Info_t) :: info_
-
-        info_%message_type = type_tag
-        info_%call_stack = call_stack_t(module_, procedure_)
-        info_%message = message
-    end function infoWithTypeS
-
     pure function genericWarningC(module_, procedure_, message) result(warning_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -270,38 +212,6 @@ contains
         internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
-
-    pure function infoTypeString(self) result(string)
-        class(Info_t), intent(in) :: self
-        type(VARYING_STRING) :: string
-
-        associate(a => self)
-        end associate
-
-        string = "IN: "
-    end function infoTypeString
-
-    pure function infoTypeRepr(self) result(repr)
-        class(Info_t), intent(in) :: self
-        type(VARYING_STRING) :: repr
-
-        associate(a => self)
-        end associate
-
-        repr = INFO_TYPE_STRING
-    end function infoTypeRepr
-
-    pure function infoIsType(self, type_tag) result(is_type)
-        class(Info_t), intent(in) :: self
-        type(message_type_t), intent(in) :: type_tag
-        logical :: is_type
-
-        if (trim(type_tag%description) == INFO_TYPE_STRING) then
-            is_type = .true.
-        else
-            is_type = self%message_type%description == type_tag%description
-        end if
-    end function
 
     pure function warningTypeString(self) result(string)
         class(Warning_t), intent(in) :: self

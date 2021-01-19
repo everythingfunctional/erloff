@@ -1,13 +1,11 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
     use Message_m, only: &
-            Info, &
             Warning, &
             Fatal, &
             Internal, &
             ERROR_TYPE, &
             FATAL_TYPE, &
-            INFO_TYPE, &
             INPUTS_TYPE, &
             INTERNAL_TYPE, &
             OUTSIDE_NORMAL_RANGE_TYPE, &
@@ -16,6 +14,7 @@ module message_test
             WARNING_TYPE
     use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL
+    use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
@@ -79,7 +78,7 @@ contains
                 GENERAL, &
                 "Test Message"))
 
-        allocate(info_message, source = Info( &
+        allocate(info_message, source = info_t( &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
@@ -111,8 +110,8 @@ contains
                         debug_message.isType.INPUTS_TYPE, &
                         debug_message%repr() // ".isType." // INPUTS_TYPE%repr()) &
                 .and.assert_Not( &
-                        debug_message.isType.INFO_TYPE, &
-                        debug_message%repr() // ".isType." // INFO_TYPE%repr()) &
+                        debug_message.isType.INFO, &
+                        debug_message%repr() // ".isType." // INFO%repr()) &
                 .and.assert_Not( &
                         debug_message.isType.ERROR_TYPE, &
                         debug_message%repr() // ".isType." // ERROR_TYPE%repr()) &
@@ -123,8 +122,8 @@ contains
                         warning_message.isType.OUTSIDE_NORMAL_RANGE_TYPE, &
                         warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE_TYPE%repr()) &
                 .and.assert_Not( &
-                        warning_message.isType.INFO_TYPE, &
-                        warning_message%repr() // ".isType." // INFO_TYPE%repr()) &
+                        warning_message.isType.INFO, &
+                        warning_message%repr() // ".isType." // INFO%repr()) &
                 .and.assert_Not( &
                         warning_message.isType.ERROR_TYPE, &
                         warning_message%repr() // ".isType." // ERROR_TYPE%repr()) &
@@ -166,7 +165,7 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
 
@@ -197,7 +196,7 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_procedure = procedure_t("other")
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
 
@@ -228,7 +227,7 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
 
@@ -259,7 +258,7 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_procedure = procedure_t("other")
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
 
@@ -290,7 +289,7 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
 
@@ -321,7 +320,7 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_procedure = procedure_t("other")
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
 
@@ -348,7 +347,7 @@ contains
         type(VARYING_STRING) :: includesAllStrings2(2)
         type(VARYING_STRING) :: includesAllStrings3(2)
 
-        allocate(message, source = Info( &
+        allocate(message, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message Content"))
         includesAnyStrings1(1) = var_str("Test")
         includesAnyStrings1(2) = var_str("else")
