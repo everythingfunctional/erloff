@@ -1,7 +1,8 @@
 module Error_list_m
+    use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
-    use Message_m, only: Error_t, MessageType_t
+    use Message_m, only: Error_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: Procedure_t
     use strff, only: hanging_indent, indent, join, NEWLINE
@@ -152,7 +153,7 @@ contains
 
     pure function ofType(self, type_tag) result(new_list)
         class(ErrorList_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(ErrorList_t) :: new_list
 
         new_list = self.ofTypes.[type_tag]
@@ -160,7 +161,7 @@ contains
 
     pure function ofTypes(self, type_tags) result(new_list)
         class(ErrorList_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tags(:)
+        type(message_type_t), intent(in) :: type_tags(:)
         type(ErrorList_t) :: new_list
 
         logical :: final_mask(self%length)
@@ -485,7 +486,7 @@ contains
 
     pure function hasType(self, type_tag)
         class(ErrorList_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: hasType
 
         hasType = size(self.ofType.type_tag) > 0

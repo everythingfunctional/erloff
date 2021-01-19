@@ -1,5 +1,6 @@
 module Message_m
     use erloff_call_stack_m, only: call_stack_t
+    use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
     use erloff_module_m, only: module_t
@@ -9,19 +10,11 @@ module Message_m
     implicit none
     private
 
-    type, public :: MessageType_t
-        character(len=100) :: description
-    contains
-        private
-        procedure, public :: toString => messageTypeToString
-        procedure, public :: repr => messageTypeRepr
-    end type MessageType_t
-
     type, public, abstract :: Message_t
         private
         type(call_stack_t) :: call_stack
         type(VARYING_STRING) :: message
-        type(MessageType_t) :: message_type
+        type(message_type_t) :: message_type
     contains
         private
         procedure, public :: prependNames
@@ -159,32 +152,32 @@ module Message_m
     character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
     character(len=*), parameter :: INTERNAL_TYPE_STRING = "Internal_t"
 
-    type(MessageType_t), parameter, public :: DEBUG_TYPE = MessageType_t( &
-            DEBUG_TYPE_STRING)
-    type(MessageType_t), parameter, public :: INFO_TYPE = MessageType_t( &
-            INFO_TYPE_STRING)
-    type(MessageType_t), parameter, public :: WARNING_TYPE = MessageType_t( &
-            WARNING_TYPE_STRING)
-    type(MessageType_t), parameter, public :: ERROR_TYPE = MessageType_t( &
-            ERROR_TYPE_STRING)
-    type(MessageType_t), parameter, public :: FATAL_TYPE = MessageType_t( &
-            FATAL_TYPE_STRING)
-    type(MessageType_t), parameter, public :: INTERNAL_TYPE = MessageType_t( &
-            INTERNAL_TYPE_STRING)
-    type(MessageType_t), parameter, public :: INPUTS_TYPE = MessageType_t( &
+    type(message_type_t), parameter, public :: DEBUG_TYPE = message_type_t( &
+            DEBUG_TYPE_STRING, .true.)
+    type(message_type_t), parameter, public :: INFO_TYPE = message_type_t( &
+            INFO_TYPE_STRING, .true.)
+    type(message_type_t), parameter, public :: WARNING_TYPE = message_type_t( &
+            WARNING_TYPE_STRING, .true.)
+    type(message_type_t), parameter, public :: ERROR_TYPE = message_type_t( &
+            ERROR_TYPE_STRING, .true.)
+    type(message_type_t), parameter, public :: FATAL_TYPE = message_type_t( &
+            FATAL_TYPE_STRING, .true.)
+    type(message_type_t), parameter, public :: INTERNAL_TYPE = message_type_t( &
+            INTERNAL_TYPE_STRING, .true.)
+    type(message_type_t), parameter, public :: INPUTS_TYPE = message_type_t( &
             "Inputs")
-    type(MessageType_t), parameter, public :: NOT_FOUND_TYPE = MessageType_t( &
+    type(message_type_t), parameter, public :: NOT_FOUND_TYPE = message_type_t( &
             "Not Found")
-    type(MessageType_t), parameter, public :: OUT_OF_BOUNDS_TYPE = MessageType_t( &
+    type(message_type_t), parameter, public :: OUT_OF_BOUNDS_TYPE = message_type_t( &
             "Out of Bounds")
-    type(MessageType_t), parameter, public :: OUTPUTS_TYPE = MessageType_t( &
+    type(message_type_t), parameter, public :: OUTPUTS_TYPE = message_type_t( &
             "Outputs")
-    type(MessageType_t), parameter, public :: OUTSIDE_NORMAL_RANGE_TYPE = &
-            MessageType_t("Outside Normal Range")
-    type(MessageType_t), parameter, public :: UNEQUAL_ARRAY_SIZES_TYPE = &
-            MessageType_t("Unequal Array Sizes")
-    type(MessageType_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
-            MessageType_t("Unknown Type Encountered")
+    type(message_type_t), parameter, public :: OUTSIDE_NORMAL_RANGE_TYPE = &
+            message_type_t("Outside Normal Range")
+    type(message_type_t), parameter, public :: UNEQUAL_ARRAY_SIZES_TYPE = &
+            message_type_t("Unequal Array Sizes")
+    type(message_type_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
+            message_type_t("Unknown Type Encountered")
 
     type(DebugLevel_t), public, parameter :: GENERAL = DebugLevel_t(1)
     type(DebugLevel_t), public, parameter :: MEDIUM = DebugLevel_t(2)
@@ -215,7 +208,7 @@ contains
 
     pure function debugWithTypeC( &
             type_tag, module_, procedure_, level, message) result(debug_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(DebugLevel_t), intent(in) :: level
@@ -227,7 +220,7 @@ contains
 
     pure function debugWithTypeS( &
             type_tag, module_, procedure_, level, message) result(debug_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(DebugLevel_t), intent(in) :: level
@@ -259,7 +252,7 @@ contains
     end function genericInfoS
 
     pure function infoWithTypeC(type_tag, module_, procedure_, message) result(info_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -269,7 +262,7 @@ contains
     end function infoWithTypeC
 
     pure function infoWithTypeS(type_tag, module_, procedure_, message) result(info_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -299,7 +292,7 @@ contains
     end function genericWarningS
 
     pure function warningWithTypeC(type_tag, module_, procedure_, message) result(warning_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -309,7 +302,7 @@ contains
     end function warningWithTypeC
 
     pure function warningWithTypeS(type_tag, module_, procedure_, message) result(warning_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -339,7 +332,7 @@ contains
     end function genericFatalS
 
     pure function fatalWithTypeC(type_tag, module_, procedure_, message) result(fatal_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -349,7 +342,7 @@ contains
     end function fatalWithTypeC
 
     pure function fatalWithTypeS(type_tag, module_, procedure_, message) result(fatal_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -379,7 +372,7 @@ contains
     end function genericInternalS
 
     pure function internalWithTypeC(type_tag, module_, procedure_, message) result(internal_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         character(len=*), intent(in) :: message
@@ -389,7 +382,7 @@ contains
     end function internalWithTypeC
 
     pure function internalWithTypeS(type_tag, module_, procedure_, message) result(internal_)
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
         type(VARYING_STRING), intent(in) :: message
@@ -399,31 +392,6 @@ contains
         internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
-
-    pure function messageTypeToString(self) result(string)
-        class(MessageType_t), intent(in) :: self
-        type(VARYING_STRING) :: string
-
-        select case (trim(self%description))
-        case ( &
-                DEBUG_TYPE_STRING, &
-                INFO_TYPE_STRING, &
-                WARNING_TYPE_STRING, &
-                ERROR_TYPE_STRING, &
-                FATAL_TYPE_STRING, &
-                INTERNAL_TYPE_STRING)
-            string = ""
-        case default
-            string = trim(self%description) // ": "
-        end select
-    end function messageTypeToString
-
-    pure function messageTypeRepr(self) result(repr)
-        class(MessageType_t), intent(in) :: self
-        type(VARYING_STRING) :: repr
-
-        repr = "MessageType(" // trim(self%description) // ")"
-    end function messageTypeRepr
 
     pure subroutine prependNames(self, module_, procedure_)
         class(Message_t), intent(inout) :: self
@@ -439,14 +407,14 @@ contains
 
         string = hanging_indent( &
                 self%call_stack%to_string() // ":" // NEWLINE &
-                    // self%typeString() // self%message_type%toString() &
+                    // self%typeString() // self%message_type%to_string() &
                     // self%message, &
                 4)
     end function messageToString
 
     pure function isType(self, type_tag)
         class(Message_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: isType
 
         isType = self%message_type%description == type_tag%description
@@ -584,7 +552,7 @@ contains
 
     pure function debugIsType(self, type_tag) result(is_type)
         class(Debug_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
         if (trim(type_tag%description) == DEBUG_TYPE_STRING) then
@@ -616,7 +584,7 @@ contains
 
     pure function infoIsType(self, type_tag) result(is_type)
         class(Info_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
         if (trim(type_tag%description) == INFO_TYPE_STRING) then
@@ -648,7 +616,7 @@ contains
 
     pure function warningIsType(self, type_tag) result(is_type)
         class(Warning_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
         if (trim(type_tag%description) == WARNING_TYPE_STRING) then
@@ -660,7 +628,7 @@ contains
 
     pure function errorIsType(self, type_tag) result(is_type)
         class(Error_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
         if (trim(type_tag%description) == ERROR_TYPE_STRING) then
@@ -692,7 +660,7 @@ contains
 
     pure function fatalIsType(self, type_tag) result(is_type)
         class(Fatal_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
         if (trim(type_tag%description) == ERROR_TYPE_STRING) then
@@ -726,7 +694,7 @@ contains
 
     pure function internalIsType(self, type_tag) result(is_type)
         class(Internal_t), intent(in) :: self
-        type(MessageType_t), intent(in) :: type_tag
+        type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
         if (trim(type_tag%description) == ERROR_TYPE_STRING) then
