@@ -114,7 +114,7 @@ contains
                 module_t("Some_m"), procedure_t("some"), "Test Error"))
         call error_list%appendError(error)
 
-        result_ = assert_Includes(error%toString(), error_list%toString())
+        result_ = assert_Includes(error%to_string(), error_list%toString())
     end function checkAppendToEmpty
 
     pure function checkAppendMultipleToEmpty() result(result_)
@@ -136,8 +136,8 @@ contains
                 error_list1, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(error1%toString(), error_list2%toString()) &
-                .and.assert_Includes(error2%toString(), error_list2%toString())
+                assert_Includes(error1%to_string(), error_list2%toString()) &
+                .and.assert_Includes(error2%to_string(), error_list2%toString())
     end function checkAppendMultipleToEmpty
 
     pure function checkAppendEmpty() result(result_)
@@ -159,8 +159,8 @@ contains
                 error_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(error1%toString(), error_list1%toString()) &
-                .and.assert_Includes(error2%toString(), error_list1%toString())
+                assert_Includes(error1%to_string(), error_list1%toString()) &
+                .and.assert_Includes(error2%to_string(), error_list1%toString())
     end function checkAppendEmpty
 
     pure function checkCombineEmpty() result(result_)
@@ -203,10 +203,10 @@ contains
                 error_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(error1%toString(), error_list1%toString()) &
-                .and.assert_Includes(error2%toString(), error_list1%toString()) &
-                .and.assert_Includes(error3%toString(), error_list1%toString()) &
-                .and.assert_Includes(error4%toString(), error_list1%toString())
+                assert_Includes(error1%to_string(), error_list1%toString()) &
+                .and.assert_Includes(error2%to_string(), error_list1%toString()) &
+                .and.assert_Includes(error3%to_string(), error_list1%toString()) &
+                .and.assert_Includes(error4%to_string(), error_list1%toString())
     end function checkCombine
 
     pure function checkFilterByType() result(result_)

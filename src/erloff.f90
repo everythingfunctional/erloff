@@ -2,7 +2,6 @@ module erloff
     use Error_list_m, only: ErrorList_t, size
     use Message_m, only: &
             ! Types
-            Message_t, &
             Debug_t, &
             Info_t, &
             Warning_t, &
@@ -35,6 +34,7 @@ module erloff
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE
     use Message_list_m, only: MessageList_t, size
+    use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t

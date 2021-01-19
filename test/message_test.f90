@@ -1,7 +1,6 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
     use Message_m, only: &
-            Message_t, &
             Debug, &
             Info, &
             Warning, &
@@ -18,6 +17,7 @@ module message_test
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE, &
             WARNING_TYPE
+    use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use vegetables, only: &

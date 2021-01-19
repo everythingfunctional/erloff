@@ -583,7 +583,7 @@ contains
             string = ""
         else
             do i = 1, self%length
-                strings(i) = self%errors(i)%error%toString()
+                strings(i) = self%errors(i)%error%to_string()
             end do
             string = join(strings, NEWLINE)
         end if

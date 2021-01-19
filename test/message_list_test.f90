@@ -1,8 +1,9 @@
 module message_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
     use Message_m, only: &
-            Message_t, Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
+            Fatal, Info, Warning, INFO_TYPE, WARNING_TYPE
     use Message_list_m, only: MessageList_t, size
+    use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use vegetables, only: &
@@ -109,7 +110,7 @@ contains
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
         call message_list%appendMessage(message)
 
-        result_ = assert_Includes(message%toString(), message_list%toString())
+        result_ = assert_Includes(message%to_string(), message_list%toString())
     end function checkAppendToEmpty
 
     pure function checkAppendMultipleToEmpty() result(result_)
@@ -131,8 +132,8 @@ contains
                 message_list1, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(message1%toString(), message_list2%toString()) &
-                .and.assert_Includes(message2%toString(), message_list2%toString())
+                assert_Includes(message1%to_string(), message_list2%toString()) &
+                .and.assert_Includes(message2%to_string(), message_list2%toString())
     end function checkAppendMultipleToEmpty
 
     pure function checkAppendEmpty() result(result_)
@@ -154,8 +155,8 @@ contains
                 message_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(message1%toString(), message_list1%toString()) &
-                .and.assert_Includes(message2%toString(), message_list1%toString())
+                assert_Includes(message1%to_string(), message_list1%toString()) &
+                .and.assert_Includes(message2%to_string(), message_list1%toString())
     end function checkAppendEmpty
 
     pure function checkCombineEmpty() result(result_)
@@ -198,10 +199,10 @@ contains
                 message_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(message1%toString(), message_list1%toString()) &
-                .and.assert_Includes(message2%toString(), message_list1%toString()) &
-                .and.assert_Includes(message3%toString(), message_list1%toString()) &
-                .and.assert_Includes(message4%toString(), message_list1%toString())
+                assert_Includes(message1%to_string(), message_list1%toString()) &
+                .and.assert_Includes(message2%to_string(), message_list1%toString()) &
+                .and.assert_Includes(message3%to_string(), message_list1%toString()) &
+                .and.assert_Includes(message4%to_string(), message_list1%toString())
     end function checkCombine
 
     pure function checkFilterByType() result(result_)

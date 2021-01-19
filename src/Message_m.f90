@@ -1,5 +1,6 @@
 module Message_m
     use erloff_call_stack_m, only: call_stack_t
+    use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
@@ -9,42 +10,6 @@ module Message_m
 
     implicit none
     private
-
-    type, public, abstract :: Message_t
-        private
-        type(call_stack_t) :: call_stack
-        type(VARYING_STRING) :: message
-        type(message_type_t) :: message_type
-    contains
-        private
-        procedure, public :: prependNames
-        procedure, public :: toString => messageToString
-        procedure(messageToString_), deferred :: typeString
-        procedure :: isType
-        generic, public :: operator(.isType.) => isType
-        procedure :: originatedFromModule
-        procedure :: originatedFromProcedure
-        generic, public :: operator(.originatedFrom.) => &
-                originatedFromModule, originatedFromProcedure
-        procedure :: isFromModule
-        procedure :: isFromProcedure
-        generic, public :: operator(.isFrom.) => &
-                isFromModule, isFromProcedure
-        procedure :: cameThroughModule
-        procedure :: cameThroughProcedure
-        generic, public :: operator(.cameThrough.) => &
-                cameThroughModule, cameThroughProcedure
-        procedure :: includesC
-        procedure :: includesS
-        generic, public :: operator(.includes.) => &
-                includesC, includesS
-        procedure :: includesAnyOf
-        generic, public :: operator(.includesAnyOf.) => includesAnyOf
-        procedure :: includesAllOf
-        generic, public :: operator(.includesAllOf.) => includesAllOf
-        procedure, public :: repr => messageRepr
-        procedure(messageToString_), deferred :: typeRepr
-    end type Message_t
 
     type :: DebugLevel_t
         private
@@ -59,56 +24,48 @@ module Message_m
         type(DebugLevel_t) :: level
     contains
         private
-        procedure :: typeString => debugTypeString
-        procedure :: typeRepr => debugTypeRepr
-        procedure :: isType => debugIsType
+        procedure, public :: type_string => debugTypeString
+        procedure, public :: typeRepr => debugTypeRepr
+        procedure, public :: is_type => debugIsType
     end type Debug_t
 
     type, public, extends(Message_t) :: Info_t
     contains
         private
-        procedure :: typeString => infoTypeString
-        procedure :: typeRepr => infoTypeRepr
-        procedure :: isType => infoIsType
+        procedure, public :: type_string => infoTypeString
+        procedure, public :: typeRepr => infoTypeRepr
+        procedure, public :: is_type => infoIsType
     end type Info_t
 
     type, public, extends(Message_t) :: Warning_t
     contains
         private
-        procedure :: typeString => warningTypeString
-        procedure :: typeRepr => warningTypeRepr
-        procedure :: isType => warningIsType
+        procedure, public :: type_string => warningTypeString
+        procedure, public :: typeRepr => warningTypeRepr
+        procedure, public :: is_type => warningIsType
     end type Warning_t
 
     type, public, abstract, extends(Message_t) :: Error_t
     contains
         private
-        procedure :: isType => errorIsType
+        procedure, public :: isType => errorIsType
     end type Error_t
 
     type, public, extends(Error_t) :: Fatal_t
     contains
         private
-        procedure :: typeString => fatalTypeString
-        procedure :: typeRepr => fatalTypeRepr
-        procedure :: isType => fatalIsType
+        procedure, public :: type_string => fatalTypeString
+        procedure, public :: typeRepr => fatalTypeRepr
+        procedure, public :: is_type => fatalIsType
     end type Fatal_t
 
     type, public, extends(Error_t) :: Internal_t
     contains
         private
-        procedure :: typeString => internalTypeString
-        procedure :: typeRepr => internalTypeRepr
-        procedure :: isType => internalIsType
+        procedure, public :: type_string => internalTypeString
+        procedure, public :: typeRepr => internalTypeRepr
+        procedure, public :: is_type => internalIsType
     end type Internal_t
-
-    abstract interface
-        pure function messageToString_(self) result(string)
-            import Message_t, VARYING_STRING
-            class(Message_t), intent(in) :: self
-            type(VARYING_STRING) :: string
-        end function messageToString_
-    end interface
 
     interface Debug
         module procedure genericDebugC
@@ -392,142 +349,6 @@ contains
         internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
-
-    pure subroutine prependNames(self, module_, procedure_)
-        class(Message_t), intent(inout) :: self
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-
-        self%call_stack = self%call_stack%with_names_prepended(module_, procedure_)
-    end subroutine prependNames
-
-    pure function messageToString(self) result(string)
-        class(Message_t), intent(in) :: self
-        type(VARYING_STRING) :: string
-
-        string = hanging_indent( &
-                self%call_stack%to_string() // ":" // NEWLINE &
-                    // self%typeString() // self%message_type%to_string() &
-                    // self%message, &
-                4)
-    end function messageToString
-
-    pure function isType(self, type_tag)
-        class(Message_t), intent(in) :: self
-        type(message_type_t), intent(in) :: type_tag
-        logical :: isType
-
-        isType = self%message_type%description == type_tag%description
-    end function isType
-
-    pure function originatedFromModule(self, module_) result(originated_from)
-        class(Message_t), intent(in) :: self
-        type(Module_t), intent(in) :: module_
-        logical :: originated_from
-
-        originated_from = self%call_stack.originatedFrom.module_
-    end function originatedFromModule
-
-    pure function originatedFromProcedure(self, procedure_) result(originated_from)
-        class(Message_t), intent(in) :: self
-        type(Procedure_t), intent(in) :: procedure_
-        logical :: originated_from
-
-        originated_from = self%call_stack.originatedFrom.procedure_
-    end function originatedFromProcedure
-
-    pure function isFromModule(self, module_) result(is_from)
-        class(Message_t), intent(in) :: self
-        type(Module_t), intent(in) :: module_
-        logical :: is_from
-
-        is_from = self%call_stack.includes.module_
-    end function isFromModule
-
-    pure function isFromProcedure(self, procedure_) result(is_from)
-        class(Message_t), intent(in) :: self
-        type(Procedure_t), intent(in) :: procedure_
-        logical :: is_from
-
-        is_from = self%call_stack.includes.procedure_
-    end function isFromProcedure
-
-    pure function cameThroughModule(self, module_) result(came_through)
-        class(Message_t), intent(in) :: self
-        type(Module_t), intent(in) :: module_
-        logical :: came_through
-
-        came_through = &
-                (.not.(self.originatedFrom.module_)) &
-                .and.(self.isFrom.module_)
-    end function cameThroughModule
-
-    pure function cameThroughProcedure(self, procedure_) result(came_through)
-        class(Message_t), intent(in) :: self
-        type(Procedure_t), intent(in) :: procedure_
-        logical :: came_through
-
-        came_through = &
-                (.not.(self.originatedFrom.procedure_)) &
-                .and.(self.isFrom.procedure_)
-    end function cameThroughProcedure
-
-    pure function includesC(self, string) result(includes)
-        class(Message_t), intent(in) :: self
-        character(len=*), intent(in) :: string
-        logical :: includes
-
-        includes = self.includes.var_str(string)
-    end function includesC
-
-    pure function includesS(self, string) result(includes)
-        class(Message_t), intent(in) :: self
-        type(VARYING_STRING), intent(in) :: string
-        logical :: includes
-
-        includes = self%message.includes.string
-    end function includesS
-
-    pure function includesAnyOf(self, strings) result(includes)
-        class(Message_t), intent(in) :: self
-        type(VARYING_STRING), intent(in) :: strings(:)
-        logical :: includes
-
-        integer :: i
-        logical :: includes_(size(strings))
-
-        do i = 1, size(strings)
-            includes_(i) = self.includes.strings(i)
-        end do
-        includes = any(includes_)
-    end function includesAnyOf
-
-    pure function includesAllOf(self, strings) result(includes)
-        class(Message_t), intent(in) :: self
-        type(VARYING_STRING), intent(in) :: strings(:)
-        logical :: includes
-
-        integer :: i
-        logical :: includes_(size(strings))
-
-        do i = 1, size(strings)
-            includes_(i) = self.includes.strings(i)
-        end do
-        includes = all(includes_)
-    end function includesAllOf
-
-    pure function messageRepr(self) result(repr)
-        class(Message_t), intent(in) :: self
-        type(VARYING_STRING) :: repr
-
-        repr = hanging_indent( &
-                'Message(' // NEWLINE &
-                    // 'type = ' // self%typeRepr() // ',' // NEWLINE &
-                    // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
-                    // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
-                    // 'message = "' // self%message // '"', &
-                4) // NEWLINE // ')'
-    end function messageRepr
 
     pure function debugLevelToString(self) result(string)
         class(DebugLevel_t), intent(in) :: self
