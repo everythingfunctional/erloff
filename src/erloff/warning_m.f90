@@ -1,0 +1,143 @@
+module erloff_warning_m
+    use erloff_call_stack_m, only: call_stack_t
+    use erloff_message_m, only: message_t
+    use erloff_message_type_m, only: message_type_t
+    use erloff_module_m, only: module_t
+    use erloff_procedure_m, only: procedure_t
+    use iso_varying_string, only: &
+            varying_string, assignment(=), operator(//), var_str
+    use strff, only: hanging_indent, NEWLINE
+
+    implicit none
+    private
+    public :: warning_t, WARNING
+
+    type, extends(Message_t) :: warning_t
+    contains
+        private
+        procedure, public :: with_names_prepended
+        procedure, public :: type_string
+        procedure, public :: repr
+        procedure, public :: typeRepr => warningTypeRepr
+        procedure, public :: is_type
+    end type
+
+    interface warning_t
+        module procedure generic_warning_c
+        module procedure generic_warning_s
+        module procedure warning_with_type_c
+        module procedure warning_with_type_s
+    end interface
+
+    character(len=*), parameter :: WARNING_TYPE_STRING = "warning_t"
+    type(message_type_t), parameter :: WARNING = message_type_t( &
+            WARNING_TYPE_STRING, .true.)
+contains
+    pure function generic_warning_c(module_, procedure_, message) result(warning_)
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(warning_t) :: warning_
+
+        warning_ = warning_t(WARNING, module_, procedure_, var_str(message))
+    end function
+
+    pure function generic_warning_s(module_, procedure_, message) result(warning_)
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        type(varying_string), intent(in) :: message
+        type(warning_t) :: warning_
+
+        warning_ = warning_t(WARNING, module_, procedure_, message)
+    end function
+
+    pure function warning_with_type_c( &
+            type_tag, module_, procedure_, message) result(warning_)
+        type(message_type_t), intent(in) :: type_tag
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        character(len=*), intent(in) :: message
+        type(warning_t) :: warning_
+
+        warning_ = warning_t(type_tag, module_, procedure_, var_str(message))
+    end function
+
+    pure function warning_with_type_s( &
+            type_tag, module_, procedure_, message) result(warning_)
+        type(message_type_t), intent(in) :: type_tag
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        type(varying_string), intent(in) :: message
+        type(warning_t) :: warning_
+
+        warning_ = internal_constructor( &
+                type_tag, call_stack_t(module_, procedure_), message)
+    end function
+
+    pure function internal_constructor(type_tag, call_stack, message) result(warning_)
+        type(message_type_t), intent(in) :: type_tag
+        type(call_stack_t), intent(in) :: call_stack
+        type(varying_string), intent(in) :: message
+        type(warning_t) :: warning_
+
+        warning_%message_type = type_tag
+        warning_%call_stack = call_stack
+        warning_%message = message
+    end function
+
+    function with_names_prepended(self, module_, procedure_) result(new_message)
+        class(warning_t), intent(in) :: self
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        class(message_t), allocatable :: new_message
+
+        new_message = internal_constructor( &
+                self%message_type, &
+                self%call_stack%with_names_prepended(module_, procedure_), &
+                self%message)
+    end function
+
+    pure function type_string(self) result(string)
+        class(warning_t), intent(in) :: self
+        type(varying_string) :: string
+
+        associate(a => self)
+        end associate
+
+        string = "WN: "
+    end function
+
+    pure function repr(self)
+        class(warning_t), intent(in) :: self
+        type(varying_string) :: repr
+
+        repr = hanging_indent( &
+                'warning_t(' // NEWLINE &
+                    // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
+                    // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
+                    // 'message = "' // self%message // '"', &
+                4) // NEWLINE // ')'
+    end function
+
+    pure function warningTypeRepr(self) result(repr)
+        class(warning_t), intent(in) :: self
+        type(varying_string) :: repr
+
+        associate(a => self)
+        end associate
+
+        repr = WARNING_TYPE_STRING
+    end function warningTypeRepr
+
+    pure function is_type(self, type_tag)
+        class(warning_t), intent(in) :: self
+        type(message_type_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == WARNING_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
+end module

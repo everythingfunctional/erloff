@@ -1,6 +1,5 @@
 module Message_m
     use erloff_call_stack_m, only: call_stack_t
-    use erloff_debug_level_m, only: debug_level_t
     use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
@@ -11,14 +10,6 @@ module Message_m
 
     implicit none
     private
-
-    type, public, extends(Message_t) :: Warning_t
-    contains
-        private
-        procedure, public :: type_string => warningTypeString
-        procedure, public :: typeRepr => warningTypeRepr
-        procedure, public :: is_type => warningIsType
-    end type Warning_t
 
     type, public, abstract, extends(Message_t) :: Error_t
     contains
@@ -42,13 +33,6 @@ module Message_m
         procedure, public :: is_type => internalIsType
     end type Internal_t
 
-    interface Warning
-        module procedure genericWarningC
-        module procedure genericWarningS
-        module procedure warningWithTypeC
-        module procedure warningWithTypeS
-    end interface Warning
-
     interface Fatal
         module procedure genericFatalC
         module procedure genericFatalS
@@ -63,13 +47,10 @@ module Message_m
         module procedure internalWithTypeS
     end interface Internal
 
-    character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
     character(len=*), parameter :: ERROR_TYPE_STRING = "Error_t"
     character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
     character(len=*), parameter :: INTERNAL_TYPE_STRING = "Internal_t"
 
-    type(message_type_t), parameter, public :: WARNING_TYPE = message_type_t( &
-            WARNING_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: ERROR_TYPE = message_type_t( &
             ERROR_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: FATAL_TYPE = message_type_t( &
@@ -91,48 +72,8 @@ module Message_m
     type(message_type_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
             message_type_t("Unknown Type Encountered")
 
-    public :: Warning, Fatal, Internal
+    public :: Fatal, Internal
 contains
-    pure function genericWarningC(module_, procedure_, message) result(warning_)
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        character(len=*), intent(in) :: message
-        type(Warning_t) :: warning_
-
-        warning_ = Warning(WARNING_TYPE, module_, procedure_, var_str(message))
-    end function genericWarningC
-
-    pure function genericWarningS(module_, procedure_, message) result(warning_)
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(VARYING_STRING), intent(in) :: message
-        type(Warning_t) :: warning_
-
-        warning_ = Warning(WARNING_TYPE, module_, procedure_, message)
-    end function genericWarningS
-
-    pure function warningWithTypeC(type_tag, module_, procedure_, message) result(warning_)
-        type(message_type_t), intent(in) :: type_tag
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        character(len=*), intent(in) :: message
-        type(Warning_t) :: warning_
-
-        warning_ = Warning(type_tag, module_, procedure_, var_str(message))
-    end function warningWithTypeC
-
-    pure function warningWithTypeS(type_tag, module_, procedure_, message) result(warning_)
-        type(message_type_t), intent(in) :: type_tag
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(VARYING_STRING), intent(in) :: message
-        type(Warning_t) :: warning_
-
-        warning_%message_type = type_tag
-        warning_%call_stack = call_stack_t(module_, procedure_)
-        warning_%message = message
-    end function warningWithTypeS
-
     pure function genericFatalC(module_, procedure_, message) result(fatal_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -212,38 +153,6 @@ contains
         internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
-
-    pure function warningTypeString(self) result(string)
-        class(Warning_t), intent(in) :: self
-        type(VARYING_STRING) :: string
-
-        associate(a => self)
-        end associate
-
-        string = "WN: "
-    end function warningTypeString
-
-    pure function warningTypeRepr(self) result(repr)
-        class(Warning_t), intent(in) :: self
-        type(VARYING_STRING) :: repr
-
-        associate(a => self)
-        end associate
-
-        repr = WARNING_TYPE_STRING
-    end function warningTypeRepr
-
-    pure function warningIsType(self, type_tag) result(is_type)
-        class(Warning_t), intent(in) :: self
-        type(message_type_t), intent(in) :: type_tag
-        logical :: is_type
-
-        if (trim(type_tag%description) == WARNING_TYPE_STRING) then
-            is_type = .true.
-        else
-            is_type = self%message_type%description == type_tag%description
-        end if
-    end function
 
     pure function errorIsType(self, type_tag) result(is_type)
         class(Error_t), intent(in) :: self

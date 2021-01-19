@@ -1,7 +1,6 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
     use Message_m, only: &
-            Warning, &
             Fatal, &
             Internal, &
             ERROR_TYPE, &
@@ -10,14 +9,14 @@ module message_test
             INTERNAL_TYPE, &
             OUTSIDE_NORMAL_RANGE_TYPE, &
             UNEQUAL_ARRAY_SIZES_TYPE, &
-            UNKNOWN_TYPE_TYPE, &
-            WARNING_TYPE
+            UNKNOWN_TYPE_TYPE
     use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL
     use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
+    use erloff_warning_m, only: warning_t, WARNING
     use vegetables, only: &
             Result_t, &
             Test_Item_t, &
@@ -84,7 +83,7 @@ contains
                 procedure_t("some"), &
                 "Test Message"))
 
-        allocate(warning_message, source = Warning( &
+        allocate(warning_message, source = warning_t( &
                 OUTSIDE_NORMAL_RANGE_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
@@ -116,8 +115,8 @@ contains
                         debug_message.isType.ERROR_TYPE, &
                         debug_message%repr() // ".isType." // ERROR_TYPE%repr()) &
                 .and.assert_That( &
-                        warning_message.isType.WARNING_TYPE, &
-                        warning_message%repr() // ".isType." // WARNING_TYPE%repr()) &
+                        warning_message.isType.WARNING, &
+                        warning_message%repr() // ".isType." // WARNING%repr()) &
                 .and.assert_That( &
                         warning_message.isType.OUTSIDE_NORMAL_RANGE_TYPE, &
                         warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE_TYPE%repr()) &

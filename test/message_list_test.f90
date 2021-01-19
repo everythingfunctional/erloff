@@ -1,12 +1,12 @@
 module message_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-    use Message_m, only: &
-            Fatal, Warning, WARNING_TYPE
+    use Message_m, only: Fatal
     use Message_list_m, only: MessageList_t, size
     use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
+    use erloff_warning_m, only: warning_t, WARNING
     use vegetables, only: &
             Result_t, &
             Test_Item_t, &
@@ -124,7 +124,7 @@ contains
 
         allocate(message1, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "First Message"))
-        allocate(message2, source = Warning( &
+        allocate(message2, source = warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Second Message"))
         call message_list1%appendMessage(message1)
         call message_list1%appendMessage(message2)
@@ -147,7 +147,7 @@ contains
 
         allocate(message1, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "First Message"))
-        allocate(message2, source = Warning( &
+        allocate(message2, source = warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Second Message"))
         call message_list1%appendMessage(message1)
         call message_list1%appendMessage(message2)
@@ -184,14 +184,14 @@ contains
 
         allocate(message1, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "First Message"))
-        allocate(message2, source = Warning( &
+        allocate(message2, source = warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Second Message"))
         call message_list1%appendMessage(message1)
         call message_list1%appendMessage(message2)
 
         allocate(message3, source = info_t( &
                 module_t("Some_m"), procedure_t("some"), "Third Message"))
-        allocate(message4, source = Warning( &
+        allocate(message4, source = warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Fourth Message"))
         call message_list2%appendMessage(message3)
         call message_list2%appendMessage(message4)
@@ -213,7 +213,7 @@ contains
 
         call messages%appendMessage(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test message"))
-        call messages%appendMessage(Warning( &
+        call messages%appendMessage(warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
         call messages%appendMessage(Fatal( &
                 module_t("Some_m"), procedure_t("some"), "Test error"))
@@ -222,7 +222,7 @@ contains
                 assert_Equals(1, size(messages.ofType.INFO), "INFO") &
                 .and.assert_Equals( &
                         2, &
-                        size(messages.ofTypes.[INFO, WARNING_TYPE]), &
+                        size(messages.ofTypes.[INFO, WARNING]), &
                         "INFO or WARNING")
     end function checkFilterByType
 
