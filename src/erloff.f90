@@ -36,7 +36,7 @@ module erloff
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE
     use Message_list_m, only: MessageList_t, size
-    use Module_m, only: Module_t, Module_
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t, Procedure_
 
     implicit none

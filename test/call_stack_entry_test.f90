@@ -1,7 +1,7 @@
 module call_stack_entry_test
     use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
     use iso_varying_string, only: operator(//)
-    use Module_m, only: Module_t, Module_
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t, Procedure_
     use vegetables, only: &
             Result_t, &
@@ -40,8 +40,8 @@ contains
         type(Module_t) :: the_module
         type(Procedure_t) :: the_procedure
 
-        other_module = Module_("Other_m")
-        the_module = Module_("Some_m")
+        other_module = module_t("Other_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         entry_ = CallStackEntry(the_module, the_procedure)
 
@@ -63,7 +63,7 @@ contains
         type(Procedure_t) :: the_procedure
 
         other_procedure = Procedure_("other")
-        the_module = Module_("Some_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
 
         entry_ = CallStackEntry(the_module, the_procedure)
@@ -84,12 +84,12 @@ contains
         type(Module_t) :: the_module
         type(Procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         entry_ = CallStackEntry(the_module, the_procedure)
 
         result_ = &
-                assert_Includes(the_module%toString(), entry_%toString()) &
+                assert_Includes(the_module%to_string(), entry_%toString()) &
                 .and.assert_Includes(the_procedure%toString(), entry_%toString())
     end function checkStringIncludes
 end module call_stack_entry_test

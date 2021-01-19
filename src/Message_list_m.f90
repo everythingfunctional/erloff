@@ -2,7 +2,7 @@ module Message_list_m
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
     use Message_m, only: Message_t, MessageType_t
-    use Module_m, only: Module_t
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t
     use strff, only: hanging_indent, indent, join, NEWLINE
 

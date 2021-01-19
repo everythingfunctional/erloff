@@ -1,6 +1,6 @@
 module Call_stack_entry_m
     use iso_varying_string, only: VARYING_STRING, operator(//)
-    use Module_m, only: Module_t
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t
     use strff, only: hanging_indent, indent, NEWLINE
 
@@ -36,7 +36,7 @@ contains
         class(CallStackEntry_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        string = self%module_%toString() // "." // self%procedure_%toString()
+        string = self%module_%to_string() // "." // self%procedure_%toString()
     end function toString
 
     elemental function isFromModule(self, module_)

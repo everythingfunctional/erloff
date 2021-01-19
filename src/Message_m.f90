@@ -2,7 +2,7 @@ module Message_m
     use Call_stack_m, only: CallStack_t, CallStack
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
-    use Module_m, only: Module_t
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t
     use strff, only: operator(.includes.), hanging_indent, to_string, NEWLINE
 

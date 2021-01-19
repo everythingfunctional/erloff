@@ -8,7 +8,7 @@ module error_list_test
             FATAL_TYPE, &
             INTERNAL_TYPE, &
             UNKNOWN_TYPE_TYPE
-    use Module_m, only: Module_t, Module_
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t, Procedure_
     use vegetables, only: &
             Result_t, &
@@ -111,7 +111,7 @@ contains
         type(ErrorList_t) :: error_list
 
         allocate(error, source = Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Test Error"))
+                module_t("Some_m"), Procedure_("some"), "Test Error"))
         call error_list%appendError(error)
 
         result_ = assert_Includes(error%toString(), error_list%toString())
@@ -126,14 +126,14 @@ contains
         type(ErrorList_t) :: error_list2
 
         allocate(error1, source = Fatal( &
-                Module_("Some_m"), Procedure_("some"), "First Error"))
+                module_t("Some_m"), Procedure_("some"), "First Error"))
         allocate(error2, source = Internal( &
-                Module_("Some_m"), Procedure_("some"), "Second Error"))
+                module_t("Some_m"), Procedure_("some"), "Second Error"))
         call error_list1%appendError(error1)
         call error_list1%appendError(error2)
 
         call error_list2%appendErrors( &
-                error_list1, Module_("Another_m"), Procedure_("another"))
+                error_list1, module_t("Another_m"), Procedure_("another"))
 
         result_ = &
                 assert_Includes(error1%toString(), error_list2%toString()) &
@@ -149,14 +149,14 @@ contains
         type(ErrorList_t) :: error_list2
 
         allocate(error1, source = Fatal( &
-                Module_("Some_m"), Procedure_("some"), "First Error"))
+                module_t("Some_m"), Procedure_("some"), "First Error"))
         allocate(error2, source = Internal( &
-                Module_("Some_m"), Procedure_("some"), "Second Error"))
+                module_t("Some_m"), Procedure_("some"), "Second Error"))
         call error_list1%appendError(error1)
         call error_list1%appendError(error2)
 
         call error_list1%appendErrors( &
-                error_list2, Module_("Another_m"), Procedure_("another"))
+                error_list2, module_t("Another_m"), Procedure_("another"))
 
         result_ = &
                 assert_Includes(error1%toString(), error_list1%toString()) &
@@ -170,7 +170,7 @@ contains
         type(ErrorList_t) :: error_list2
 
         call error_list1%appendErrors( &
-                error_list2, Module_("Another_m"), Procedure_("another"))
+                error_list2, module_t("Another_m"), Procedure_("another"))
 
         result_ = assert_Empty(error_list1%toString())
     end function checkCombineEmpty
@@ -186,21 +186,21 @@ contains
         type(ErrorList_t) :: error_list2
 
         allocate(error1, source = Fatal( &
-                Module_("Some_m"), Procedure_("some"), "First Error"))
+                module_t("Some_m"), Procedure_("some"), "First Error"))
         allocate(error2, source = Internal( &
-                Module_("Some_m"), Procedure_("some"), "Second Error"))
+                module_t("Some_m"), Procedure_("some"), "Second Error"))
         call error_list1%appendError(error1)
         call error_list1%appendError(error2)
 
         allocate(error3, source = Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Third Error"))
+                module_t("Some_m"), Procedure_("some"), "Third Error"))
         allocate(error4, source = Internal( &
-                Module_("Some_m"), Procedure_("some"), "Fourth Error"))
+                module_t("Some_m"), Procedure_("some"), "Fourth Error"))
         call error_list2%appendError(error3)
         call error_list2%appendError(error4)
 
         call error_list1%appendErrors( &
-                error_list2, Module_("Another_m"), Procedure_("another"))
+                error_list2, module_t("Another_m"), Procedure_("another"))
 
         result_ = &
                 assert_Includes(error1%toString(), error_list1%toString()) &
@@ -215,11 +215,11 @@ contains
         type(ErrorList_t) :: errors
 
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Test error"))
+                module_t("Some_m"), Procedure_("some"), "Test error"))
         call errors%appendError(Internal( &
-                Module_("Some_m"), Procedure_("some"), "Test warning"))
+                module_t("Some_m"), Procedure_("some"), "Test warning"))
         call errors%appendError(Fatal( &
-                UNKNOWN_TYPE_TYPE, Module_("Some_m"), Procedure_("some"), "Test error"))
+                UNKNOWN_TYPE_TYPE, module_t("Some_m"), Procedure_("some"), "Test error"))
 
         result_ = &
                 assert_Equals(1, size(errors.ofType.INTERNAL_TYPE), "INTERNAL") &
@@ -240,9 +240,9 @@ contains
         type(Procedure_t) :: procedure2
         type(Procedure_t) :: procedure3
 
-        module1 = Module_("Some_m")
-        module2 = Module_("Another_m")
-        module3 = Module_("Yet_another_m")
+        module1 = module_t("Some_m")
+        module2 = module_t("Another_m")
+        module3 = module_t("Yet_another_m")
         procedure1 = Procedure_("some")
         procedure2 = Procedure_("another")
         procedure3 = Procedure_("yetAnother")
@@ -280,9 +280,9 @@ contains
         type(Procedure_t) :: procedure2
         type(Procedure_t) :: procedure3
 
-        module1 = Module_("Some_m")
-        module2 = Module_("Another_m")
-        module3 = Module_("Yet_another_m")
+        module1 = module_t("Some_m")
+        module2 = module_t("Another_m")
+        module3 = module_t("Yet_another_m")
         procedure1 = Procedure_("some")
         procedure2 = Procedure_("another")
         procedure3 = Procedure_("yetAnother")
@@ -334,13 +334,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -430,13 +430,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -526,13 +526,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -622,13 +622,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -704,17 +704,17 @@ contains
         test_string2 = "Test"
 
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Hello Test"))
+                module_t("Some_m"), Procedure_("some"), "Hello Test"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Goodbye Test"))
+                module_t("Some_m"), Procedure_("some"), "Goodbye Test"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Example Error"))
+                module_t("Some_m"), Procedure_("some"), "Example Error"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Simple Error"))
+                module_t("Some_m"), Procedure_("some"), "Simple Error"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Test Error"))
+                module_t("Some_m"), Procedure_("some"), "Test Error"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Hello Error"))
+                module_t("Some_m"), Procedure_("some"), "Hello Error"))
 
         result_ = &
                 assert_Equals( &
@@ -742,7 +742,7 @@ contains
         type(ErrorList_t) :: errors
 
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Test Error"))
+                module_t("Some_m"), Procedure_("some"), "Test Error"))
 
         result_ = &
                 assert_Not( &
@@ -764,8 +764,8 @@ contains
         type(Procedure_t) :: procedure1
         type(Procedure_t) :: procedure2
 
-        module1 = Module_("Some_m")
-        module2 = Module_("Another_m")
+        module1 = module_t("Some_m")
+        module2 = module_t("Another_m")
         procedure1 = Procedure_("some")
         procedure2 = Procedure_("another")
 
@@ -794,8 +794,8 @@ contains
         type(Procedure_t) :: procedure1
         type(Procedure_t) :: procedure2
 
-        module1 = Module_("Some_m")
-        module2 = Module_("Another_m")
+        module1 = module_t("Some_m")
+        module2 = module_t("Another_m")
         procedure1 = Procedure_("some")
         procedure2 = Procedure_("another")
 
@@ -838,13 +838,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -924,13 +924,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -1010,13 +1010,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -1096,13 +1096,13 @@ contains
         type(Procedure_t) :: branch3_middle_procedure
         type(Procedure_t) :: top_level_procedure
 
-        branch1_bottom_module = Module_("Branch1_originating_m")
-        branch1_middle_module = Module_("Branch1_middle_m")
-        branch2_bottom_module = Module_("Branch2_originating_m")
-        branch2_middle_module = Module_("Branch2_middle_m")
-        branch3_bottom_module = Module_("Branch3_originating_m")
-        branch3_middle_module = Module_("Branch3_middle_m")
-        top_level_module = Module_("Top_level_m")
+        branch1_bottom_module = module_t("Branch1_originating_m")
+        branch1_middle_module = module_t("Branch1_middle_m")
+        branch2_bottom_module = module_t("Branch2_originating_m")
+        branch2_middle_module = module_t("Branch2_middle_m")
+        branch3_bottom_module = module_t("Branch3_originating_m")
+        branch3_middle_module = module_t("Branch3_middle_m")
+        top_level_module = module_t("Top_level_m")
         branch1_bottom_procedure = Procedure_("branch1Originating")
         branch1_middle_procedure = Procedure_("branch1Middle")
         branch2_bottom_procedure = Procedure_("branch2Originating")
@@ -1170,17 +1170,17 @@ contains
         test_string3 = "Other"
 
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Hello Test"))
+                module_t("Some_m"), Procedure_("some"), "Hello Test"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Goodbye Test"))
+                module_t("Some_m"), Procedure_("some"), "Goodbye Test"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Example Error"))
+                module_t("Some_m"), Procedure_("some"), "Example Error"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Simple Error"))
+                module_t("Some_m"), Procedure_("some"), "Simple Error"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Test Error"))
+                module_t("Some_m"), Procedure_("some"), "Test Error"))
         call errors%appendError(Fatal( &
-                Module_("Some_m"), Procedure_("some"), "Hello Error"))
+                module_t("Some_m"), Procedure_("some"), "Hello Error"))
 
         result_ = &
                 assert_That( &

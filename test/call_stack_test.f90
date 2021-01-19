@@ -1,7 +1,7 @@
 module call_stack_test
     use Call_stack_m, only: CallStack_t, CallStack
     use iso_varying_string, only: operator(//)
-    use Module_m, only: Module_t, Module_
+    use erloff_module_m, only: module_t
     use Procedure_m, only: Procedure_t, Procedure_
     use vegetables, only: &
             Result_t, &
@@ -49,9 +49,9 @@ contains
         type(Procedure_t) :: the_procedure
         type(CallStack_t) :: stack
 
-        another_module = Module_("Another_m")
+        another_module = module_t("Another_m")
         another_procedure = Procedure_("another")
-        the_module = Module_("Some_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         stack = CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
@@ -74,9 +74,9 @@ contains
         type(Procedure_t) :: the_procedure
         type(CallStack_t) :: stack
 
-        another_module = Module_("Another_m")
+        another_module = module_t("Another_m")
         another_procedure = Procedure_("another")
-        the_module = Module_("Some_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         stack = CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
@@ -100,10 +100,10 @@ contains
         type(Procedure_t) :: the_procedure
         type(CallStack_t) :: stack
 
-        another_module = Module_("Another_m")
+        another_module = module_t("Another_m")
         another_procedure = Procedure_("another")
-        other_module = Module_("Other_m")
-        the_module = Module_("Some_m")
+        other_module = module_t("Other_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         stack = CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
@@ -127,10 +127,10 @@ contains
         type(Procedure_t) :: the_procedure
         type(CallStack_t) :: stack
 
-        another_module = Module_("Another_m")
+        another_module = module_t("Another_m")
         another_procedure = Procedure_("another")
         other_procedure = Procedure_("other")
-        the_module = Module_("Some_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         stack = CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
@@ -153,17 +153,17 @@ contains
         type(Procedure_t) :: the_procedure
         type(CallStack_t) :: stack
 
-        another_module = Module_("Another_m")
+        another_module = module_t("Another_m")
         another_procedure = Procedure_("another")
-        the_module = Module_("Some_m")
+        the_module = module_t("Some_m")
         the_procedure = Procedure_("some")
         stack = CallStack(the_module, the_procedure)
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
-                assert_Includes(the_module%toString(), stack%toString()) &
+                assert_Includes(the_module%to_string(), stack%toString()) &
                 .and.assert_Includes(the_procedure%toString(), stack%toString()) &
-                .and.assert_Includes(another_module%toString(), stack%toString()) &
+                .and.assert_Includes(another_module%to_string(), stack%toString()) &
                 .and.assert_Includes(another_procedure%toString(), stack%toString())
     end function checkStringIncludes
 end module call_stack_test
