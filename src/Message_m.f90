@@ -68,6 +68,7 @@ module Message_m
         private
         procedure :: typeString => debugTypeString
         procedure :: typeRepr => debugTypeRepr
+        procedure :: isType => debugIsType
     end type Debug_t
 
     type, public, extends(Message_t) :: Info_t
@@ -75,6 +76,7 @@ module Message_m
         private
         procedure :: typeString => infoTypeString
         procedure :: typeRepr => infoTypeRepr
+        procedure :: isType => infoIsType
     end type Info_t
 
     type, public, extends(Message_t) :: Warning_t
@@ -82,9 +84,13 @@ module Message_m
         private
         procedure :: typeString => warningTypeString
         procedure :: typeRepr => warningTypeRepr
+        procedure :: isType => warningIsType
     end type Warning_t
 
     type, public, abstract, extends(Message_t) :: Error_t
+    contains
+        private
+        procedure :: isType => errorIsType
     end type Error_t
 
     type, public, extends(Error_t) :: Fatal_t
@@ -92,6 +98,7 @@ module Message_m
         private
         procedure :: typeString => fatalTypeString
         procedure :: typeRepr => fatalTypeRepr
+        procedure :: isType => fatalIsType
     end type Fatal_t
 
     type, public, extends(Error_t) :: Internal_t
@@ -99,6 +106,7 @@ module Message_m
         private
         procedure :: typeString => internalTypeString
         procedure :: typeRepr => internalTypeRepr
+        procedure :: isType => internalIsType
     end type Internal_t
 
     abstract interface
@@ -441,52 +449,7 @@ contains
         type(MessageType_t), intent(in) :: type_tag
         logical :: isType
 
-        select case (trim(type_tag%description))
-        case (DEBUG_TYPE_STRING)
-            select type (self)
-            class is (Debug_t)
-                isType = .true.
-            class default
-                isType = .false.
-            end select
-        case (INFO_TYPE_STRING)
-            select type (self)
-            class is (Info_t)
-                isType = .true.
-            class default
-                isType = .false.
-            end select
-        case (WARNING_TYPE_STRING)
-            select type (self)
-            class is (Warning_t)
-                isType = .true.
-            class default
-                isType = .false.
-            end select
-        case (ERROR_TYPE_STRING)
-            select type (self)
-            class is (Error_t)
-                isType = .true.
-            class default
-                isType = .false.
-            end select
-        case (FATAL_TYPE_STRING)
-            select type (self)
-            class is (Fatal_t)
-                isType = .true.
-            class default
-                isType = .false.
-            end select
-        case (INTERNAL_TYPE_STRING)
-            select type (self)
-            class is (Internal_t)
-                isType = .true.
-            class default
-                isType = .false.
-            end select
-        case default
-            isType = self%message_type%description == type_tag%description
-        end select
+        isType = self%message_type%description == type_tag%description
     end function isType
 
     pure function originatedFromModule(self, module_) result(originated_from)
@@ -619,6 +582,18 @@ contains
         repr = DEBUG_TYPE_STRING // '(level = ' // self%level%toString() // ')'
     end function debugTypeRepr
 
+    pure function debugIsType(self, type_tag) result(is_type)
+        class(Debug_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == DEBUG_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
+
     pure function infoTypeString(self) result(string)
         class(Info_t), intent(in) :: self
         type(VARYING_STRING) :: string
@@ -638,6 +613,18 @@ contains
 
         repr = INFO_TYPE_STRING
     end function infoTypeRepr
+
+    pure function infoIsType(self, type_tag) result(is_type)
+        class(Info_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == INFO_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
 
     pure function warningTypeString(self) result(string)
         class(Warning_t), intent(in) :: self
@@ -659,6 +646,30 @@ contains
         repr = WARNING_TYPE_STRING
     end function warningTypeRepr
 
+    pure function warningIsType(self, type_tag) result(is_type)
+        class(Warning_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == WARNING_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
+
+    pure function errorIsType(self, type_tag) result(is_type)
+        class(Error_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == ERROR_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
+
     pure function fatalTypeString(self) result(string)
         class(Fatal_t), intent(in) :: self
         type(VARYING_STRING) :: string
@@ -679,6 +690,20 @@ contains
         repr = FATAL_TYPE_STRING
     end function fatalTypeRepr
 
+    pure function fatalIsType(self, type_tag) result(is_type)
+        class(Fatal_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == ERROR_TYPE_STRING) then
+            is_type = .true.
+        else if (trim(type_tag%description) == FATAL_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
+
     pure function internalTypeString(self) result(string)
         class(Internal_t), intent(in) :: self
         type(VARYING_STRING) :: string
@@ -698,4 +723,18 @@ contains
 
         repr = INTERNAL_TYPE_STRING
     end function internalTypeRepr
+
+    pure function internalIsType(self, type_tag) result(is_type)
+        class(Internal_t), intent(in) :: self
+        type(MessageType_t), intent(in) :: type_tag
+        logical :: is_type
+
+        if (trim(type_tag%description) == ERROR_TYPE_STRING) then
+            is_type = .true.
+        else if (trim(type_tag%description) == INTERNAL_TYPE_STRING) then
+            is_type = .true.
+        else
+            is_type = self%message_type%description == type_tag%description
+        end if
+    end function
 end module Message_m
