@@ -14,11 +14,6 @@ module erloff
             Warning, &
             Fatal, &
             Internal, &
-            ! Debug Levels
-            GENERAL, &
-            MEDIUM, &
-            DETAILED, &
-            NITTY_GRITTY, &
             ! Message types
             DEBUG_TYPE, &
             INFO_TYPE, &
@@ -34,6 +29,7 @@ module erloff
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE
     use Message_list_m, only: MessageList_t, size
+    use erloff_debug_level_m, only: GENERAL, MEDIUM, DETAILED, NITTY_GRITTY
     use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use erloff_module_m, only: module_t

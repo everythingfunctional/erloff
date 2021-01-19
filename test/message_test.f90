@@ -9,7 +9,6 @@ module message_test
             DEBUG_TYPE, &
             ERROR_TYPE, &
             FATAL_TYPE, &
-            GENERAL, &
             INFO_TYPE, &
             INPUTS_TYPE, &
             INTERNAL_TYPE, &
@@ -17,6 +16,7 @@ module message_test
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE, &
             WARNING_TYPE
+    use erloff_debug_level_m, only: GENERAL
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t

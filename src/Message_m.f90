@@ -1,5 +1,6 @@
 module Message_m
     use erloff_call_stack_m, only: call_stack_t
+    use erloff_debug_level_m, only: debug_level_t
     use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
@@ -11,17 +12,9 @@ module Message_m
     implicit none
     private
 
-    type :: DebugLevel_t
-        private
-        integer :: level
-    contains
-        private
-        procedure :: toString => debugLevelToString
-    end type DebugLevel_t
-
     type, public, extends(Message_t) :: Debug_t
         private
-        type(DebugLevel_t) :: level
+        type(debug_level_t) :: level
     contains
         private
         procedure, public :: type_string => debugTypeString
@@ -136,17 +129,12 @@ module Message_m
     type(message_type_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
             message_type_t("Unknown Type Encountered")
 
-    type(DebugLevel_t), public, parameter :: GENERAL = DebugLevel_t(1)
-    type(DebugLevel_t), public, parameter :: MEDIUM = DebugLevel_t(2)
-    type(DebugLevel_t), public, parameter :: DETAILED = DebugLevel_t(3)
-    type(DebugLevel_t), public, parameter :: NITTY_GRITTY = DebugLevel_t(4)
-
     public :: Debug, Info, Warning, Fatal, Internal
 contains
     pure function genericDebugC(module_, procedure_, level, message) result(debug_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
-        type(DebugLevel_t), intent(in) :: level
+        type(debug_level_t), intent(in) :: level
         character(len=*), intent(in) :: message
         type(Debug_t) :: debug_
 
@@ -156,7 +144,7 @@ contains
     pure function genericDebugS(module_, procedure_, level, message) result(debug_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
-        type(DebugLevel_t), intent(in) :: level
+        type(debug_level_t), intent(in) :: level
         type(VARYING_STRING), intent(in) :: message
         type(Debug_t) :: debug_
 
@@ -168,7 +156,7 @@ contains
         type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
-        type(DebugLevel_t), intent(in) :: level
+        type(debug_level_t), intent(in) :: level
         character(len=*), intent(in) :: message
         type(Debug_t) :: debug_
 
@@ -180,7 +168,7 @@ contains
         type(message_type_t), intent(in) :: type_tag
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
-        type(DebugLevel_t), intent(in) :: level
+        type(debug_level_t), intent(in) :: level
         type(VARYING_STRING), intent(in) :: message
         type(Debug_t) :: debug_
 
@@ -350,25 +338,18 @@ contains
         internal_%message = message
     end function internalWithTypeS
 
-    pure function debugLevelToString(self) result(string)
-        class(DebugLevel_t), intent(in) :: self
-        type(VARYING_STRING) :: string
-
-        string = to_string(self%level)
-    end function debugLevelToString
-
     pure function debugTypeString(self) result(string)
         class(Debug_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        string = "DB-" // self%level%toString() // ": "
+        string = "DB-" // self%level%to_string() // ": "
     end function debugTypeString
 
     pure function debugTypeRepr(self) result(repr)
         class(Debug_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
-        repr = DEBUG_TYPE_STRING // '(level = ' // self%level%toString() // ')'
+        repr = DEBUG_TYPE_STRING // '(level = ' // self%level%to_string() // ')'
     end function debugTypeRepr
 
     pure function debugIsType(self, type_tag) result(is_type)
