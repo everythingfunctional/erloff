@@ -19,7 +19,7 @@ module message_test
             UNKNOWN_TYPE_TYPE, &
             WARNING_TYPE
     use erloff_module_m, only: module_t
-    use Procedure_m, only: Procedure_t, Procedure_
+    use erloff_procedure_m, only: procedure_t
     use vegetables, only: &
             Result_t, &
             Test_Item_t, &
@@ -76,32 +76,32 @@ contains
         allocate(debug_message, source = Debug( &
                 INPUTS_TYPE, &
                 module_t("Some_m"), &
-                Procedure_("some"), &
+                procedure_t("some"), &
                 GENERAL, &
                 "Test Message"))
 
         allocate(info_message, source = Info( &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
                 module_t("Some_m"), &
-                Procedure_("some"), &
+                procedure_t("some"), &
                 "Test Message"))
 
         allocate(warning_message, source = Warning( &
                 OUTSIDE_NORMAL_RANGE_TYPE, &
                 module_t("Some_m"), &
-                Procedure_("some"), &
+                procedure_t("some"), &
                 "Test Message"))
 
         allocate(fatal_message, source = Fatal( &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
                 module_t("Some_m"), &
-                Procedure_("some"), &
+                procedure_t("some"), &
                 "Test Message"))
 
         allocate(internal_message, source = Internal( &
                 UNKNOWN_TYPE_TYPE, &
                 module_t("Some_m"), &
-                Procedure_("some"), &
+                procedure_t("some"), &
                 "Test Message"))
 
         result_ = &
@@ -156,16 +156,16 @@ contains
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         another_module = module_t("Another_m")
-        another_procedure = Procedure_("another")
+        another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
         allocate(message, source = Info( &
                 the_module, the_procedure, "Test Message"))
@@ -187,17 +187,17 @@ contains
         type(Result_t) :: result_
 
         type(module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
-        type(Procedure_t) :: other_procedure
+        type(procedure_t) :: other_procedure
         type(module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         another_module = module_t("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
+        another_procedure = procedure_t("another")
+        other_procedure = procedure_t("other")
         allocate(message, source = Info( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
@@ -218,16 +218,16 @@ contains
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         another_module = module_t("Another_m")
-        another_procedure = Procedure_("another")
+        another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
         allocate(message, source = Info( &
                 the_module, the_procedure, "Test Message"))
@@ -249,17 +249,17 @@ contains
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
-        type(Procedure_t) :: other_procedure
+        type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         another_module = module_t("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
+        another_procedure = procedure_t("another")
+        other_procedure = procedure_t("other")
         allocate(message, source = Info( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
@@ -280,16 +280,16 @@ contains
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         another_module = module_t("Another_m")
-        another_procedure = Procedure_("another")
+        another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
         allocate(message, source = Info( &
                 the_module, the_procedure, "Test Message"))
@@ -311,17 +311,17 @@ contains
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
-        type(Procedure_t) :: other_procedure
+        type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         another_module = module_t("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
+        another_procedure = procedure_t("another")
+        other_procedure = procedure_t("other")
         allocate(message, source = Info( &
                 the_module, the_procedure, "Test Message"))
         call message%prependNames(another_module, another_procedure)
@@ -350,7 +350,7 @@ contains
         type(VARYING_STRING) :: includesAllStrings3(2)
 
         allocate(message, source = Info( &
-                module_t("Some_m"), Procedure_("some"), "Test Message Content"))
+                module_t("Some_m"), procedure_t("some"), "Test Message Content"))
         includesAnyStrings1(1) = var_str("Test")
         includesAnyStrings1(2) = var_str("else")
         includesAnyStrings2(1) = var_str("Test")

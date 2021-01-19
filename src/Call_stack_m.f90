@@ -2,7 +2,7 @@ module Call_stack_m
     use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
     use iso_varying_string, only: VARYING_STRING, operator(//)
     use erloff_module_m, only: module_t
-    use Procedure_m, only: Procedure_t
+    use erloff_procedure_m, only: Procedure_t
     use strff, only: hanging_indent, indent, join, NEWLINE
 
     implicit none

@@ -2,7 +2,7 @@ module call_stack_entry_test
     use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
     use iso_varying_string, only: operator(//)
     use erloff_module_m, only: module_t
-    use Procedure_m, only: Procedure_t, Procedure_
+    use erloff_procedure_m, only: procedure_t
     use vegetables, only: &
             Result_t, &
             Test_Item_t, &
@@ -38,11 +38,11 @@ contains
         type(CallStackEntry_t) :: entry_
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         other_module = module_t("Other_m")
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         entry_ = CallStackEntry(the_module, the_procedure)
 
         result_ = &
@@ -58,13 +58,13 @@ contains
         type(Result_t) :: result_
 
         type(CallStackEntry_t) :: entry_
-        type(Procedure_t) :: other_procedure
+        type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
-        other_procedure = Procedure_("other")
+        other_procedure = procedure_t("other")
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
 
         entry_ = CallStackEntry(the_module, the_procedure)
 
@@ -82,14 +82,14 @@ contains
 
         type(CallStackEntry_t) :: entry_
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
-        the_procedure = Procedure_("some")
+        the_procedure = procedure_t("some")
         entry_ = CallStackEntry(the_module, the_procedure)
 
         result_ = &
                 assert_Includes(the_module%to_string(), entry_%toString()) &
-                .and.assert_Includes(the_procedure%toString(), entry_%toString())
+                .and.assert_Includes(the_procedure%to_string(), entry_%toString())
     end function checkStringIncludes
 end module call_stack_entry_test

@@ -37,7 +37,5 @@ module erloff
             UNKNOWN_TYPE_TYPE
     use Message_list_m, only: MessageList_t, size
     use erloff_module_m, only: module_t
-    use Procedure_m, only: Procedure_t, Procedure_
-
-    implicit none
-end module erloff
+    use erloff_procedure_m, only: procedure_t
+end module
