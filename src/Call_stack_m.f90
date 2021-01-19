@@ -1,5 +1,5 @@
 module Call_stack_m
-    use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
+    use erloff_call_stack_entry_m, only: call_stack_entry_t
     use iso_varying_string, only: VARYING_STRING, operator(//)
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: Procedure_t
@@ -10,7 +10,7 @@ module Call_stack_m
 
     type, public :: CallStack_t
         private
-        type(CallStackEntry_t), allocatable :: entries(:)
+        type(call_stack_entry_t), allocatable :: entries(:)
     contains
         private
         procedure, public :: prependNames
@@ -34,7 +34,7 @@ contains
         type(CallStack_t) :: CallStack
 
         allocate(CallStack%entries(1))
-        CallStack%entries(1) = CallStackEntry(module_, procedure_)
+        CallStack%entries(1) = call_stack_entry_t(module_, procedure_)
     end function CallStack
 
     pure subroutine prependNames(self, module_, procedure_)
@@ -42,12 +42,12 @@ contains
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
 
-        type(CallStackEntry_t) :: previous_entries(size(self%entries))
+        type(call_stack_entry_t) :: previous_entries(size(self%entries))
 
         previous_entries = self%entries
         deallocate(self%entries)
         allocate(self%entries(size(previous_entries) + 1))
-        self%entries(1) = CallStackEntry(module_, procedure_)
+        self%entries(1) = call_stack_entry_t(module_, procedure_)
         self%entries(2:) = previous_entries
     end subroutine prependNames
 
@@ -55,7 +55,7 @@ contains
         class(CallStack_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        string = join(self%entries%toString(), "->")
+        string = join(self%entries%to_string(), "->")
     end function toString
 
     pure function originatedFromModule(self, module_)

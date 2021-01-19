@@ -1,5 +1,5 @@
 module call_stack_entry_test
-    use Call_stack_entry_m, only: CallStackEntry_t, CallStackEntry
+    use erloff_call_stack_entry_m, only: call_stack_entry_t
     use iso_varying_string, only: operator(//)
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
@@ -29,13 +29,13 @@ contains
         individual_tests(3) = It( &
                 "String includes the given module and procedure names", &
                 checkStringIncludes)
-        tests = Describe("CallStackEntry_t", individual_tests)
+        tests = Describe("call_stack_entry_t", individual_tests)
     end function test_call_stack_entry
 
     pure function checkIsFromModule() result(result_)
         type(Result_t) :: result_
 
-        type(CallStackEntry_t) :: entry_
+        type(call_stack_entry_t) :: entry_
         type(Module_t) :: other_module
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -43,7 +43,7 @@ contains
         other_module = module_t("Other_m")
         the_module = module_t("Some_m")
         the_procedure = procedure_t("some")
-        entry_ = CallStackEntry(the_module, the_procedure)
+        entry_ = call_stack_entry_t(the_module, the_procedure)
 
         result_ = &
                 assert_That( &
@@ -57,7 +57,7 @@ contains
     pure function checkIsFromProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(CallStackEntry_t) :: entry_
+        type(call_stack_entry_t) :: entry_
         type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -66,7 +66,7 @@ contains
         the_module = module_t("Some_m")
         the_procedure = procedure_t("some")
 
-        entry_ = CallStackEntry(the_module, the_procedure)
+        entry_ = call_stack_entry_t(the_module, the_procedure)
 
         result_ = &
                 assert_That( &
@@ -80,16 +80,16 @@ contains
     pure function checkStringIncludes() result(result_)
         type(Result_t) :: result_
 
-        type(CallStackEntry_t) :: entry_
+        type(call_stack_entry_t) :: entry_
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
 
         the_module = module_t("Some_m")
         the_procedure = procedure_t("some")
-        entry_ = CallStackEntry(the_module, the_procedure)
+        entry_ = call_stack_entry_t(the_module, the_procedure)
 
         result_ = &
-                assert_Includes(the_module%to_string(), entry_%toString()) &
-                .and.assert_Includes(the_procedure%to_string(), entry_%toString())
+                assert_Includes(the_module%to_string(), entry_%to_string()) &
+                .and.assert_Includes(the_procedure%to_string(), entry_%to_string())
     end function checkStringIncludes
 end module call_stack_entry_test
