@@ -4,7 +4,7 @@ module Message_m
             VARYING_STRING, assignment(=), operator(//), var_str
     use Module_m, only: Module_t
     use Procedure_m, only: Procedure_t
-    use strff, only: operator(.includes.), hangingIndent, toString, NEWLINE
+    use strff, only: operator(.includes.), hanging_indent, to_string, NEWLINE
 
     implicit none
     private
@@ -429,7 +429,7 @@ contains
         class(Message_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        string = hangingIndent( &
+        string = hanging_indent( &
                 self%call_stack%toString() // ":" // NEWLINE &
                     // self%typeString() // self%message_type%toString() &
                     // self%message, &
@@ -589,7 +589,7 @@ contains
         class(Message_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
-        repr = hangingIndent( &
+        repr = hanging_indent( &
                 'Message(' // NEWLINE &
                     // 'type = ' // self%typeRepr() // ',' // NEWLINE &
                     // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
@@ -602,7 +602,7 @@ contains
         class(DebugLevel_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        string = toString(self%level)
+        string = to_string(self%level)
     end function debugLevelToString
 
     pure function debugTypeString(self) result(string)

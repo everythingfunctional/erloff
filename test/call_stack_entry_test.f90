@@ -3,12 +3,12 @@ module call_stack_entry_test
     use iso_varying_string, only: operator(//)
     use Module_m, only: Module_t, Module_
     use Procedure_m, only: Procedure_t, Procedure_
-    use Vegetables_m, only: &
+    use vegetables, only: &
             Result_t, &
-            TestItem_t, &
-            assertIncludes, &
-            assertNot, &
-            assertThat, &
+            Test_Item_t, &
+            assert_Includes, &
+            assert_Not, &
+            assert_That, &
             Describe, &
             It
 
@@ -18,9 +18,9 @@ module call_stack_entry_test
     public :: test_call_stack_entry
 contains
     function test_call_stack_entry() result(tests)
-        type(TestItem_t) :: tests
+        type(Test_Item_t) :: tests
 
-        type(TestItem_t) :: individual_tests(3)
+        type(Test_Item_t) :: individual_tests(3)
 
         individual_tests(1) = It( &
                 "Can tell if it is from a module", checkIsFromModule)
@@ -46,10 +46,10 @@ contains
         entry_ = CallStackEntry(the_module, the_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         entry_.isFrom.the_module, &
                         entry_%repr() // '.isFrom.' // the_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         entry_.isFrom.other_module, &
                         entry_%repr() // '.isFrom.' // other_module%repr())
     end function checkIsFromModule
@@ -69,10 +69,10 @@ contains
         entry_ = CallStackEntry(the_module, the_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         entry_.isFrom.the_procedure, &
                         entry_%repr() // '.isFrom.' // the_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         entry_.isFrom.other_procedure, &
                         entry_%repr() // '.isFrom.' // other_procedure%repr())
     end function checkIsFromProcedure
@@ -89,7 +89,7 @@ contains
         entry_ = CallStackEntry(the_module, the_procedure)
 
         result_ = &
-                assertIncludes(the_module%toString(), entry_%toString()) &
-                .and.assertIncludes(the_procedure%toString(), entry_%toString())
+                assert_Includes(the_module%toString(), entry_%toString()) &
+                .and.assert_Includes(the_procedure%toString(), entry_%toString())
     end function checkStringIncludes
 end module call_stack_entry_test

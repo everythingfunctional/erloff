@@ -20,12 +20,12 @@ module message_test
             WARNING_TYPE
     use Module_m, only: Module_t, Module_
     use Procedure_m, only: Procedure_t, Procedure_
-    use Vegetables_m, only: &
+    use vegetables, only: &
             Result_t, &
-            TestItem_t, &
+            Test_Item_t, &
             Describe, &
-            assertNot, &
-            assertThat, &
+            assert_Not, &
+            assert_That, &
             It
 
     implicit none
@@ -34,9 +34,9 @@ module message_test
     public :: test_message
 contains
     function test_message() result(tests)
-        type(TestItem_t) :: tests
+        type(Test_Item_t) :: tests
 
-        type(TestItem_t) :: individual_tests(8)
+        type(Test_Item_t) :: individual_tests(8)
 
         individual_tests(1) = It( &
                 "Can tell whether it is of a given type", checkType)
@@ -105,49 +105,49 @@ contains
                 "Test Message"))
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         debug_message.isType.DEBUG_TYPE, &
                         debug_message%repr() // ".isType." // DEBUG_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         debug_message.isType.INPUTS_TYPE, &
                         debug_message%repr() // ".isType." // INPUTS_TYPE%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         debug_message.isType.INFO_TYPE, &
                         debug_message%repr() // ".isType." // INFO_TYPE%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         debug_message.isType.ERROR_TYPE, &
                         debug_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         warning_message.isType.WARNING_TYPE, &
                         warning_message%repr() // ".isType." // WARNING_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         warning_message.isType.OUTSIDE_NORMAL_RANGE_TYPE, &
                         warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE_TYPE%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         warning_message.isType.INFO_TYPE, &
                         warning_message%repr() // ".isType." // INFO_TYPE%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         warning_message.isType.ERROR_TYPE, &
                         warning_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         fatal_message.isType.ERROR_TYPE, &
                         fatal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         fatal_message.isType.FATAL_TYPE, &
                         fatal_message%repr() // ".isType." // FATAL_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         fatal_message.isType.UNEQUAL_ARRAY_SIZES_TYPE, &
                         fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         fatal_message.isType.INTERNAL_TYPE, &
                         fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         internal_message.isType.ERROR_TYPE, &
                         internal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         internal_message.isType.INTERNAL_TYPE, &
                         internal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         internal_message.isType.UNKNOWN_TYPE_TYPE, &
                         internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())
     end function checkType
@@ -172,13 +172,13 @@ contains
         call message%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.originatedFrom.the_module, &
                         message%repr() // '.originatedFrom.' // the_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.another_module, &
                         message%repr() // '.originatedFrom.' // another_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.other_module, &
                         message%repr() // '.originatedFrom.' // other_module%repr())
     end function checkOriginatingModule
@@ -203,13 +203,13 @@ contains
         call message%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.originatedFrom.the_procedure, &
                         message%repr() // '.originatedFrom.' // the_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.another_procedure, &
                         message%repr() // '.originatedFrom.' // another_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.other_procedure, &
                         message%repr() // '.originatedFrom.' // other_procedure%repr())
     end function checkOriginatingProcedure
@@ -234,13 +234,13 @@ contains
         call message%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.isFrom.the_module, &
                         message%repr() // '.isFrom.' // the_module%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.isFrom.another_module, &
                         message%repr() // '.isFrom.' // another_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.isFrom.other_module, &
                         message%repr() // '.isFrom.' // other_module%repr())
     end function checkFromModule
@@ -265,13 +265,13 @@ contains
         call message%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.isFrom.the_procedure, &
                         message%repr() // '.isFrom.' // the_procedure%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.isFrom.another_procedure, &
                         message%repr() // '.isFrom.' // another_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.isFrom.other_procedure, &
                         message%repr() // '.isFrom.' // other_procedure%repr())
     end function checkFromProcedure
@@ -296,13 +296,13 @@ contains
         call message%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         message.cameThrough.the_module, &
                         message%repr() // '.cameThrough.' // the_module%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.cameThrough.another_module, &
                         message%repr() // '.cameThrough.' // another_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.cameThrough.other_module, &
                         message%repr() // '.cameThrough.' // other_module%repr())
     end function checkThroughModule
@@ -327,13 +327,13 @@ contains
         call message%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         message.cameThrough.the_procedure, &
                         message%repr() // '.cameThrough.' // the_procedure%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.cameThrough.another_procedure, &
                         message%repr() // '.cameThrough.' // another_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.cameThrough.other_procedure, &
                         message%repr() // '.cameThrough.' // other_procedure%repr())
     end function checkThroughProcedure
@@ -365,28 +365,28 @@ contains
         includesAllStrings3(2) = var_str("message")
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.includes."Test", &
                         message%repr() // '.includes."Test"') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includes."test", &
                         message%repr() // '.includes."test"') &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.includesAnyOf.includesAnyStrings1, &
                         message%repr() // '.includesAnyOf.[var_str("Test"), var_str("else")]') &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.includesAnyOf.includesAnyStrings2, &
                         message%repr() // '.includesAnyOf.[var_str("Test"), var_str("Content")]') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includesAnyOf.includesAnyStrings3, &
                         message%repr() // '.includesAnyOf.[var_str("test"), var_str("else")]') &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.includesAllOf.includesAllStrings1, &
                         message%repr() // '.includesAllOf.[var_str("Test"), var_str("Message")]') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includesAllOf.includesAllStrings2, &
                         message%repr() // '.includesAllOf.[var_str("test"), var_str("Message")]') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includesAllOf.includesAllStrings3, &
                         message%repr() // '.includesAllOf.[var_str("Test"), var_str("message")]')
     end function checkContents

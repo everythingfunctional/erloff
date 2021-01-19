@@ -3,12 +3,12 @@ module call_stack_test
     use iso_varying_string, only: operator(//)
     use Module_m, only: Module_t, Module_
     use Procedure_m, only: Procedure_t, Procedure_
-    use Vegetables_m, only: &
+    use vegetables, only: &
             Result_t, &
-            TestItem_t, &
-            assertIncludes, &
-            assertNot, &
-            assertThat, &
+            Test_Item_t, &
+            assert_Includes, &
+            assert_Not, &
+            assert_That, &
             describe, &
             it
 
@@ -18,9 +18,9 @@ module call_stack_test
     public :: test_call_stack
 contains
     function test_call_stack() result(tests)
-        type(TestItem_t) :: tests
+        type(Test_Item_t) :: tests
 
-        type(TestItem_t) :: individual_tests(5)
+        type(Test_Item_t) :: individual_tests(5)
 
         individual_tests(1) = it( &
                 "Can tell if it originated from a module", &
@@ -57,10 +57,10 @@ contains
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         stack.originatedFrom.the_module, &
                         stack%repr() // '.originatedFrom.' // the_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         stack.originatedFrom.another_module, &
                         stack%repr() // '.originatedFrom.' // another_module%repr())
     end function checkOriginatedFromModule
@@ -82,10 +82,10 @@ contains
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         stack.originatedFrom.the_procedure, &
                         stack%repr() // '.originatedFrom.' // the_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         stack.originatedFrom.another_procedure, &
                         stack%repr() // '.originatedFrom.' // another_procedure%repr())
     end function checkOriginatedFromProcedure
@@ -109,10 +109,10 @@ contains
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         stack.includes.the_module, &
                         stack%repr() // '.includes.' // the_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         stack.includes.other_module, &
                         stack%repr() // '.includes.' // other_module%repr())
     end function checkContainsModule
@@ -136,10 +136,10 @@ contains
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         stack.includes.the_procedure, &
                         stack%repr() // '.includes.' // the_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         stack.includes.other_procedure, &
                         stack%repr() // '.includes.' // other_procedure%repr())
     end function checkContainsProcedure
@@ -161,9 +161,9 @@ contains
         call stack%prependNames(another_module, another_procedure)
 
         result_ = &
-                assertIncludes(the_module%toString(), stack%toString()) &
-                .and.assertIncludes(the_procedure%toString(), stack%toString()) &
-                .and.assertIncludes(another_module%toString(), stack%toString()) &
-                .and.assertIncludes(another_procedure%toString(), stack%toString())
+                assert_Includes(the_module%toString(), stack%toString()) &
+                .and.assert_Includes(the_procedure%toString(), stack%toString()) &
+                .and.assert_Includes(another_module%toString(), stack%toString()) &
+                .and.assert_Includes(another_procedure%toString(), stack%toString())
     end function checkStringIncludes
 end module call_stack_test

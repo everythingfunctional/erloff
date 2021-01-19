@@ -3,7 +3,7 @@ module Call_stack_m
     use iso_varying_string, only: VARYING_STRING, operator(//)
     use Module_m, only: Module_t
     use Procedure_m, only: Procedure_t
-    use strff, only: hangingIndent, indent, join, NEWLINE
+    use strff, only: hanging_indent, indent, join, NEWLINE
 
     implicit none
     private
@@ -94,7 +94,7 @@ contains
         class(CallStack_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
-        repr = hangingIndent( &
+        repr = hanging_indent( &
                 "CallStack_t(" // NEWLINE &
                     // "entries = [" // NEWLINE &
                     // indent( &

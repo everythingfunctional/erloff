@@ -10,14 +10,14 @@ module error_list_test
             UNKNOWN_TYPE_TYPE
     use Module_m, only: Module_t, Module_
     use Procedure_m, only: Procedure_t, Procedure_
-    use Vegetables_m, only: &
+    use vegetables, only: &
             Result_t, &
-            TestItem_t, &
-            assertEmpty, &
-            assertEquals, &
-            assertIncludes, &
-            assertNot, &
-            assertThat, &
+            Test_Item_t, &
+            assert_Empty, &
+            assert_Equals, &
+            assert_Includes, &
+            assert_Not, &
+            assert_That, &
             Describe, &
             It
 
@@ -27,9 +27,9 @@ module error_list_test
     public :: test_error_list
 contains
     function test_error_list() result(tests)
-        type(TestItem_t) :: tests
+        type(Test_Item_t) :: tests
 
-        type(TestItem_t) :: individual_tests(22)
+        type(Test_Item_t) :: individual_tests(22)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -101,7 +101,7 @@ contains
 
         type(ErrorList_t) :: error_list
 
-        result_ = assertEmpty(error_list%toString())
+        result_ = assert_Empty(error_list%toString())
     end function checkEmptyToString
 
     pure function checkAppendToEmpty() result(result_)
@@ -114,7 +114,7 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Test Error"))
         call error_list%appendError(error)
 
-        result_ = assertIncludes(error%toString(), error_list%toString())
+        result_ = assert_Includes(error%toString(), error_list%toString())
     end function checkAppendToEmpty
 
     pure function checkAppendMultipleToEmpty() result(result_)
@@ -136,8 +136,8 @@ contains
                 error_list1, Module_("Another_m"), Procedure_("another"))
 
         result_ = &
-                assertIncludes(error1%toString(), error_list2%toString()) &
-                .and.assertIncludes(error2%toString(), error_list2%toString())
+                assert_Includes(error1%toString(), error_list2%toString()) &
+                .and.assert_Includes(error2%toString(), error_list2%toString())
     end function checkAppendMultipleToEmpty
 
     pure function checkAppendEmpty() result(result_)
@@ -159,8 +159,8 @@ contains
                 error_list2, Module_("Another_m"), Procedure_("another"))
 
         result_ = &
-                assertIncludes(error1%toString(), error_list1%toString()) &
-                .and.assertIncludes(error2%toString(), error_list1%toString())
+                assert_Includes(error1%toString(), error_list1%toString()) &
+                .and.assert_Includes(error2%toString(), error_list1%toString())
     end function checkAppendEmpty
 
     pure function checkCombineEmpty() result(result_)
@@ -172,7 +172,7 @@ contains
         call error_list1%appendErrors( &
                 error_list2, Module_("Another_m"), Procedure_("another"))
 
-        result_ = assertEmpty(error_list1%toString())
+        result_ = assert_Empty(error_list1%toString())
     end function checkCombineEmpty
 
     pure function checkCombine() result(result_)
@@ -203,10 +203,10 @@ contains
                 error_list2, Module_("Another_m"), Procedure_("another"))
 
         result_ = &
-                assertIncludes(error1%toString(), error_list1%toString()) &
-                .and.assertIncludes(error2%toString(), error_list1%toString()) &
-                .and.assertIncludes(error3%toString(), error_list1%toString()) &
-                .and.assertIncludes(error4%toString(), error_list1%toString())
+                assert_Includes(error1%toString(), error_list1%toString()) &
+                .and.assert_Includes(error2%toString(), error_list1%toString()) &
+                .and.assert_Includes(error3%toString(), error_list1%toString()) &
+                .and.assert_Includes(error4%toString(), error_list1%toString())
     end function checkCombine
 
     pure function checkFilterByType() result(result_)
@@ -222,8 +222,8 @@ contains
                 UNKNOWN_TYPE_TYPE, Module_("Some_m"), Procedure_("some"), "Test error"))
 
         result_ = &
-                assertEquals(1, size(errors.ofType.INTERNAL_TYPE), "INTERNAL") &
-                .and.assertEquals( &
+                assert_Equals(1, size(errors.ofType.INTERNAL_TYPE), "INTERNAL") &
+                .and.assert_Equals( &
                         2, &
                         size(errors.ofTypes.[INTERNAL_TYPE, UNKNOWN_TYPE_TYPE]), &
                         "INTERNAL or UNKNOWN_TYPE")
@@ -255,15 +255,15 @@ contains
                 module3, procedure3, "Yet another error"))
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(errors.originatingFrom.module1), &
                         module1%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(errors.originatingFrom.module2), &
                         module2%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(errors.originatingFrom.[module1, module2]), &
                         module1%repr() // " or " // module2%repr())
@@ -295,15 +295,15 @@ contains
                 module3, procedure3, "Yet another error"))
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(errors.originatingFrom.procedure1), &
                         procedure1%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(errors.originatingFrom.procedure2), &
                         procedure2%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(errors.originatingFrom.[procedure1, procedure2]), &
                         procedure1%repr() // " or " // procedure2%repr())
@@ -387,19 +387,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         0, &
                         size(top_level_errors.comingThrough.branch1_bottom_module), &
                         branch1_bottom_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.comingThrough.branch1_middle_module), &
                         branch1_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.comingThrough.branch2_middle_module), &
                         branch2_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_errors.comingThrough.[branch1_middle_module, branch2_middle_module]), &
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
@@ -483,19 +483,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         0, &
                         size(top_level_errors.comingThrough.branch1_bottom_procedure), &
                         branch1_bottom_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.comingThrough.branch1_middle_procedure), &
                         branch1_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.comingThrough.branch2_middle_procedure), &
                         branch2_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_errors.comingThrough.[branch1_middle_procedure, branch2_middle_procedure]), &
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
@@ -579,19 +579,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(top_level_errors.from.branch1_bottom_module), &
                         branch1_bottom_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.from.branch1_middle_module), &
                         branch1_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.from.branch2_middle_module), &
                         branch2_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_errors.from.[branch1_middle_module, branch2_middle_module]), &
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
@@ -675,19 +675,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(top_level_errors.from.branch1_bottom_procedure), &
                         branch1_bottom_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.from.branch1_middle_procedure), &
                         branch1_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_errors.from.branch2_middle_procedure), &
                         branch2_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_errors.from.[branch1_middle_procedure, branch2_middle_procedure]), &
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
@@ -717,19 +717,19 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Hello Error"))
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         2, &
                         size(errors.including."Hello"), &
                         'including "Hello"') &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         3, &
                         size(errors.including.test_string2), &
                         'including "' // test_string2 // '"') &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         4, &
                         size(errors.includingAnyOf.[test_string1, test_string2]), &
                         'includingAnyOf "' // test_string1 // '" or "' // test_string2 // '"') &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(errors.includingAllOf.[test_string1, test_string2]), &
                         'includingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
@@ -745,10 +745,10 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Test Error"))
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         empty_list.hasType.FATAL_TYPE, &
                         empty_list%repr() // ".hasType." // FATAL_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         errors.hasType.FATAL_TYPE, &
                         errors%repr() // ".hasType." // FATAL_TYPE%repr())
     end function checkForType
@@ -775,10 +775,10 @@ contains
                 module2, procedure2, "Another error"))
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         empty_list.hasAnyOriginatingFrom.module1, &
                         empty_list%repr() // ".hasAnyOriginatingFrom." // module1%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         errors.hasAnyOriginatingFrom.module1, &
                         errors%repr() // ".hasAnyOriginatingFrom." // module1%repr())
     end function checkForOriginatingModule
@@ -805,10 +805,10 @@ contains
                 module2, procedure2, "Another error"))
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         empty_list.hasAnyOriginatingFrom.procedure1, &
                         empty_list%repr() // ".hasAnyOriginatingFrom." // procedure1%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         errors.hasAnyOriginatingFrom.procedure1, &
                         errors%repr() // ".hasAnyOriginatingFrom." // procedure1%repr())
     end function checkForOriginatingProcedure
@@ -891,10 +891,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_errors.hasAnyComingThrough.branch1_middle_module, &
                         top_level_errors%repr() // ".hasAnyCominghThrough." // branch1_middle_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         top_level_errors.hasAnyComingThrough.branch1_bottom_module, &
                         top_level_errors%repr() // ".hasAnyCominghThrough." // branch1_bottom_module%repr())
     end function checkForThroughModule
@@ -977,10 +977,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_errors.hasAnyComingThrough.branch1_middle_procedure, &
                         top_level_errors%repr() // ".hasAnyCominghThrough." // branch1_middle_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         top_level_errors.hasAnyComingThrough.branch1_bottom_procedure, &
                         top_level_errors%repr() // ".hasAnyCominghThrough." // branch1_bottom_procedure%repr())
     end function checkForThroughProcedure
@@ -1063,10 +1063,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_errors.hasAnyFrom.branch1_middle_module, &
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_middle_module%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         top_level_errors.hasAnyFrom.branch1_bottom_module, &
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_bottom_module%repr())
     end function checkForFromModule
@@ -1149,10 +1149,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_errors.hasAnyFrom.branch1_middle_procedure, &
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_middle_procedure%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         top_level_errors.hasAnyFrom.branch1_bottom_procedure, &
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_bottom_procedure%repr())
     end function checkForFromProcedure
@@ -1183,16 +1183,16 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Hello Error"))
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         errors.hasAnyIncluding."Hello", &
                         errors%repr() // '.hasAnyIncluding."Hello"') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         errors.hasAnyIncluding.test_string3, &
                         errors%repr() // '.hasAnyIncluding."' // test_string3 // '"') &
-                .and.assertThat( &
+                .and.assert_That( &
                         errors.hasAnyIncludingAnyOf.[test_string1, test_string2], &
                         errors%repr() // '.hasAnyIncludingAnyOf."' // test_string1 // '" or "' // test_string2 // '"') &
-                .and.assertThat( &
+                .and.assert_That( &
                         errors.hasAnyIncludingAllOf.[test_string1, test_string2], &
                         errors%repr() // '.hasAnyIncludingAllOf."' // test_string1 // '" or "' // test_string2 // '"')
     end function checkForContents

@@ -5,14 +5,14 @@ module message_list_test
     use Message_list_m, only: MessageList_t, size
     use Module_m, only: Module_t, Module_
     use Procedure_m, only: Procedure_t, Procedure_
-    use Vegetables_m, only: &
+    use vegetables, only: &
             Result_t, &
-            TestItem_t, &
-            assertEmpty, &
-            assertEquals, &
-            assertIncludes, &
-            assertNot, &
-            assertThat, &
+            Test_Item_t, &
+            assert_Empty, &
+            assert_Equals, &
+            assert_Includes, &
+            assert_Not, &
+            assert_That, &
             Describe, &
             It
 
@@ -22,9 +22,9 @@ module message_list_test
     public :: test_message_list
 contains
     function test_message_list() result(tests)
-        type(TestItem_t) :: tests
+        type(Test_Item_t) :: tests
 
-        type(TestItem_t) :: individual_tests(22)
+        type(Test_Item_t) :: individual_tests(22)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -96,7 +96,7 @@ contains
 
         type(MessageList_t) :: message_list
 
-        result_ = assertEmpty(message_list%toString())
+        result_ = assert_Empty(message_list%toString())
     end function checkEmptyToString
 
     pure function checkAppendToEmpty() result(result_)
@@ -109,7 +109,7 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Test Message"))
         call message_list%appendMessage(message)
 
-        result_ = assertIncludes(message%toString(), message_list%toString())
+        result_ = assert_Includes(message%toString(), message_list%toString())
     end function checkAppendToEmpty
 
     pure function checkAppendMultipleToEmpty() result(result_)
@@ -131,8 +131,8 @@ contains
                 message_list1, Module_("Another_m"), Procedure_("another"))
 
         result_ = &
-                assertIncludes(message1%toString(), message_list2%toString()) &
-                .and.assertIncludes(message2%toString(), message_list2%toString())
+                assert_Includes(message1%toString(), message_list2%toString()) &
+                .and.assert_Includes(message2%toString(), message_list2%toString())
     end function checkAppendMultipleToEmpty
 
     pure function checkAppendEmpty() result(result_)
@@ -154,8 +154,8 @@ contains
                 message_list2, Module_("Another_m"), Procedure_("another"))
 
         result_ = &
-                assertIncludes(message1%toString(), message_list1%toString()) &
-                .and.assertIncludes(message2%toString(), message_list1%toString())
+                assert_Includes(message1%toString(), message_list1%toString()) &
+                .and.assert_Includes(message2%toString(), message_list1%toString())
     end function checkAppendEmpty
 
     pure function checkCombineEmpty() result(result_)
@@ -167,7 +167,7 @@ contains
         call message_list1%appendMessages( &
                 message_list2, Module_("Another_m"), Procedure_("another"))
 
-        result_ = assertEmpty(message_list1%toString())
+        result_ = assert_Empty(message_list1%toString())
     end function checkCombineEmpty
 
     pure function checkCombine() result(result_)
@@ -198,10 +198,10 @@ contains
                 message_list2, Module_("Another_m"), Procedure_("another"))
 
         result_ = &
-                assertIncludes(message1%toString(), message_list1%toString()) &
-                .and.assertIncludes(message2%toString(), message_list1%toString()) &
-                .and.assertIncludes(message3%toString(), message_list1%toString()) &
-                .and.assertIncludes(message4%toString(), message_list1%toString())
+                assert_Includes(message1%toString(), message_list1%toString()) &
+                .and.assert_Includes(message2%toString(), message_list1%toString()) &
+                .and.assert_Includes(message3%toString(), message_list1%toString()) &
+                .and.assert_Includes(message4%toString(), message_list1%toString())
     end function checkCombine
 
     pure function checkFilterByType() result(result_)
@@ -217,8 +217,8 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Test error"))
 
         result_ = &
-                assertEquals(1, size(messages.ofType.INFO_TYPE), "INFO") &
-                .and.assertEquals( &
+                assert_Equals(1, size(messages.ofType.INFO_TYPE), "INFO") &
+                .and.assert_Equals( &
                         2, &
                         size(messages.ofTypes.[INFO_TYPE, WARNING_TYPE]), &
                         "INFO or WARNING")
@@ -250,15 +250,15 @@ contains
                 module3, procedure3, "Yet another message"))
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(messages.originatingFrom.module1), &
                         module1%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(messages.originatingFrom.module2), &
                         module2%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(messages.originatingFrom.[module1, module2]), &
                         module1%repr() // " or " // module2%repr())
@@ -290,15 +290,15 @@ contains
                 module3, procedure3, "Yet another message"))
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(messages.originatingFrom.procedure1), &
                         procedure1%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(messages.originatingFrom.procedure2), &
                         procedure2%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(messages.originatingFrom.[procedure1, procedure2]), &
                         procedure1%repr() // " or " // procedure2%repr())
@@ -382,19 +382,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         0, &
                         size(top_level_messages.comingThrough.branch1_bottom_module), &
                         branch1_bottom_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.comingThrough.branch1_middle_module), &
                         branch1_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.comingThrough.branch2_middle_module), &
                         branch2_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_messages.comingThrough.[branch1_middle_module, branch2_middle_module]), &
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
@@ -478,19 +478,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         0, &
                         size(top_level_messages.comingThrough.branch1_bottom_procedure), &
                         branch1_bottom_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.comingThrough.branch1_middle_procedure), &
                         branch1_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.comingThrough.branch2_middle_procedure), &
                         branch2_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_messages.comingThrough.[branch1_middle_procedure, branch2_middle_procedure]), &
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
@@ -574,19 +574,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(top_level_messages.from.branch1_bottom_module), &
                         branch1_bottom_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.from.branch1_middle_module), &
                         branch1_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.from.branch2_middle_module), &
                         branch2_middle_module%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_messages.from.[branch1_middle_module, branch2_middle_module]), &
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
@@ -670,19 +670,19 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         1, &
                         size(top_level_messages.from.branch1_bottom_procedure), &
                         branch1_bottom_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.from.branch1_middle_procedure), &
                         branch1_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(top_level_messages.from.branch2_middle_procedure), &
                         branch2_middle_procedure%repr()) &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         2, &
                         size(top_level_messages.from.[branch1_middle_procedure, branch2_middle_procedure]), &
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
@@ -712,19 +712,19 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Hello Message"))
 
         result_ = &
-                assertEquals( &
+                assert_Equals( &
                         2, &
                         size(messages.including."Hello"), &
                         'including "Hello"') &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         3, &
                         size(messages.including.test_string2), &
                         'including "' // test_string2 // '"') &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         4, &
                         size(messages.includingAnyOf.[test_string1, test_string2]), &
                         'includingAnyOf "' // test_string1 // '" or "' // test_string2 // '"') &
-                .and.assertEquals( &
+                .and.assert_Equals( &
                         1, &
                         size(messages.includingAllOf.[test_string1, test_string2]), &
                         'includingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
@@ -740,10 +740,10 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Test Message"))
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         empty_list.hasType.INFO_TYPE, &
                         empty_list%repr() // ".hasType." // INFO_TYPE%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         messages.hasType.INFO_TYPE, &
                         messages%repr() // ".hasType." // INFO_TYPE%repr())
     end function checkForType
@@ -770,10 +770,10 @@ contains
                 module2, procedure2, "Another message"))
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         empty_list.hasAnyOriginatingFrom.module1, &
                         empty_list%repr() // ".hasAnyOriginatingFrom." // module1%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         messages.hasAnyOriginatingFrom.module1, &
                         messages%repr() // ".hasAnyOriginatingFrom." // module1%repr())
     end function checkForOriginatingModule
@@ -800,10 +800,10 @@ contains
                 module2, procedure2, "Another message"))
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         empty_list.hasAnyOriginatingFrom.procedure1, &
                         empty_list%repr() // ".hasAnyOriginatingFrom." // procedure1%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         messages.hasAnyOriginatingFrom.procedure1, &
                         messages%repr() // ".hasAnyOriginatingFrom." // procedure1%repr())
     end function checkForOriginatingProcedure
@@ -886,10 +886,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_messages.hasAnyComingThrough.branch1_middle_module, &
                         top_level_messages%repr() // ".hasAnyCominghThrough." // branch1_middle_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         top_level_messages.hasAnyComingThrough.branch1_bottom_module, &
                         top_level_messages%repr() // ".hasAnyCominghThrough." // branch1_bottom_module%repr())
     end function checkForThroughModule
@@ -972,10 +972,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_messages.hasAnyComingThrough.branch1_middle_procedure, &
                         top_level_messages%repr() // ".hasAnyCominghThrough." // branch1_middle_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         top_level_messages.hasAnyComingThrough.branch1_bottom_procedure, &
                         top_level_messages%repr() // ".hasAnyCominghThrough." // branch1_bottom_procedure%repr())
     end function checkForThroughProcedure
@@ -1058,10 +1058,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_messages.hasAnyFrom.branch1_middle_module, &
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_middle_module%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         top_level_messages.hasAnyFrom.branch1_bottom_module, &
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_bottom_module%repr())
     end function checkForFromModule
@@ -1144,10 +1144,10 @@ contains
                 top_level_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         top_level_messages.hasAnyFrom.branch1_middle_procedure, &
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_middle_procedure%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         top_level_messages.hasAnyFrom.branch1_bottom_procedure, &
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_bottom_procedure%repr())
     end function checkForFromProcedure
@@ -1178,16 +1178,16 @@ contains
                 Module_("Some_m"), Procedure_("some"), "Hello Message"))
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         messages.hasAnyIncluding."Hello", &
                         messages%repr() // '.hasAnyIncluding."Hello"') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         messages.hasAnyIncluding.test_string3, &
                         messages%repr() // '.hasAnyIncluding."' // test_string3 // '"') &
-                .and.assertThat( &
+                .and.assert_That( &
                         messages.hasAnyIncludingAnyOf.[test_string1, test_string2], &
                         messages%repr() // '.hasAnyIncludingAnyOf."' // test_string1 // '" or "' // test_string2 // '"') &
-                .and.assertThat( &
+                .and.assert_That( &
                         messages.hasAnyIncludingAllOf.[test_string1, test_string2], &
                         messages%repr() // '.hasAnyIncludingAllOf."' // test_string1 // '" or "' // test_string2 // '"')
     end function checkForContents

@@ -4,7 +4,7 @@ module Error_list_m
     use Message_m, only: Error_t, MessageType_t
     use Module_m, only: Module_t
     use Procedure_m, only: Procedure_t
-    use strff, only: hangingIndent, indent, join, NEWLINE
+    use strff, only: hanging_indent, indent, join, NEWLINE
 
     implicit none
     private
@@ -599,7 +599,7 @@ contains
             strings(i) = self%errors(i)%error%repr()
         end do
 
-        repr = hangingIndent( &
+        repr = hanging_indent( &
                 "MessageList_t(" // NEWLINE &
                     // "messages = [" // NEWLINE &
                     // indent(join(strings, "," // NEWLINE), 4) // NEWLINE // "]", &
