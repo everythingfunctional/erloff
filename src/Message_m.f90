@@ -12,16 +12,6 @@ module Message_m
     implicit none
     private
 
-    type, public, extends(Message_t) :: Debug_t
-        private
-        type(debug_level_t) :: level
-    contains
-        private
-        procedure, public :: type_string => debugTypeString
-        procedure, public :: typeRepr => debugTypeRepr
-        procedure, public :: is_type => debugIsType
-    end type Debug_t
-
     type, public, extends(Message_t) :: Info_t
     contains
         private
@@ -60,13 +50,6 @@ module Message_m
         procedure, public :: is_type => internalIsType
     end type Internal_t
 
-    interface Debug
-        module procedure genericDebugC
-        module procedure genericDebugS
-        module procedure debugWithTypeC
-        module procedure debugWithTypeS
-    end interface Debug
-
     interface Info
         module procedure genericInfoC
         module procedure genericInfoS
@@ -95,15 +78,12 @@ module Message_m
         module procedure internalWithTypeS
     end interface Internal
 
-    character(len=*), parameter :: DEBUG_TYPE_STRING = "Debug_t"
     character(len=*), parameter :: INFO_TYPE_STRING = "Info_t"
     character(len=*), parameter :: WARNING_TYPE_STRING = "Warning_t"
     character(len=*), parameter :: ERROR_TYPE_STRING = "Error_t"
     character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
     character(len=*), parameter :: INTERNAL_TYPE_STRING = "Internal_t"
 
-    type(message_type_t), parameter, public :: DEBUG_TYPE = message_type_t( &
-            DEBUG_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: INFO_TYPE = message_type_t( &
             INFO_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: WARNING_TYPE = message_type_t( &
@@ -129,55 +109,8 @@ module Message_m
     type(message_type_t), parameter, public :: UNKNOWN_TYPE_TYPE = &
             message_type_t("Unknown Type Encountered")
 
-    public :: Debug, Info, Warning, Fatal, Internal
+    public :: Info, Warning, Fatal, Internal
 contains
-    pure function genericDebugC(module_, procedure_, level, message) result(debug_)
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(debug_level_t), intent(in) :: level
-        character(len=*), intent(in) :: message
-        type(Debug_t) :: debug_
-
-        debug_ = Debug(DEBUG_TYPE, module_, procedure_, level, var_str(message))
-    end function genericDebugC
-
-    pure function genericDebugS(module_, procedure_, level, message) result(debug_)
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(debug_level_t), intent(in) :: level
-        type(VARYING_STRING), intent(in) :: message
-        type(Debug_t) :: debug_
-
-        debug_ = Debug(DEBUG_TYPE, module_, procedure_, level, message)
-    end function genericDebugS
-
-    pure function debugWithTypeC( &
-            type_tag, module_, procedure_, level, message) result(debug_)
-        type(message_type_t), intent(in) :: type_tag
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(debug_level_t), intent(in) :: level
-        character(len=*), intent(in) :: message
-        type(Debug_t) :: debug_
-
-        debug_ = Debug(type_tag, module_, procedure_, level, var_str(message))
-    end function debugWithTypeC
-
-    pure function debugWithTypeS( &
-            type_tag, module_, procedure_, level, message) result(debug_)
-        type(message_type_t), intent(in) :: type_tag
-        type(Module_t), intent(in) :: module_
-        type(Procedure_t), intent(in) :: procedure_
-        type(debug_level_t), intent(in) :: level
-        type(VARYING_STRING), intent(in) :: message
-        type(Debug_t) :: debug_
-
-        debug_%message_type = type_tag
-        debug_%call_stack = call_stack_t(module_, procedure_)
-        debug_%level = level
-        debug_%message = message
-    end function debugWithTypeS
-
     pure function genericInfoC(module_, procedure_, message) result(info_)
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
@@ -337,32 +270,6 @@ contains
         internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
-
-    pure function debugTypeString(self) result(string)
-        class(Debug_t), intent(in) :: self
-        type(VARYING_STRING) :: string
-
-        string = "DB-" // self%level%to_string() // ": "
-    end function debugTypeString
-
-    pure function debugTypeRepr(self) result(repr)
-        class(Debug_t), intent(in) :: self
-        type(VARYING_STRING) :: repr
-
-        repr = DEBUG_TYPE_STRING // '(level = ' // self%level%to_string() // ')'
-    end function debugTypeRepr
-
-    pure function debugIsType(self, type_tag) result(is_type)
-        class(Debug_t), intent(in) :: self
-        type(message_type_t), intent(in) :: type_tag
-        logical :: is_type
-
-        if (trim(type_tag%description) == DEBUG_TYPE_STRING) then
-            is_type = .true.
-        else
-            is_type = self%message_type%description == type_tag%description
-        end if
-    end function
 
     pure function infoTypeString(self) result(string)
         class(Info_t), intent(in) :: self

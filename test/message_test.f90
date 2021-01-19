@@ -1,12 +1,10 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
     use Message_m, only: &
-            Debug, &
             Info, &
             Warning, &
             Fatal, &
             Internal, &
-            DEBUG_TYPE, &
             ERROR_TYPE, &
             FATAL_TYPE, &
             INFO_TYPE, &
@@ -16,6 +14,7 @@ module message_test
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE, &
             WARNING_TYPE
+    use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
@@ -73,7 +72,7 @@ contains
         class(Message_t), allocatable :: fatal_message
         class(Message_t), allocatable :: internal_message
 
-        allocate(debug_message, source = Debug( &
+        allocate(debug_message, source = debug_t( &
                 INPUTS_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
@@ -106,8 +105,8 @@ contains
 
         result_ = &
                 assert_That( &
-                        debug_message.isType.DEBUG_TYPE, &
-                        debug_message%repr() // ".isType." // DEBUG_TYPE%repr()) &
+                        debug_message.isType.DEBUG, &
+                        debug_message%repr() // ".isType." // DEBUG%repr()) &
                 .and.assert_That( &
                         debug_message.isType.INPUTS_TYPE, &
                         debug_message%repr() // ".isType." // INPUTS_TYPE%repr()) &
