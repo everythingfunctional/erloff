@@ -1,7 +1,7 @@
 module erloff_call_stack_entry_m
-    use iso_varying_string, only: varying_string, operator(//)
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
+    use iso_varying_string, only: varying_string, operator(//)
     use strff, only: hanging_indent, indent, NEWLINE
 
     implicit none

@@ -1,5 +1,5 @@
 module Message_m
-    use Call_stack_m, only: CallStack_t, CallStack
+    use erloff_call_stack_m, only: call_stack_t
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
     use erloff_module_m, only: module_t
@@ -19,7 +19,7 @@ module Message_m
 
     type, public, abstract :: Message_t
         private
-        type(CallStack_t) :: call_stack
+        type(call_stack_t) :: call_stack
         type(VARYING_STRING) :: message
         type(MessageType_t) :: message_type
     contains
@@ -227,7 +227,7 @@ contains
         type(Debug_t) :: debug_
 
         debug_%message_type = type_tag
-        debug_%call_stack = CallStack(module_, procedure_)
+        debug_%call_stack = call_stack_t(module_, procedure_)
         debug_%level = level
         debug_%message = message
     end function debugWithTypeS
@@ -268,7 +268,7 @@ contains
         type(Info_t) :: info_
 
         info_%message_type = type_tag
-        info_%call_stack = CallStack(module_, procedure_)
+        info_%call_stack = call_stack_t(module_, procedure_)
         info_%message = message
     end function infoWithTypeS
 
@@ -308,7 +308,7 @@ contains
         type(Warning_t) :: warning_
 
         warning_%message_type = type_tag
-        warning_%call_stack = CallStack(module_, procedure_)
+        warning_%call_stack = call_stack_t(module_, procedure_)
         warning_%message = message
     end function warningWithTypeS
 
@@ -348,7 +348,7 @@ contains
         type(Fatal_t) :: fatal_
 
         fatal_%message_type = type_tag
-        fatal_%call_stack = CallStack(module_, procedure_)
+        fatal_%call_stack = call_stack_t(module_, procedure_)
         fatal_%message = message
     end function fatalWithTypeS
 
@@ -388,7 +388,7 @@ contains
         type(Internal_t) :: internal_
 
         internal_%message_type = type_tag
-        internal_%call_stack = CallStack(module_, procedure_)
+        internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
 
@@ -422,7 +422,7 @@ contains
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
 
-        call self%call_stack%prependNames(module_, procedure_)
+        self%call_stack = self%call_stack%with_names_prepended(module_, procedure_)
     end subroutine prependNames
 
     pure function messageToString(self) result(string)
@@ -430,7 +430,7 @@ contains
         type(VARYING_STRING) :: string
 
         string = hanging_indent( &
-                self%call_stack%toString() // ":" // NEWLINE &
+                self%call_stack%to_string() // ":" // NEWLINE &
                     // self%typeString() // self%message_type%toString() &
                     // self%message, &
                 4)
