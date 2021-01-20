@@ -1,9 +1,7 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
     use Message_m, only: &
-            Fatal, &
             Internal, &
-            FATAL_TYPE, &
             INPUTS_TYPE, &
             INTERNAL_TYPE, &
             OUTSIDE_NORMAL_RANGE_TYPE, &
@@ -12,6 +10,7 @@ module message_test
     use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL
     use erloff_error_m, only: ERROR
+    use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
@@ -89,7 +88,7 @@ contains
                 procedure_t("some"), &
                 "Test Message"))
 
-        allocate(fatal_message, source = Fatal( &
+        allocate(fatal_message, source = fatal_t( &
                 UNEQUAL_ARRAY_SIZES_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
@@ -130,8 +129,8 @@ contains
                         fatal_message.isType.ERROR, &
                         fatal_message%repr() // ".isType." // ERROR%repr()) &
                 .and.assert_That( &
-                        fatal_message.isType.FATAL_TYPE, &
-                        fatal_message%repr() // ".isType." // FATAL_TYPE%repr()) &
+                        fatal_message.isType.FATAL, &
+                        fatal_message%repr() // ".isType." // FATAL%repr()) &
                 .and.assert_That( &
                         fatal_message.isType.UNEQUAL_ARRAY_SIZES_TYPE, &
                         fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &

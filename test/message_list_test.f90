@@ -1,7 +1,7 @@
 module message_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-    use Message_m, only: Fatal
     use Message_list_m, only: MessageList_t, size
+    use erloff_fatal_m, only: fatal_t
     use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
@@ -215,7 +215,7 @@ contains
                 module_t("Some_m"), procedure_t("some"), "Test message"))
         call messages%appendMessage(warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
-        call messages%appendMessage(Fatal( &
+        call messages%appendMessage(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test error"))
 
         result_ = &

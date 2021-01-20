@@ -2,13 +2,10 @@ module erloff
     use Error_list_m, only: ErrorList_t, size
     use Message_m, only: &
             ! Types
-            Fatal_t, &
             Internal_t, &
             ! Message constructors
-            Fatal, &
             Internal, &
             ! Message types
-            FATAL_TYPE, &
             INTERNAL_TYPE, &
             INPUTS_TYPE, &
             NOT_FOUND_TYPE, &
@@ -21,6 +18,7 @@ module erloff
     use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL, MEDIUM, DETAILED, NITTY_GRITTY
     use erloff_error_m, only: error_t, ERROR
+    use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: message_t
     use erloff_message_type_m, only: message_type_t
