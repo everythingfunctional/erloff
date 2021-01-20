@@ -1,6 +1,6 @@
 module erloff_message_type_m
     use iso_varying_string, only: varying_string, assignment(=), operator(//)
-    use strff, only: to_string
+    use strff, only: hanging_indent, to_string, NEWLINE
 
     implicit none
     private
@@ -50,8 +50,10 @@ contains
         class(message_type_t), intent(in) :: self
         type(varying_string) :: repr
 
-        repr = &
-                "message_type_t(description = " // trim(self%description) &
-                // ", is_fundamental = " // to_string(self%is_fundamental) // ")"
+        repr = hanging_indent( &
+                'message_type_t(' // NEWLINE &
+                    // 'description = "' // trim(self%description) // '",' // NEWLINE &
+                    // 'is_fundamental = ' // to_string(self%is_fundamental), &
+                4) // NEWLINE // ')'
     end function
 end module
