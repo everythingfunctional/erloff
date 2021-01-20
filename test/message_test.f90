@@ -1,10 +1,5 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
-    use Message_m, only: &
-            INPUTS_TYPE, &
-            OUTSIDE_NORMAL_RANGE_TYPE, &
-            UNEQUAL_ARRAY_SIZES_TYPE, &
-            UNKNOWN_TYPE_TYPE
     use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL
     use erloff_error_m, only: ERROR
@@ -12,6 +7,11 @@ module message_test
     use erloff_info_m, only: info_t, INFO
     use erloff_internal_m, only: internal_t, INTERNAL
     use erloff_message_m, only: Message_t
+    use erloff_message_type_m, only: &
+            INPUTS, &
+            OUTSIDE_NORMAL_RANGE, &
+            UNEQUAL_ARRAY_SIZES, &
+            UNKNOWN_TYPE
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use erloff_warning_m, only: warning_t, WARNING
@@ -69,32 +69,32 @@ contains
         class(Message_t), allocatable :: internal_message
 
         allocate(debug_message, source = debug_t( &
-                INPUTS_TYPE, &
+                INPUTS, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
                 GENERAL, &
                 "Test Message"))
 
         allocate(info_message, source = info_t( &
-                UNEQUAL_ARRAY_SIZES_TYPE, &
+                UNEQUAL_ARRAY_SIZES, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
                 "Test Message"))
 
         allocate(warning_message, source = warning_t( &
-                OUTSIDE_NORMAL_RANGE_TYPE, &
+                OUTSIDE_NORMAL_RANGE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
                 "Test Message"))
 
         allocate(fatal_message, source = fatal_t( &
-                UNEQUAL_ARRAY_SIZES_TYPE, &
+                UNEQUAL_ARRAY_SIZES, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
                 "Test Message"))
 
         allocate(internal_message, source = internal_t( &
-                UNKNOWN_TYPE_TYPE, &
+                UNKNOWN_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
                 "Test Message"))
@@ -104,8 +104,8 @@ contains
                         debug_message.isType.DEBUG, &
                         debug_message%repr() // ".isType." // DEBUG%repr()) &
                 .and.assert_That( &
-                        debug_message.isType.INPUTS_TYPE, &
-                        debug_message%repr() // ".isType." // INPUTS_TYPE%repr()) &
+                        debug_message.isType.INPUTS, &
+                        debug_message%repr() // ".isType." // INPUTS%repr()) &
                 .and.assert_Not( &
                         debug_message.isType.INFO, &
                         debug_message%repr() // ".isType." // INFO%repr()) &
@@ -116,8 +116,8 @@ contains
                         warning_message.isType.WARNING, &
                         warning_message%repr() // ".isType." // WARNING%repr()) &
                 .and.assert_That( &
-                        warning_message.isType.OUTSIDE_NORMAL_RANGE_TYPE, &
-                        warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE_TYPE%repr()) &
+                        warning_message.isType.OUTSIDE_NORMAL_RANGE, &
+                        warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE%repr()) &
                 .and.assert_Not( &
                         warning_message.isType.INFO, &
                         warning_message%repr() // ".isType." // INFO%repr()) &
@@ -131,8 +131,8 @@ contains
                         fatal_message.isType.FATAL, &
                         fatal_message%repr() // ".isType." // FATAL%repr()) &
                 .and.assert_That( &
-                        fatal_message.isType.UNEQUAL_ARRAY_SIZES_TYPE, &
-                        fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &
+                        fatal_message.isType.UNEQUAL_ARRAY_SIZES, &
+                        fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES%repr()) &
                 .and.assert_Not( &
                         fatal_message.isType.INTERNAL, &
                         fatal_message%repr() // ".isType." // INTERNAL%repr()) &
@@ -143,8 +143,8 @@ contains
                         internal_message.isType.INTERNAL, &
                         internal_message%repr() // ".isType." // INTERNAL%repr()) &
                 .and.assert_That( &
-                        internal_message.isType.UNKNOWN_TYPE_TYPE, &
-                        internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())
+                        internal_message.isType.UNKNOWN_TYPE, &
+                        internal_message%repr() // ".isType." // UNKNOWN_TYPE%repr())
     end function checkType
 
     pure function checkOriginatingModule() result(result_)

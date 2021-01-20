@@ -4,7 +4,15 @@ module erloff_message_type_m
 
     implicit none
     private
-    public :: message_type_t
+    public :: &
+            message_type_t, &
+            INPUTS, &
+            NOT_FOUND, &
+            OUT_OF_BOUNDS, &
+            OUTPUTS, &
+            OUTSIDE_NORMAL_RANGE, &
+            UNEQUAL_ARRAY_SIZES, &
+            UNKNOWN_TYPE
 
     type :: message_type_t
         character(len=100) :: description
@@ -14,6 +22,18 @@ module erloff_message_type_m
         procedure, public :: to_string => message_type_to_string
         procedure, public :: repr
     end type
+
+    type(message_type_t), parameter :: INPUTS = message_type_t("Inputs")
+    type(message_type_t), parameter :: NOT_FOUND = message_type_t("Not Found")
+    type(message_type_t), parameter :: OUT_OF_BOUNDS = message_type_t( &
+            "Out of Bounds")
+    type(message_type_t), parameter :: OUTPUTS = message_type_t("Outputs")
+    type(message_type_t), parameter :: OUTSIDE_NORMAL_RANGE = message_type_t( &
+            "Outside Normal Range")
+    type(message_type_t), parameter :: UNEQUAL_ARRAY_SIZES = message_type_t( &
+            "Unequal Array Sizes")
+    type(message_type_t), parameter :: UNKNOWN_TYPE = message_type_t( &
+            "Unknown Type Encountered")
 contains
     pure function message_type_to_string(self) result(string)
         class(message_type_t), intent(in) :: self

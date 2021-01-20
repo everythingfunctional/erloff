@@ -1,11 +1,10 @@
 module error_list_test
     use Error_list_m, only: ErrorList_t, size
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-    use Message_m, only: &
-            UNKNOWN_TYPE_TYPE
     use erloff_error_m, only: error_t
     use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_internal_m, only: internal_t, INTERNAL
+    use erloff_message_type_m, only: UNKNOWN_TYPE
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use vegetables, only: &
@@ -217,13 +216,13 @@ contains
         call errors%appendError(internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
         call errors%appendError(fatal_t( &
-                UNKNOWN_TYPE_TYPE, module_t("Some_m"), procedure_t("some"), "Test error"))
+                UNKNOWN_TYPE, module_t("Some_m"), procedure_t("some"), "Test error"))
 
         result_ = &
                 assert_Equals(1, size(errors.ofType.INTERNAL), "INTERNAL") &
                 .and.assert_Equals( &
                         2, &
-                        size(errors.ofTypes.[INTERNAL, UNKNOWN_TYPE_TYPE]), &
+                        size(errors.ofTypes.[INTERNAL, UNKNOWN_TYPE]), &
                         "INTERNAL or UNKNOWN_TYPE")
     end function checkFilterByType
 
