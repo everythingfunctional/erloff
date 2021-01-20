@@ -1,9 +1,7 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
     use Message_m, only: &
-            Internal, &
             INPUTS_TYPE, &
-            INTERNAL_TYPE, &
             OUTSIDE_NORMAL_RANGE_TYPE, &
             UNEQUAL_ARRAY_SIZES_TYPE, &
             UNKNOWN_TYPE_TYPE
@@ -12,6 +10,7 @@ module message_test
     use erloff_error_m, only: ERROR
     use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_info_m, only: info_t, INFO
+    use erloff_internal_m, only: internal_t, INTERNAL
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
@@ -94,7 +93,7 @@ contains
                 procedure_t("some"), &
                 "Test Message"))
 
-        allocate(internal_message, source = Internal( &
+        allocate(internal_message, source = internal_t( &
                 UNKNOWN_TYPE_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
@@ -135,14 +134,14 @@ contains
                         fatal_message.isType.UNEQUAL_ARRAY_SIZES_TYPE, &
                         fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &
                 .and.assert_Not( &
-                        fatal_message.isType.INTERNAL_TYPE, &
-                        fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
+                        fatal_message.isType.INTERNAL, &
+                        fatal_message%repr() // ".isType." // INTERNAL%repr()) &
                 .and.assert_That( &
                         internal_message.isType.ERROR, &
                         internal_message%repr() // ".isType." // ERROR%repr()) &
                 .and.assert_That( &
-                        internal_message.isType.INTERNAL_TYPE, &
-                        internal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
+                        internal_message.isType.INTERNAL, &
+                        internal_message%repr() // ".isType." // INTERNAL%repr()) &
                 .and.assert_That( &
                         internal_message.isType.UNKNOWN_TYPE_TYPE, &
                         internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())

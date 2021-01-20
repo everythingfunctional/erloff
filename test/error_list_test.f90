@@ -2,11 +2,10 @@ module error_list_test
     use Error_list_m, only: ErrorList_t, size
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
     use Message_m, only: &
-            Internal, &
-            INTERNAL_TYPE, &
             UNKNOWN_TYPE_TYPE
     use erloff_error_m, only: error_t
     use erloff_fatal_m, only: fatal_t, FATAL
+    use erloff_internal_m, only: internal_t, INTERNAL
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use vegetables, only: &
@@ -126,7 +125,7 @@ contains
 
         allocate(error1, source = fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "First Error"))
-        allocate(error2, source = Internal( &
+        allocate(error2, source = internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Second Error"))
         call error_list1%appendError(error1)
         call error_list1%appendError(error2)
@@ -149,7 +148,7 @@ contains
 
         allocate(error1, source = fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "First Error"))
-        allocate(error2, source = Internal( &
+        allocate(error2, source = internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Second Error"))
         call error_list1%appendError(error1)
         call error_list1%appendError(error2)
@@ -186,14 +185,14 @@ contains
 
         allocate(error1, source = fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "First Error"))
-        allocate(error2, source = Internal( &
+        allocate(error2, source = internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Second Error"))
         call error_list1%appendError(error1)
         call error_list1%appendError(error2)
 
         allocate(error3, source = fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Third Error"))
-        allocate(error4, source = Internal( &
+        allocate(error4, source = internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Fourth Error"))
         call error_list2%appendError(error3)
         call error_list2%appendError(error4)
@@ -215,16 +214,16 @@ contains
 
         call errors%appendError(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test error"))
-        call errors%appendError(Internal( &
+        call errors%appendError(internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
         call errors%appendError(fatal_t( &
                 UNKNOWN_TYPE_TYPE, module_t("Some_m"), procedure_t("some"), "Test error"))
 
         result_ = &
-                assert_Equals(1, size(errors.ofType.INTERNAL_TYPE), "INTERNAL") &
+                assert_Equals(1, size(errors.ofType.INTERNAL), "INTERNAL") &
                 .and.assert_Equals( &
                         2, &
-                        size(errors.ofTypes.[INTERNAL_TYPE, UNKNOWN_TYPE_TYPE]), &
+                        size(errors.ofTypes.[INTERNAL, UNKNOWN_TYPE_TYPE]), &
                         "INTERNAL or UNKNOWN_TYPE")
     end function checkFilterByType
 

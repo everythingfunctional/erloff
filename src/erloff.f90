@@ -1,12 +1,7 @@
 module erloff
     use Error_list_m, only: ErrorList_t, size
     use Message_m, only: &
-            ! Types
-            Internal_t, &
-            ! Message constructors
-            Internal, &
             ! Message types
-            INTERNAL_TYPE, &
             INPUTS_TYPE, &
             NOT_FOUND_TYPE, &
             OUT_OF_BOUNDS_TYPE, &
@@ -20,6 +15,7 @@ module erloff
     use erloff_error_m, only: error_t, ERROR
     use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_info_m, only: info_t, INFO
+    use erloff_internal_m, only: internal_t, INTERNAL
     use erloff_message_m, only: message_t
     use erloff_message_type_m, only: message_type_t
     use erloff_module_m, only: module_t
