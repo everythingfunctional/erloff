@@ -2,7 +2,7 @@ module Error_list_m
     use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
-    use Message_m, only: Error_t
+    use erloff_error_m, only: Error_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: Procedure_t
     use strff, only: hanging_indent, indent, join, NEWLINE

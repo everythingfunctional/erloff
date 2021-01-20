@@ -3,7 +3,6 @@ module message_test
     use Message_m, only: &
             Fatal, &
             Internal, &
-            ERROR_TYPE, &
             FATAL_TYPE, &
             INPUTS_TYPE, &
             INTERNAL_TYPE, &
@@ -12,6 +11,7 @@ module message_test
             UNKNOWN_TYPE_TYPE
     use erloff_debug_m, only: debug_t, DEBUG
     use erloff_debug_level_m, only: GENERAL
+    use erloff_error_m, only: ERROR
     use erloff_info_m, only: info_t, INFO
     use erloff_message_m, only: Message_t
     use erloff_module_m, only: module_t
@@ -112,8 +112,8 @@ contains
                         debug_message.isType.INFO, &
                         debug_message%repr() // ".isType." // INFO%repr()) &
                 .and.assert_Not( &
-                        debug_message.isType.ERROR_TYPE, &
-                        debug_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                        debug_message.isType.ERROR, &
+                        debug_message%repr() // ".isType." // ERROR%repr()) &
                 .and.assert_That( &
                         warning_message.isType.WARNING, &
                         warning_message%repr() // ".isType." // WARNING%repr()) &
@@ -124,11 +124,11 @@ contains
                         warning_message.isType.INFO, &
                         warning_message%repr() // ".isType." // INFO%repr()) &
                 .and.assert_Not( &
-                        warning_message.isType.ERROR_TYPE, &
-                        warning_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                        warning_message.isType.ERROR, &
+                        warning_message%repr() // ".isType." // ERROR%repr()) &
                 .and.assert_That( &
-                        fatal_message.isType.ERROR_TYPE, &
-                        fatal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                        fatal_message.isType.ERROR, &
+                        fatal_message%repr() // ".isType." // ERROR%repr()) &
                 .and.assert_That( &
                         fatal_message.isType.FATAL_TYPE, &
                         fatal_message%repr() // ".isType." // FATAL_TYPE%repr()) &
@@ -139,8 +139,8 @@ contains
                         fatal_message.isType.INTERNAL_TYPE, &
                         fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
                 .and.assert_That( &
-                        internal_message.isType.ERROR_TYPE, &
-                        internal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
+                        internal_message.isType.ERROR, &
+                        internal_message%repr() // ".isType." // ERROR%repr()) &
                 .and.assert_That( &
                         internal_message.isType.INTERNAL_TYPE, &
                         internal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &

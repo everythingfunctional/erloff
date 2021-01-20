@@ -1,5 +1,6 @@
 module Message_m
     use erloff_call_stack_m, only: call_stack_t
+    use erloff_error_m, only: error_t, ERROR_TYPE_STRING
     use erloff_message_m, only: Message_t
     use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
@@ -10,12 +11,6 @@ module Message_m
 
     implicit none
     private
-
-    type, public, abstract, extends(Message_t) :: Error_t
-    contains
-        private
-        procedure, public :: isType => errorIsType
-    end type Error_t
 
     type, public, extends(Error_t) :: Fatal_t
     contains
@@ -47,12 +42,9 @@ module Message_m
         module procedure internalWithTypeS
     end interface Internal
 
-    character(len=*), parameter :: ERROR_TYPE_STRING = "Error_t"
     character(len=*), parameter :: FATAL_TYPE_STRING = "Fatal_t"
     character(len=*), parameter :: INTERNAL_TYPE_STRING = "Internal_t"
 
-    type(message_type_t), parameter, public :: ERROR_TYPE = message_type_t( &
-            ERROR_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: FATAL_TYPE = message_type_t( &
             FATAL_TYPE_STRING, .true.)
     type(message_type_t), parameter, public :: INTERNAL_TYPE = message_type_t( &
@@ -153,18 +145,6 @@ contains
         internal_%call_stack = call_stack_t(module_, procedure_)
         internal_%message = message
     end function internalWithTypeS
-
-    pure function errorIsType(self, type_tag) result(is_type)
-        class(Error_t), intent(in) :: self
-        type(message_type_t), intent(in) :: type_tag
-        logical :: is_type
-
-        if (trim(type_tag%description) == ERROR_TYPE_STRING) then
-            is_type = .true.
-        else
-            is_type = self%message_type%description == type_tag%description
-        end if
-    end function
 
     pure function fatalTypeString(self) result(string)
         class(Fatal_t), intent(in) :: self

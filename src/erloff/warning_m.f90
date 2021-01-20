@@ -12,7 +12,7 @@ module erloff_warning_m
     private
     public :: warning_t, WARNING
 
-    type, extends(Message_t) :: warning_t
+    type, extends(message_t) :: warning_t
     contains
         private
         procedure, public :: with_names_prepended

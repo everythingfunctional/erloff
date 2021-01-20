@@ -2,12 +2,12 @@ module error_list_test
     use Error_list_m, only: ErrorList_t, size
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
     use Message_m, only: &
-            Error_t, &
             Internal, &
             Fatal, &
             FATAL_TYPE, &
             INTERNAL_TYPE, &
             UNKNOWN_TYPE_TYPE
+    use erloff_error_m, only: error_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use vegetables, only: &
