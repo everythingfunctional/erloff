@@ -114,7 +114,7 @@ contains
         result_ = assert_Includes(message%to_string(), message_list%toString())
     end function checkAppendToEmpty
 
-    pure function checkAppendMultipleToEmpty() result(result_)
+    function checkAppendMultipleToEmpty() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message1
@@ -137,7 +137,7 @@ contains
                 .and.assert_Includes(message2%to_string(), message_list2%toString())
     end function checkAppendMultipleToEmpty
 
-    pure function checkAppendEmpty() result(result_)
+    function checkAppendEmpty() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message1
@@ -160,7 +160,7 @@ contains
                 .and.assert_Includes(message2%to_string(), message_list1%toString())
     end function checkAppendEmpty
 
-    pure function checkCombineEmpty() result(result_)
+    function checkCombineEmpty() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: message_list1
@@ -172,7 +172,7 @@ contains
         result_ = assert_Empty(message_list1%toString())
     end function checkCombineEmpty
 
-    pure function checkCombine() result(result_)
+    function checkCombine() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message1
@@ -306,7 +306,7 @@ contains
                         procedure1%repr() // " or " // procedure2%repr())
     end function checkFilterByOriginatingProcedure
 
-    pure function checkFilterByModulesThrough() result(result_)
+    function checkFilterByModulesThrough() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -402,7 +402,7 @@ contains
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
     end function checkFilterByModulesThrough
 
-    pure function checkFilterByProceduresThrough() result(result_)
+    function checkFilterByProceduresThrough() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -498,7 +498,7 @@ contains
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresThrough
 
-    pure function checkFilterByModulesFrom() result(result_)
+    function checkFilterByModulesFrom() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -594,7 +594,7 @@ contains
                         branch1_middle_module%repr() // " or " // branch2_middle_module%repr())
     end function checkFilterByModulesFrom
 
-    pure function checkFilterByProceduresFrom() result(result_)
+    function checkFilterByProceduresFrom() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -810,7 +810,7 @@ contains
                         messages%repr() // ".hasAnyOriginatingFrom." // procedure1%repr())
     end function checkForOriginatingProcedure
 
-    pure function checkForThroughModule() result(result_)
+    function checkForThroughModule() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -896,7 +896,7 @@ contains
                         top_level_messages%repr() // ".hasAnyCominghThrough." // branch1_bottom_module%repr())
     end function checkForThroughModule
 
-    pure function checkForThroughProcedure() result(result_)
+    function checkForThroughProcedure() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -982,7 +982,7 @@ contains
                         top_level_messages%repr() // ".hasAnyCominghThrough." // branch1_bottom_procedure%repr())
     end function checkForThroughProcedure
 
-    pure function checkForFromModule() result(result_)
+    function checkForFromModule() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages
@@ -1068,7 +1068,7 @@ contains
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_bottom_module%repr())
     end function checkForFromModule
 
-    pure function checkForFromProcedure() result(result_)
+    function checkForFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: branch1_bottom_messages

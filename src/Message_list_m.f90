@@ -114,7 +114,7 @@ contains
         end if
     end subroutine appendMessage
 
-    pure subroutine appendMessages(self, messages, module_, procedure_)
+    subroutine appendMessages(self, messages, module_, procedure_)
         class(MessageList_t), intent(inout) :: self
         type(MessageList_t), intent(in) :: messages
         type(Module_t), intent(in) :: module_
@@ -131,7 +131,9 @@ contains
                 allocate(self%messages, source = messages%messages)
                 self%length = size(self%messages)
                 do i = 1, self%length
-                    call self%messages(i)%message%prependNames(module_, procedure_)
+                    self%messages(i)%message = &
+                            self%messages(i)%message%with_names_prepended( &
+                                    module_, procedure_)
                 end do
             else
                 num_old_messages = self%length
@@ -143,7 +145,9 @@ contains
                 self%messages(1:num_old_messages) = old_messages
                 self%messages(num_old_messages+1:) = messages%messages
                 do i = num_old_messages + 1, total_num_messages
-                    call self%messages(i)%message%prependNames(module_, procedure_)
+                    self%messages(i)%message = &
+                            self%messages(i)%message%with_names_prepended( &
+                                    module_, procedure_)
                 end do
                 self%length = total_num_messages
             end if

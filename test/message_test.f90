@@ -147,7 +147,7 @@ contains
                         internal_message%repr() // ".isType." // UNKNOWN_TYPE%repr())
     end function checkType
 
-    pure function checkOriginatingModule() result(result_)
+    function checkOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -164,7 +164,7 @@ contains
         other_module = module_t("Other_m")
         allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -178,7 +178,7 @@ contains
                         message%repr() // '.originatedFrom.' // other_module%repr())
     end function checkOriginatingModule
 
-    pure function checkOriginatingProcedure() result(result_)
+    function checkOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
         type(module_t) :: another_module
@@ -195,7 +195,7 @@ contains
         other_procedure = procedure_t("other")
         allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -209,7 +209,7 @@ contains
                         message%repr() // '.originatedFrom.' // other_procedure%repr())
     end function checkOriginatingProcedure
 
-    pure function checkFromModule() result(result_)
+    function checkFromModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -226,7 +226,7 @@ contains
         other_module = module_t("Other_m")
         allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -240,7 +240,7 @@ contains
                         message%repr() // '.isFrom.' // other_module%repr())
     end function checkFromModule
 
-    pure function checkFromProcedure() result(result_)
+    function checkFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -257,7 +257,7 @@ contains
         other_procedure = procedure_t("other")
         allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -271,7 +271,7 @@ contains
                         message%repr() // '.isFrom.' // other_procedure%repr())
     end function checkFromProcedure
 
-    pure function checkThroughModule() result(result_)
+    function checkThroughModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -288,7 +288,7 @@ contains
         other_module = module_t("Other_m")
         allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_Not( &
@@ -302,7 +302,7 @@ contains
                         message%repr() // '.cameThrough.' // other_module%repr())
     end function checkThroughModule
 
-    pure function checkThroughProcedure() result(result_)
+    function checkThroughProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
@@ -319,7 +319,7 @@ contains
         other_procedure = procedure_t("other")
         allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_Not( &
@@ -333,7 +333,7 @@ contains
                         message%repr() // '.cameThrough.' // other_procedure%repr())
     end function checkThroughProcedure
 
-    pure function checkContents() result(result_)
+    function checkContents() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message

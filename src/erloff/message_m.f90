@@ -16,7 +16,7 @@ module erloff_message_m
         type(message_type_t) :: message_type
     contains
         private
-        procedure, public :: prependNames
+        procedure(prepend_names_i), public, deferred :: with_names_prepended
         procedure, public :: to_string => message_to_string
         procedure(to_string_i), public, deferred :: type_string
         procedure, public :: is_type
@@ -41,18 +41,28 @@ module erloff_message_m
         generic, public :: operator(.includesAnyOf.) => includes_any_of
         procedure :: includes_all_of
         generic, public :: operator(.includesAllOf.) => includes_all_of
-        procedure, public :: repr => messageRepr
-        procedure(to_string_i), public, deferred :: typeRepr
+        procedure(to_string_i), public, deferred :: repr
     end type
 
     abstract interface
         pure function to_string_i(self) result(string)
-            import message_t, varying_string
+            import :: message_t, varying_string
 
             implicit none
 
             class(message_t), intent(in) :: self
             type(varying_string) :: string
+        end function
+
+        function prepend_names_i(self, module_, procedure_) result(new_message)
+            import :: message_t, module_t, procedure_t
+
+            implicit none
+
+            class(message_t), intent(in) :: self
+            type(module_t), intent(in) :: module_
+            type(procedure_t), intent(in) :: procedure_
+            class(message_t), allocatable :: new_message
         end function
     end interface
 contains
@@ -178,17 +188,4 @@ contains
         end do
         includes = all(includes_)
     end function
-
-    pure function messageRepr(self) result(repr)
-        class(message_t), intent(in) :: self
-        type(varying_string) :: repr
-
-        repr = hanging_indent( &
-                'Message(' // NEWLINE &
-                    // 'type = ' // self%typeRepr() // ',' // NEWLINE &
-                    // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
-                    // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
-                    // 'message = "' // self%message // '"', &
-                4) // NEWLINE // ')'
-    end function messageRepr
 end module

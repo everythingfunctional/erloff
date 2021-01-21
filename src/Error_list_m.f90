@@ -115,7 +115,7 @@ contains
         end if
     end subroutine appendError
 
-    pure subroutine appendErrors(self, errors, module_, procedure_)
+    subroutine appendErrors(self, errors, module_, procedure_)
         class(ErrorList_t), intent(inout) :: self
         type(ErrorList_t), intent(in) :: errors
         type(Module_t), intent(in) :: module_
@@ -132,7 +132,11 @@ contains
                 allocate(self%errors, source = errors%errors)
                 self%length = size(self%errors)
                 do i = 1, self%length
-                    call self%errors(i)%error%prependNames(module_, procedure_)
+                    select type (error => self%errors(i)%error%with_names_prepended( &
+                            module_, procedure_))
+                    class is (error_t)
+                        self%errors(i)%error = error
+                    end select
                 end do
             else
                 num_old_errors = self%length
@@ -144,7 +148,11 @@ contains
                 self%errors(1:num_old_errors) = old_errors
                 self%errors(num_old_errors+1:) = errors%errors
                 do i = num_old_errors + 1, total_num_errors
-                    call self%errors(i)%error%prependNames(module_, procedure_)
+                    select type (error => self%errors(i)%error%with_names_prepended( &
+                            module_, procedure_))
+                    class is (error_t)
+                        self%errors(i)%error = error
+                    end select
                 end do
                 self%length = total_num_errors
             end if
