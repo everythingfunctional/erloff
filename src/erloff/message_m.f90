@@ -11,11 +11,11 @@ module erloff_message_m
     public :: message_t, default_is_type
 
     type, abstract :: message_t
-        type(varying_string) :: message
         type(message_type_t) :: message_type
     contains
         private
         procedure(call_stack_i), public, deferred :: call_stack
+        procedure(message_i), public, deferred :: message
         procedure(prepend_names_i), public, deferred :: with_names_prepended
         procedure, public :: to_string => message_to_string
         procedure(to_string_i), public, deferred :: type_string
@@ -73,6 +73,15 @@ module erloff_message_m
             class(message_t), intent(in) :: self
             type(call_stack_t) :: call_stack
         end function
+
+        pure function message_i(self) result(message)
+            import :: message_t, varying_string
+
+            implicit none
+
+            class(message_t), intent(in) :: self
+            type(varying_string) :: message
+        end function
     end interface
 contains
     pure function message_to_string(self) result(string)
@@ -85,7 +94,7 @@ contains
         string = hanging_indent( &
                 call_stack%to_string() // ":" // NEWLINE &
                     // self%type_string() // self%message_type%to_string() &
-                    // self%message, &
+                    // self%message(), &
                 4)
     end function
 
@@ -162,7 +171,7 @@ contains
         type(varying_string), intent(in) :: string
         logical :: includes
 
-        includes = self%message.includes.string
+        includes = self%message().includes.string
     end function
 
     pure function includes_any_of(self, strings) result(includes)

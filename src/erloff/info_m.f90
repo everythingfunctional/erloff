@@ -15,8 +15,10 @@ module erloff_info_m
     type, extends(message_t) :: info_t
         private
         type(call_stack_t) :: call_stack_
+        type(varying_string) :: message_
     contains
         private
+        procedure, public :: message
         procedure, public :: call_stack
         procedure, public :: with_names_prepended
         procedure, public :: type_string
@@ -85,7 +87,7 @@ contains
 
         info_%message_type = type_tag
         info_%call_stack_ = call_stack
-        info_%message = message
+        info_%message_ = message
     end function
 
     function with_names_prepended(self, module_, procedure_) result(new_message)
@@ -97,7 +99,7 @@ contains
         new_message = internal_constructor( &
                 self%message_type, &
                 self%call_stack_%with_names_prepended(module_, procedure_), &
-                self%message)
+                self%message_)
     end function
 
     pure function call_stack(self)
@@ -105,6 +107,13 @@ contains
         type(call_stack_t) :: call_stack
 
         call_stack = self%call_stack_
+    end function
+
+    pure function message(self)
+        class(info_t), intent(in) :: self
+        type(varying_string) :: message
+
+        message = self%message_
     end function
 
     pure function type_string(self) result(string)
@@ -123,9 +132,9 @@ contains
 
         repr = hanging_indent( &
                 'info_t(' // NEWLINE &
-                    // 'call_stack = ' // self%call_stack_%repr() // ',' // NEWLINE &
+                    // 'call_stack_ = ' // self%call_stack_%repr() // ',' // NEWLINE &
                     // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
-                    // 'message = "' // self%message // '"', &
+                    // 'message_ = "' // self%message_ // '"', &
                 4) // NEWLINE // ')'
     end function
 
