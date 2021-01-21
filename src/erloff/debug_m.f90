@@ -17,10 +17,12 @@ module erloff_debug_m
         type(debug_level_t) :: level
         type(call_stack_t) :: call_stack_
         type(varying_string) :: message_
+        type(message_type_t) :: message_type_
     contains
         private
         procedure, public :: call_stack
         procedure, public :: message
+        procedure, public :: message_type
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
@@ -92,7 +94,7 @@ contains
         type(varying_string), intent(in) :: message
         type(debug_t) :: debug_
 
-        debug_%message_type = type_tag
+        debug_%message_type_ = type_tag
         debug_%call_stack_ = call_stack
         debug_%level = level
         debug_%message_ = message
@@ -105,7 +107,7 @@ contains
         class(message_t), allocatable :: new_message
 
         new_message = internal_constructor( &
-                self%message_type, &
+                self%message_type_, &
                 self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%level, &
                 self%message_)
@@ -125,6 +127,13 @@ contains
         message = self%message_
     end function
 
+    pure function message_type(self)
+        class(debug_t), intent(in) :: self
+        type(message_type_t) :: message_type
+
+        message_type = self%message_type_
+    end function
+
     pure function type_string(self) result(string)
         class(debug_t), intent(in) :: self
         type(varying_string) :: string
@@ -140,7 +149,7 @@ contains
                 'debug_t(' // NEWLINE &
                     // 'level = ' // self%level%repr() // ',' // NEWLINE &
                     // 'call_stack_ = ' // self%call_stack_%repr() // ',' // NEWLINE &
-                    // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
+                    // 'message_type = ' // self%message_type_%repr() // ',' // NEWLINE &
                     // 'message_ = "' // self%message_ // '"', &
                 4) // NEWLINE // ')'
     end function
