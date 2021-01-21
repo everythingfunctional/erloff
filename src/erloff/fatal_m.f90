@@ -26,7 +26,6 @@ module erloff_fatal_m
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
-        procedure, public :: typeRepr => fatalTypeRepr
         procedure, public :: is_type
     end type
 
@@ -145,16 +144,6 @@ contains
                     // 'message_ = "' // self%message_ // '"', &
                 4) // NEWLINE // ')'
     end function
-
-    pure function fatalTypeRepr(self) result(repr)
-        class(fatal_t), intent(in) :: self
-        type(varying_string) :: repr
-
-        associate(a => self)
-        end associate
-
-        repr = FATAL_TYPE_STRING
-    end function fatalTypeRepr
 
     pure function is_type(self, type_tag)
         class(fatal_t), intent(in) :: self

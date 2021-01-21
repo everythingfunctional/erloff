@@ -26,7 +26,6 @@ module erloff_debug_m
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
-        procedure, public :: typeRepr => debugTypeRepr
         procedure, public :: is_type
     end type
 
@@ -153,13 +152,6 @@ contains
                     // 'message_ = "' // self%message_ // '"', &
                 4) // NEWLINE // ')'
     end function
-
-    pure function debugTypeRepr(self) result(repr)
-        class(debug_t), intent(in) :: self
-        type(varying_string) :: repr
-
-        repr = DEBUG_TYPE_STRING // '(level = ' // self%level%to_string() // ')'
-    end function debugTypeRepr
 
     pure function is_type(self, type_tag)
         class(debug_t), intent(in) :: self

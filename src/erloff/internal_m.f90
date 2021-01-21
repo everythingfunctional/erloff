@@ -26,7 +26,6 @@ module erloff_internal_m
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
-        procedure, public :: typeRepr => internalTypeRepr
         procedure, public :: is_type
     end type
 
@@ -145,16 +144,6 @@ contains
                     // 'message_ = "' // self%message_ // '"', &
                 4) // NEWLINE // ')'
     end function
-
-    pure function internalTypeRepr(self) result(repr)
-        class(internal_t), intent(in) :: self
-        type(varying_string) :: repr
-
-        associate(a => self)
-        end associate
-
-        repr = INTERNAL_TYPE_STRING
-    end function internalTypeRepr
 
     pure function is_type(self, type_tag)
         class(internal_t), intent(in) :: self
