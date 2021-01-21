@@ -180,7 +180,7 @@ contains
         includes = self.includes.var_str(string)
     end function
 
-    pure function includes_s(self, string) result(includes)
+    elemental function includes_s(self, string) result(includes)
         class(message_t), intent(in) :: self
         type(varying_string), intent(in) :: string
         logical :: includes
@@ -193,13 +193,7 @@ contains
         type(varying_string), intent(in) :: strings(:)
         logical :: includes
 
-        integer :: i
-        logical :: includes_(size(strings))
-
-        do i = 1, size(strings)
-            includes_(i) = self.includes.strings(i)
-        end do
-        includes = any(includes_)
+        includes = any(self.includes.strings)
     end function
 
     pure function includes_all_of(self, strings) result(includes)
@@ -207,12 +201,6 @@ contains
         type(varying_string), intent(in) :: strings(:)
         logical :: includes
 
-        integer :: i
-        logical :: includes_(size(strings))
-
-        do i = 1, size(strings)
-            includes_(i) = self.includes.strings(i)
-        end do
-        includes = all(includes_)
+        includes = all(self.includes.strings)
     end function
 end module
