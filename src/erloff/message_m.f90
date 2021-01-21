@@ -11,11 +11,11 @@ module erloff_message_m
     public :: message_t, default_is_type
 
     type, abstract :: message_t
-        type(call_stack_t) :: call_stack
         type(varying_string) :: message
         type(message_type_t) :: message_type
     contains
         private
+        procedure(call_stack_i), public, deferred :: call_stack
         procedure(prepend_names_i), public, deferred :: with_names_prepended
         procedure, public :: to_string => message_to_string
         procedure(to_string_i), public, deferred :: type_string
@@ -64,14 +64,26 @@ module erloff_message_m
             type(procedure_t), intent(in) :: procedure_
             class(message_t), allocatable :: new_message
         end function
+
+        pure function call_stack_i(self) result(call_stack)
+            import :: message_t, call_stack_t
+
+            implicit none
+
+            class(message_t), intent(in) :: self
+            type(call_stack_t) :: call_stack
+        end function
     end interface
 contains
     pure function message_to_string(self) result(string)
         class(message_t), intent(in) :: self
         type(varying_string) :: string
 
+        type(call_stack_t) :: call_stack
+
+        call_stack = self%call_stack()
         string = hanging_indent( &
-                self%call_stack%to_string() // ":" // NEWLINE &
+                call_stack%to_string() // ":" // NEWLINE &
                     // self%type_string() // self%message_type%to_string() &
                     // self%message, &
                 4)
@@ -90,7 +102,7 @@ contains
         type(module_t), intent(in) :: module_
         logical :: originated_from
 
-        originated_from = self%call_stack.originatedFrom.module_
+        originated_from = self%call_stack().originatedFrom.module_
     end function
 
     pure function originated_from_procedure(self, procedure_) result(originated_from)
@@ -98,7 +110,7 @@ contains
         type(procedure_t), intent(in) :: procedure_
         logical :: originated_from
 
-        originated_from = self%call_stack.originatedFrom.procedure_
+        originated_from = self%call_stack().originatedFrom.procedure_
     end function
 
     pure function is_from_module(self, module_) result(is_from)
@@ -106,7 +118,7 @@ contains
         type(module_t), intent(in) :: module_
         logical :: is_from
 
-        is_from = self%call_stack.includes.module_
+        is_from = self%call_stack().includes.module_
     end function
 
     pure function is_from_procedure(self, procedure_) result(is_from)
@@ -114,7 +126,7 @@ contains
         type(procedure_t), intent(in) :: procedure_
         logical :: is_from
 
-        is_from = self%call_stack.includes.procedure_
+        is_from = self%call_stack().includes.procedure_
     end function
 
     pure function came_through_module(self, module_) result(came_through)

@@ -13,8 +13,11 @@ module erloff_info_m
     public :: info_t, INFO
 
     type, extends(message_t) :: info_t
+        private
+        type(call_stack_t) :: call_stack_
     contains
         private
+        procedure, public :: call_stack
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
@@ -81,7 +84,7 @@ contains
         type(info_t) :: info_
 
         info_%message_type = type_tag
-        info_%call_stack = call_stack
+        info_%call_stack_ = call_stack
         info_%message = message
     end function
 
@@ -93,8 +96,15 @@ contains
 
         new_message = internal_constructor( &
                 self%message_type, &
-                self%call_stack%with_names_prepended(module_, procedure_), &
+                self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%message)
+    end function
+
+    pure function call_stack(self)
+        class(info_t), intent(in) :: self
+        type(call_stack_t) :: call_stack
+
+        call_stack = self%call_stack_
     end function
 
     pure function type_string(self) result(string)
@@ -113,7 +123,7 @@ contains
 
         repr = hanging_indent( &
                 'info_t(' // NEWLINE &
-                    // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
+                    // 'call_stack = ' // self%call_stack_%repr() // ',' // NEWLINE &
                     // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
                     // 'message = "' // self%message // '"', &
                 4) // NEWLINE // ')'

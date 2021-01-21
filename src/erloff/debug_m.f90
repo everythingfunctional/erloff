@@ -15,8 +15,10 @@ module erloff_debug_m
     type, extends(message_t) :: debug_t
         private
         type(debug_level_t) :: level
+        type(call_stack_t) :: call_stack_
     contains
         private
+        procedure, public :: call_stack
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
@@ -89,7 +91,7 @@ contains
         type(debug_t) :: debug_
 
         debug_%message_type = type_tag
-        debug_%call_stack = call_stack
+        debug_%call_stack_ = call_stack
         debug_%level = level
         debug_%message = message
     end function
@@ -102,9 +104,16 @@ contains
 
         new_message = internal_constructor( &
                 self%message_type, &
-                self%call_stack%with_names_prepended(module_, procedure_), &
+                self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%level, &
                 self%message)
+    end function
+
+    pure function call_stack(self)
+        class(debug_t), intent(in) :: self
+        type(call_stack_t) :: call_stack
+
+        call_stack = self%call_stack_
     end function
 
     pure function type_string(self) result(string)
@@ -121,7 +130,7 @@ contains
         repr = hanging_indent( &
                 'debug_t(' // NEWLINE &
                     // 'level = ' // self%level%repr() // ',' // NEWLINE &
-                    // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
+                    // 'call_stack = ' // self%call_stack_%repr() // ',' // NEWLINE &
                     // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
                     // 'message = "' // self%message // '"', &
                 4) // NEWLINE // ')'

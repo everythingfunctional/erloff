@@ -14,8 +14,11 @@ module erloff_internal_m
     public :: internal_t, INTERNAL
 
     type, public, extends(error_t) :: internal_t
+        private
+        type(call_stack_t) :: call_stack_
     contains
         private
+        procedure, public :: call_stack
         procedure, public :: with_names_prepended
         procedure, public :: type_string
         procedure, public :: repr
@@ -80,7 +83,7 @@ contains
         type(internal_t) :: internal_
 
         internal_%message_type = type_tag
-        internal_%call_stack = call_stack
+        internal_%call_stack_ = call_stack
         internal_%message = message
     end function
 
@@ -92,8 +95,15 @@ contains
 
         new_message = internal_constructor( &
                 self%message_type, &
-                self%call_stack%with_names_prepended(module_, procedure_), &
+                self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%message)
+    end function
+
+    pure function call_stack(self)
+        class(internal_t), intent(in) :: self
+        type(call_stack_t) :: call_stack
+
+        call_stack = self%call_stack_
     end function
 
     pure function type_string(self) result(string)
@@ -112,7 +122,7 @@ contains
 
         repr = hanging_indent( &
                 'internal_t(' // NEWLINE &
-                    // 'call_stack = ' // self%call_stack%repr() // ',' // NEWLINE &
+                    // 'call_stack = ' // self%call_stack_%repr() // ',' // NEWLINE &
                     // 'message_type = ' // self%message_type%repr() // ',' // NEWLINE &
                     // 'message = "' // self%message // '"', &
                 4) // NEWLINE // ')'
