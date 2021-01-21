@@ -1,6 +1,6 @@
 module erloff_internal_m
     use erloff_call_stack_m, only: call_stack_t
-    use erloff_error_m, only: error_t, ERROR_TYPE_STRING
+    use erloff_error_m, only: error_t, error_is_type
     use erloff_message_m, only: message_t
     use erloff_message_type_m, only: message_type_t
     use erloff_module_m, only: module_t
@@ -133,12 +133,10 @@ contains
         type(message_type_t), intent(in) :: type_tag
         logical :: is_type
 
-        if (trim(type_tag%description) == ERROR_TYPE_STRING) then
-            is_type = .true.
-        else if (trim(type_tag%description) == INTERNAL_TYPE_STRING) then
+        if (trim(type_tag%description) == INTERNAL_TYPE_STRING) then
             is_type = .true.
         else
-            is_type = self%message_type%description == type_tag%description
+            is_type = error_is_type(self, type_tag)
         end if
     end function
 end module

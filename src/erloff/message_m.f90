@@ -8,7 +8,7 @@ module erloff_message_m
 
     implicit none
     private
-    public :: message_t
+    public :: message_t, default_is_type
 
     type, abstract :: message_t
         type(call_stack_t) :: call_stack
@@ -19,7 +19,7 @@ module erloff_message_m
         procedure(prepend_names_i), public, deferred :: with_names_prepended
         procedure, public :: to_string => message_to_string
         procedure(to_string_i), public, deferred :: type_string
-        procedure, public :: is_type
+        procedure, public :: is_type => default_is_type
         generic, public :: operator(.isType.) => is_type
         procedure :: originated_from_module
         procedure :: originated_from_procedure
@@ -66,14 +66,6 @@ module erloff_message_m
         end function
     end interface
 contains
-    pure subroutine prependNames(self, module_, procedure_)
-        class(message_t), intent(inout) :: self
-        type(module_t), intent(in) :: module_
-        type(procedure_t), intent(in) :: procedure_
-
-        self%call_stack = self%call_stack%with_names_prepended(module_, procedure_)
-    end subroutine prependNames
-
     pure function message_to_string(self) result(string)
         class(message_t), intent(in) :: self
         type(varying_string) :: string
@@ -85,7 +77,7 @@ contains
                 4)
     end function
 
-    pure function is_type(self, type_tag)
+    pure function default_is_type(self, type_tag) result(is_type)
         class(message_t), intent(in) :: self
         type(message_type_t), intent(in) :: type_tag
         logical :: is_type

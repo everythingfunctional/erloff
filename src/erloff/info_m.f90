@@ -1,6 +1,6 @@
 module erloff_info_m
     use erloff_call_stack_m, only: call_stack_t
-    use erloff_message_m, only: message_t
+    use erloff_message_m, only: message_t, default_is_type
     use erloff_message_type_m, only: message_type_t
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
@@ -137,7 +137,7 @@ contains
         if (trim(type_tag%description) == INFO_TYPE_STRING) then
             is_type = .true.
         else
-            is_type = self%message_type%description == type_tag%description
+            is_type = default_is_type(self, type_tag)
         end if
     end function
 end module
