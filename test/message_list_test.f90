@@ -101,7 +101,7 @@ contains
         result_ = assert_Empty(message_list%toString())
     end function checkEmptyToString
 
-    pure function checkAppendToEmpty() result(result_)
+    function checkAppendToEmpty() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message
@@ -206,7 +206,7 @@ contains
                 .and.assert_Includes(message4%to_string(), message_list1%toString())
     end function checkCombine
 
-    pure function checkFilterByType() result(result_)
+    function checkFilterByType() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -226,7 +226,7 @@ contains
                         "INFO or WARNING")
     end function checkFilterByType
 
-    pure function checkFilterByOriginatingModule() result(result_)
+    function checkFilterByOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -266,7 +266,7 @@ contains
                         module1%repr() // " or " // module2%repr())
     end function checkFilterByOriginatingModule
 
-    pure function checkFilterByOriginatingProcedure() result(result_)
+    function checkFilterByOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -690,7 +690,7 @@ contains
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresFrom
 
-    pure function checkFilterByContents() result(result_)
+    function checkFilterByContents() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages
@@ -732,7 +732,7 @@ contains
                         'includingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
     end function checkFilterByContents
 
-    pure function checkForType() result(result_)
+    function checkForType() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: empty_list
@@ -750,7 +750,7 @@ contains
                         messages%repr() // ".hasType." // INFO%repr())
     end function checkForType
 
-    pure function checkForOriginatingModule() result(result_)
+    function checkForOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: empty_list
@@ -780,7 +780,7 @@ contains
                         messages%repr() // ".hasAnyOriginatingFrom." // module1%repr())
     end function checkForOriginatingModule
 
-    pure function checkForOriginatingProcedure() result(result_)
+    function checkForOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: empty_list
@@ -1154,7 +1154,7 @@ contains
                         top_level_messages%repr() // ".hasAnyFrom." // branch1_bottom_procedure%repr())
     end function checkForFromProcedure
 
-    pure function checkForContents() result(result_)
+    function checkForContents() result(result_)
         type(Result_t) :: result_
 
         type(MessageList_t) :: messages

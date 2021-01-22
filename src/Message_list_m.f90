@@ -1,5 +1,6 @@
 module Message_list_m
     use erloff_message_m, only: Message_t
+    use erloff_message_item_m, only: message_item_t
     use erloff_message_type_m, only: message_type_t
     use iso_varying_string, only: &
             VARYING_STRING, assignment(=), operator(//), var_str
@@ -10,14 +11,10 @@ module Message_list_m
     implicit none
     private
 
-    type :: MessageItem_t
-        class(Message_t), allocatable :: message
-    end type MessageItem_t
-
     type, public :: MessageList_t
         private
         integer :: length = 0
-        type(MessageItem_t), allocatable :: messages(:)
+        type(message_item_t), allocatable :: messages(:)
     contains
         private
         procedure, public :: appendMessage
@@ -94,23 +91,16 @@ module Message_list_m
 
     public :: size
 contains
-    pure subroutine appendMessage(self, message)
+    subroutine appendMessage(self, message)
         class(MessageList_t), intent(inout) :: self
         class(Message_t), intent(in) :: message
 
-        type(MessageItem_t) :: old_messages(self%length)
-
         if (self%length == 0) then
-            allocate(self%messages(1))
-            allocate(self%messages(1)%message, source = message)
+            allocate(self%messages, source = [message_item_t(message)])
             self%length = 1
         else
             self%length = self%length + 1
-            old_messages = self%messages
-            deallocate(self%messages)
-            allocate(self%messages(self%length))
-            self%messages(1:size(old_messages)) = old_messages
-            allocate(self%messages(self%length)%message, source = message)
+            self%messages = [self%messages, message_item_t(message)]
         end if
     end subroutine appendMessage
 
@@ -120,37 +110,17 @@ contains
         type(Module_t), intent(in) :: module_
         type(Procedure_t), intent(in) :: procedure_
 
-        integer :: i
-        type(MessageItem_t) :: old_messages(self%length)
-        integer :: num_new_messages
-        integer :: num_old_messages
-        integer :: total_num_messages
-
         if (.not. messages%length == 0) then
             if (self%length == 0) then
-                allocate(self%messages, source = messages%messages)
-                self%length = size(self%messages)
-                do i = 1, self%length
-                    self%messages(i)%message = &
-                            self%messages(i)%message%with_names_prepended( &
-                                    module_, procedure_)
-                end do
+                allocate(self%messages, source = &
+                        messages%messages%with_names_prepended(module_, procedure_))
             else
-                num_old_messages = self%length
-                num_new_messages = messages%length
-                total_num_messages = num_old_messages + num_new_messages
-                old_messages = self%messages
-                deallocate(self%messages)
-                allocate(self%messages(total_num_messages))
-                self%messages(1:num_old_messages) = old_messages
-                self%messages(num_old_messages+1:) = messages%messages
-                do i = num_old_messages + 1, total_num_messages
-                    self%messages(i)%message = &
-                            self%messages(i)%message%with_names_prepended( &
-                                    module_, procedure_)
-                end do
-                self%length = total_num_messages
+                self%messages = &
+                        [ self%messages &
+                        , messages%messages%with_names_prepended(module_, procedure_) &
+                        ]
             end if
+            self%length = size(self%messages)
         end if
     end subroutine appendMessages
 
@@ -167,28 +137,13 @@ contains
         type(message_type_t), intent(in) :: type_tags(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(type_tags))
-        integer :: num_output
-        integer :: num_tags
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_tags = size(type_tags)
-            do i = 1, num_tags
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.isType.type_tags(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).isType.type_tags), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function ofTypes
 
@@ -205,28 +160,13 @@ contains
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(modules))
-        integer :: num_modules
-        integer :: num_output
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_modules = size(modules)
-            do i = 1, num_modules
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.originatedFrom.modules(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).originatedFrom.modules), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function originatingFromModules
 
@@ -243,28 +183,13 @@ contains
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(procedures))
-        integer :: num_output
-        integer :: num_procedures
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_procedures = size(procedures)
-            do i = 1, num_procedures
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.originatedFrom.procedures(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).originatedFrom.procedures), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function originatingFromProcedures
 
@@ -281,28 +206,13 @@ contains
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(modules))
-        integer :: num_modules
-        integer :: num_output
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_modules = size(modules)
-            do i = 1, num_modules
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.cameThrough.modules(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).cameThrough.modules), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function comingThroughModules
 
@@ -319,28 +229,13 @@ contains
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(procedures))
-        integer :: num_output
-        integer :: num_procedures
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_procedures = size(procedures)
-            do i = 1, num_procedures
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.cameThrough.procedures(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).cameThrough.procedures), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function comingThroughProcedures
 
@@ -357,28 +252,13 @@ contains
         type(Module_t), intent(in) :: modules(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(modules))
-        integer :: num_modules
-        integer :: num_output
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_modules = size(modules)
-            do i = 1, num_modules
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.isFrom.modules(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).isFrom.modules), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function fromModules
 
@@ -395,28 +275,13 @@ contains
         type(Procedure_t), intent(in) :: procedures(:)
         type(MessageList_t) :: new_list
 
-        logical :: final_mask(self%length)
-        integer :: i, j
-        logical :: individual_masks(self%length, size(procedures))
-        integer :: num_output
-        integer :: num_procedures
+        integer :: i
 
         if (.not. self%length == 0) then
-            num_procedures = size(procedures)
-            do i = 1, num_procedures
-                do j = 1, self%length
-                    individual_masks(j, i) = self%messages(j)%message.isFrom.procedures(i)
-                end do
-            end do
-            do i = 1, self%length
-                final_mask(i) = any(individual_masks(i, :))
-            end do
-            num_output = count(final_mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%length = num_output
-                new_list%messages = pack(self%messages, mask=final_mask)
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(any(self%messages(i).isFrom.procedures), i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function fromProcedures
 
@@ -442,19 +307,12 @@ contains
         type(MessageList_t) :: new_list
 
         integer :: i
-        logical :: mask(self%length)
-        integer :: num_output
 
         if (.not. self%length == 0) then
-            do i = 1, self%length
-                mask(i) = self%messages(i)%message.includesAnyOf.strings
-            end do
-            num_output = count(mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%messages = pack(self%messages, mask = mask)
-                new_list%length = num_output
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(self%messages(i).includesAnyOf.strings, i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function includingAnyOf
 
@@ -464,19 +322,12 @@ contains
         type(MessageList_t) :: new_list
 
         integer :: i
-        logical :: mask(self%length)
-        integer :: num_output
 
         if (.not. self%length == 0) then
-            do i = 1, self%length
-                mask(i) = self%messages(i)%message.includesAllOf.strings
-            end do
-            num_output = count(mask)
-            if (num_output > 0) then
-                allocate(new_list%messages(num_output))
-                new_list%messages = pack(self%messages, mask = mask)
-                new_list%length = num_output
-            end if
+            allocate(new_list%messages, source = pack( &
+                    self%messages, &
+                    mask = [(self%messages(i).includesAllOf.strings, i = 1, self%length)]))
+            new_list%length = size(new_list%messages)
         end if
     end function includingAllOf
 
@@ -572,16 +423,10 @@ contains
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING) :: string
 
-        integer :: i
-        type(VARYING_STRING) :: strings(self%length)
-
         if (self%length == 0) then
             string = ""
         else
-            do i = 1, self%length
-                strings(i) = self%messages(i)%message%to_string()
-            end do
-            string = join(strings, NEWLINE)
+            string = join(self%messages%to_string(), NEWLINE)
         end if
     end function toString
 
@@ -589,17 +434,20 @@ contains
         class(MessageList_t), intent(in) :: self
         type(VARYING_STRING) :: repr
 
-        integer :: i
-        type(VARYING_STRING) :: strings(self%length)
+        type(varying_string) :: messages_string
 
-        do i = 1, self%length
-            strings(i) = self%messages(i)%message%repr()
-        end do
+        if (self%length == 0) then
+            messages_string = "[]"
+        else
+            messages_string = "[" // NEWLINE &
+                    // indent( &
+                            join(self%messages%repr(), "," // NEWLINE), &
+                            4) // NEWLINE // "]"
+        end if
 
         repr = hanging_indent( &
                 "MessageList_t(" // NEWLINE &
-                    // "messages = [" // NEWLINE &
-                    // indent(join(strings, "," // NEWLINE), 4) // NEWLINE // "]", &
+                    // "messages = " // messages_string, &
                 4) // NEWLINE // ")"
     end function repr
 
