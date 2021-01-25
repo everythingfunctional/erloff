@@ -1,9 +1,9 @@
 module message_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-    use Message_list_m, only: MessageList_t, size
     use erloff_fatal_m, only: fatal_t
     use erloff_info_m, only: info_t, INFO
-    use erloff_message_m, only: Message_t
+    use erloff_message_m, only: message_t
+    use erloff_message_list_m, only: message_list_t, size
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use erloff_warning_m, only: warning_t, WARNING
@@ -90,132 +90,132 @@ contains
         individual_tests(22) = It( &
                 "Can tell if it has a message with some contents", &
                 checkForContents)
-        tests = Describe("MessageList_t", individual_tests)
+        tests = Describe("message_list_t", individual_tests)
     end function test_message_list
 
     pure function checkEmptyToString() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: message_list
+        type(message_list_t) :: message_list
 
-        result_ = assert_Empty(message_list%toString())
+        result_ = assert_Empty(message_list%to_string())
     end function checkEmptyToString
 
     function checkAppendToEmpty() result(result_)
         type(Result_t) :: result_
 
-        class(Message_t), allocatable :: message
-        type(MessageList_t) :: message_list
+        type(info_t) :: message
+        type(message_list_t) :: message_list
 
-        allocate(message, source = info_t( &
-                module_t("Some_m"), procedure_t("some"), "Test Message"))
-        call message_list%appendMessage(message)
+        message = info_t( &
+                module_t("Some_m"), procedure_t("some"), "Test Message")
+        message_list = message_list%with_message_appended(message)
 
-        result_ = assert_Includes(message%to_string(), message_list%toString())
+        result_ = assert_Includes(message%to_string(), message_list%to_string())
     end function checkAppendToEmpty
 
     function checkAppendMultipleToEmpty() result(result_)
         type(Result_t) :: result_
 
-        class(Message_t), allocatable :: message1
-        class(Message_t), allocatable :: message2
-        type(MessageList_t) :: message_list1
-        type(MessageList_t) :: message_list2
+        type(info_t) :: message1
+        type(warning_t) :: message2
+        type(message_list_t) :: message_list1
+        type(message_list_t) :: message_list2
 
-        allocate(message1, source = info_t( &
-                module_t("Some_m"), procedure_t("some"), "First Message"))
-        allocate(message2, source = warning_t( &
-                module_t("Some_m"), procedure_t("some"), "Second Message"))
-        call message_list1%appendMessage(message1)
-        call message_list1%appendMessage(message2)
+        message1 = info_t( &
+                module_t("Some_m"), procedure_t("some"), "First Message")
+        message2 = warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Message")
+        message_list1 = message_list1%with_message_appended(message1)
+        message_list1 = message_list1%with_message_appended(message2)
 
-        call message_list2%appendMessages( &
+        message_list2 = message_list2%with_messages_appended( &
                 message_list1, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(message1%to_string(), message_list2%toString()) &
-                .and.assert_Includes(message2%to_string(), message_list2%toString())
+                assert_Includes(message1%to_string(), message_list2%to_string()) &
+                .and.assert_Includes(message2%to_string(), message_list2%to_string())
     end function checkAppendMultipleToEmpty
 
     function checkAppendEmpty() result(result_)
         type(Result_t) :: result_
 
-        class(Message_t), allocatable :: message1
-        class(Message_t), allocatable :: message2
-        type(MessageList_t) :: message_list1
-        type(MessageList_t) :: message_list2
+        type(info_t) :: message1
+        type(warning_t) :: message2
+        type(message_list_t) :: message_list1
+        type(message_list_t) :: message_list2
 
-        allocate(message1, source = info_t( &
-                module_t("Some_m"), procedure_t("some"), "First Message"))
-        allocate(message2, source = warning_t( &
-                module_t("Some_m"), procedure_t("some"), "Second Message"))
-        call message_list1%appendMessage(message1)
-        call message_list1%appendMessage(message2)
+        message1 = info_t( &
+                module_t("Some_m"), procedure_t("some"), "First Message")
+        message2 = warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Message")
+        message_list1 = message_list1%with_message_appended(message1)
+        message_list1 = message_list1%with_message_appended(message2)
 
-        call message_list1%appendMessages( &
+        message_list1 = message_list1%with_messages_appended( &
                 message_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(message1%to_string(), message_list1%toString()) &
-                .and.assert_Includes(message2%to_string(), message_list1%toString())
+                assert_Includes(message1%to_string(), message_list1%to_string()) &
+                .and.assert_Includes(message2%to_string(), message_list1%to_string())
     end function checkAppendEmpty
 
     function checkCombineEmpty() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: message_list1
-        type(MessageList_t) :: message_list2
+        type(message_list_t) :: message_list1
+        type(message_list_t) :: message_list2
 
-        call message_list1%appendMessages( &
+        message_list1 = message_list1%with_messages_appended( &
                 message_list2, module_t("Another_m"), procedure_t("another"))
 
-        result_ = assert_Empty(message_list1%toString())
+        result_ = assert_Empty(message_list1%to_string())
     end function checkCombineEmpty
 
     function checkCombine() result(result_)
         type(Result_t) :: result_
 
-        class(Message_t), allocatable :: message1
-        class(Message_t), allocatable :: message2
-        class(Message_t), allocatable :: message3
-        class(Message_t), allocatable :: message4
-        type(MessageList_t) :: message_list1
-        type(MessageList_t) :: message_list2
+        type(info_t) :: message1
+        type(warning_t) :: message2
+        type(info_t) :: message3
+        type(warning_t) :: message4
+        type(message_list_t) :: message_list1
+        type(message_list_t) :: message_list2
 
-        allocate(message1, source = info_t( &
-                module_t("Some_m"), procedure_t("some"), "First Message"))
-        allocate(message2, source = warning_t( &
-                module_t("Some_m"), procedure_t("some"), "Second Message"))
-        call message_list1%appendMessage(message1)
-        call message_list1%appendMessage(message2)
+        message1 = info_t( &
+                module_t("Some_m"), procedure_t("some"), "First Message")
+        message2 = warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Message")
+        message_list1 = message_list1%with_message_appended(message1)
+        message_list1 = message_list1%with_message_appended(message2)
 
-        allocate(message3, source = info_t( &
-                module_t("Some_m"), procedure_t("some"), "Third Message"))
-        allocate(message4, source = warning_t( &
-                module_t("Some_m"), procedure_t("some"), "Fourth Message"))
-        call message_list2%appendMessage(message3)
-        call message_list2%appendMessage(message4)
+        message3 = info_t( &
+                module_t("Some_m"), procedure_t("some"), "Third Message")
+        message4 = warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Fourth Message")
+        message_list2 = message_list2%with_message_appended(message3)
+        message_list2 = message_list2%with_message_appended(message4)
 
-        call message_list1%appendMessages( &
+        message_list1 = message_list1%with_messages_appended( &
                 message_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(message1%to_string(), message_list1%toString()) &
-                .and.assert_Includes(message2%to_string(), message_list1%toString()) &
-                .and.assert_Includes(message3%to_string(), message_list1%toString()) &
-                .and.assert_Includes(message4%to_string(), message_list1%toString())
+                assert_Includes(message1%to_string(), message_list1%to_string()) &
+                .and.assert_Includes(message2%to_string(), message_list1%to_string()) &
+                .and.assert_Includes(message3%to_string(), message_list1%to_string()) &
+                .and.assert_Includes(message4%to_string(), message_list1%to_string())
     end function checkCombine
 
     function checkFilterByType() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: messages
+        type(message_list_t) :: messages
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test message"))
-        call messages%appendMessage(warning_t( &
+        messages = messages%with_message_appended(warning_t( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
-        call messages%appendMessage(fatal_t( &
+        messages = messages%with_message_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test error"))
 
         result_ = &
@@ -229,7 +229,7 @@ contains
     function checkFilterByOriginatingModule() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: messages
+        type(message_list_t) :: messages
         type(Module_t) :: module1
         type(Module_t) :: module2
         type(Module_t) :: module3
@@ -244,11 +244,11 @@ contains
         procedure2 = procedure_t("another")
         procedure3 = procedure_t("yetAnother")
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module2, procedure2, "Another message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module3, procedure3, "Yet another message"))
 
         result_ = &
@@ -269,7 +269,7 @@ contains
     function checkFilterByOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: messages
+        type(message_list_t) :: messages
         type(Module_t) :: module1
         type(Module_t) :: module2
         type(Module_t) :: module3
@@ -284,11 +284,11 @@ contains
         procedure2 = procedure_t("another")
         procedure3 = procedure_t("yetAnother")
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module2, procedure2, "Another message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module3, procedure3, "Yet another message"))
 
         result_ = &
@@ -309,13 +309,13 @@ contains
     function checkFilterByModulesThrough() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -346,39 +346,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -405,13 +405,13 @@ contains
     function checkFilterByProceduresThrough() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -442,39 +442,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -501,13 +501,13 @@ contains
     function checkFilterByModulesFrom() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -538,39 +538,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -597,13 +597,13 @@ contains
     function checkFilterByProceduresFrom() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -634,39 +634,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -693,24 +693,24 @@ contains
     function checkFilterByContents() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: messages
+        type(message_list_t) :: messages
         type(VARYING_STRING) :: test_string1
         type(VARYING_STRING) :: test_string2
 
         test_string1 = "Hello"
         test_string2 = "Test"
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Test"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Goodbye Test"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Example Message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Simple Message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Message"))
 
         result_ = &
@@ -735,10 +735,10 @@ contains
     function checkForType() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: empty_list
-        type(MessageList_t) :: messages
+        type(message_list_t) :: empty_list
+        type(message_list_t) :: messages
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
 
         result_ = &
@@ -753,8 +753,8 @@ contains
     function checkForOriginatingModule() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: empty_list
-        type(MessageList_t) :: messages
+        type(message_list_t) :: empty_list
+        type(message_list_t) :: messages
 
         type(Module_t) :: module1
         type(Module_t) :: module2
@@ -766,9 +766,9 @@ contains
         procedure1 = procedure_t("some")
         procedure2 = procedure_t("another")
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module2, procedure2, "Another message"))
 
         result_ = &
@@ -783,8 +783,8 @@ contains
     function checkForOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: empty_list
-        type(MessageList_t) :: messages
+        type(message_list_t) :: empty_list
+        type(message_list_t) :: messages
 
         type(Module_t) :: module1
         type(Module_t) :: module2
@@ -796,9 +796,9 @@ contains
         procedure1 = procedure_t("some")
         procedure2 = procedure_t("another")
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module1, procedure1, "Test message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module2, procedure2, "Another message"))
 
         result_ = &
@@ -813,13 +813,13 @@ contains
     function checkForThroughModule() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -850,39 +850,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -899,13 +899,13 @@ contains
     function checkForThroughProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -936,39 +936,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -985,13 +985,13 @@ contains
     function checkForFromModule() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -1022,39 +1022,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -1071,13 +1071,13 @@ contains
     function checkForFromProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: branch1_bottom_messages
-        type(MessageList_t) :: branch1_middle_messages
-        type(MessageList_t) :: branch2_bottom_messages
-        type(MessageList_t) :: branch2_middle_messages
-        type(MessageList_t) :: branch3_bottom_messages
-        type(MessageList_t) :: branch3_middle_messages
-        type(MessageList_t) :: top_level_messages
+        type(message_list_t) :: branch1_bottom_messages
+        type(message_list_t) :: branch1_middle_messages
+        type(message_list_t) :: branch2_bottom_messages
+        type(message_list_t) :: branch2_middle_messages
+        type(message_list_t) :: branch3_bottom_messages
+        type(message_list_t) :: branch3_middle_messages
+        type(message_list_t) :: top_level_messages
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -1108,39 +1108,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_messages%appendMessage(info_t( &
+        branch1_bottom_messages = message_list_t(info_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "message"))
-        call branch1_middle_messages%appendMessages( &
+        branch1_middle_messages = message_list_t( &
                 branch1_bottom_messages, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_messages%appendMessage(info_t( &
+        branch2_bottom_messages = message_list_t(info_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "message"))
-        call branch2_middle_messages%appendMessages( &
+        branch2_middle_messages = message_list_t( &
                 branch2_bottom_messages, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_messages%appendMessage(info_t( &
+        branch3_bottom_messages = message_list_t(info_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "message"))
-        call branch3_middle_messages%appendMessages( &
+        branch3_middle_messages = message_list_t( &
                 branch3_bottom_messages, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = message_list_t( &
                 branch1_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch2_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_messages%appendMessages( &
+        top_level_messages = top_level_messages%with_messages_appended( &
                 branch3_middle_messages, &
                 top_level_module, &
                 top_level_procedure)
@@ -1157,7 +1157,7 @@ contains
     function checkForContents() result(result_)
         type(Result_t) :: result_
 
-        type(MessageList_t) :: messages
+        type(message_list_t) :: messages
         type(VARYING_STRING) :: test_string1
         type(VARYING_STRING) :: test_string2
         type(VARYING_STRING) :: test_string3
@@ -1166,17 +1166,17 @@ contains
         test_string2 = "Test"
         test_string3 = "Other"
 
-        call messages%appendMessage(info_t( &
+        messages = message_list_t(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Test"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Goodbye Test"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Example Message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Simple Message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Message"))
-        call messages%appendMessage(info_t( &
+        messages = messages%with_message_appended(info_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Message"))
 
         result_ = &
