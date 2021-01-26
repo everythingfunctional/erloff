@@ -1,7 +1,7 @@
 module error_list_test
-    use Error_list_m, only: ErrorList_t, size
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
     use erloff_error_m, only: error_t
+    use erloff_error_list_m, only: error_list_t, size
     use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_internal_m, only: internal_t, INTERNAL
     use erloff_message_type_m, only: UNKNOWN_TYPE
@@ -90,132 +90,132 @@ contains
         individual_tests(22) = It( &
                 "Can tell if it has an error with some contents", &
                 checkForContents)
-        tests = Describe("ErrorList_t", individual_tests)
+        tests = Describe("error_list_t", individual_tests)
     end function test_error_list
 
-    pure function checkEmptyToString() result(result_)
+    function checkEmptyToString() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: error_list
+        type(error_list_t) :: error_list
 
-        result_ = assert_Empty(error_list%toString())
+        result_ = assert_Empty(error_list%to_string())
     end function checkEmptyToString
 
-    pure function checkAppendToEmpty() result(result_)
+    function checkAppendToEmpty() result(result_)
         type(Result_t) :: result_
 
-        class(Error_t), allocatable :: error
-        type(ErrorList_t) :: error_list
+        type(fatal_t) :: error
+        type(error_list_t) :: error_list
 
-        allocate(error, source = fatal_t( &
-                module_t("Some_m"), procedure_t("some"), "Test Error"))
-        call error_list%appendError(error)
+        error = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "Test Error")
+        error_list = error_list%with_error_appended(error)
 
-        result_ = assert_Includes(error%to_string(), error_list%toString())
+        result_ = assert_Includes(error%to_string(), error_list%to_string())
     end function checkAppendToEmpty
 
     function checkAppendMultipleToEmpty() result(result_)
         type(Result_t) :: result_
 
-        class(Error_t), allocatable :: error1
-        class(Error_t), allocatable :: error2
-        type(ErrorList_t) :: error_list1
-        type(ErrorList_t) :: error_list2
+        type(fatal_t) :: error1
+        type(internal_t) :: error2
+        type(error_list_t) :: error_list1
+        type(error_list_t) :: error_list2
 
-        allocate(error1, source = fatal_t( &
-                module_t("Some_m"), procedure_t("some"), "First Error"))
-        allocate(error2, source = internal_t( &
-                module_t("Some_m"), procedure_t("some"), "Second Error"))
-        call error_list1%appendError(error1)
-        call error_list1%appendError(error2)
+        error1 = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "First Error")
+        error2 = internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Error")
+        error_list1 = error_list1%with_error_appended(error1)
+        error_list1 = error_list1%with_error_appended(error2)
 
-        call error_list2%appendErrors( &
+        error_list2 = error_list2%with_errors_appended( &
                 error_list1, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(error1%to_string(), error_list2%toString()) &
-                .and.assert_Includes(error2%to_string(), error_list2%toString())
+                assert_Includes(error1%to_string(), error_list2%to_string()) &
+                .and.assert_Includes(error2%to_string(), error_list2%to_string())
     end function checkAppendMultipleToEmpty
 
     function checkAppendEmpty() result(result_)
         type(Result_t) :: result_
 
-        class(Error_t), allocatable :: error1
-        class(Error_t), allocatable :: error2
-        type(ErrorList_t) :: error_list1
-        type(ErrorList_t) :: error_list2
+        type(fatal_t) :: error1
+        type(internal_t) :: error2
+        type(error_list_t) :: error_list1
+        type(error_list_t) :: error_list2
 
-        allocate(error1, source = fatal_t( &
-                module_t("Some_m"), procedure_t("some"), "First Error"))
-        allocate(error2, source = internal_t( &
-                module_t("Some_m"), procedure_t("some"), "Second Error"))
-        call error_list1%appendError(error1)
-        call error_list1%appendError(error2)
+        error1 = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "First Error")
+        error2 = internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Error")
+                error_list1 = error_list1%with_error_appended(error1)
+                error_list1 = error_list1%with_error_appended(error2)
 
-        call error_list1%appendErrors( &
+        error_list1 = error_list1%with_errors_appended( &
                 error_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(error1%to_string(), error_list1%toString()) &
-                .and.assert_Includes(error2%to_string(), error_list1%toString())
+                assert_Includes(error1%to_string(), error_list1%to_string()) &
+                .and.assert_Includes(error2%to_string(), error_list1%to_string())
     end function checkAppendEmpty
 
     function checkCombineEmpty() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: error_list1
-        type(ErrorList_t) :: error_list2
+        type(error_list_t) :: error_list1
+        type(error_list_t) :: error_list2
 
-        call error_list1%appendErrors( &
+        error_list1 = error_list1%with_errors_appended( &
                 error_list2, module_t("Another_m"), procedure_t("another"))
 
-        result_ = assert_Empty(error_list1%toString())
+        result_ = assert_Empty(error_list1%to_string())
     end function checkCombineEmpty
 
     function checkCombine() result(result_)
         type(Result_t) :: result_
 
-        class(Error_t), allocatable :: error1
-        class(Error_t), allocatable :: error2
-        class(Error_t), allocatable :: error3
-        class(Error_t), allocatable :: error4
-        type(ErrorList_t) :: error_list1
-        type(ErrorList_t) :: error_list2
+        type(fatal_t) :: error1
+        type(internal_t) :: error2
+        type(fatal_t) :: error3
+        type(internal_t) :: error4
+        type(error_list_t) :: error_list1
+        type(error_list_t) :: error_list2
 
-        allocate(error1, source = fatal_t( &
-                module_t("Some_m"), procedure_t("some"), "First Error"))
-        allocate(error2, source = internal_t( &
-                module_t("Some_m"), procedure_t("some"), "Second Error"))
-        call error_list1%appendError(error1)
-        call error_list1%appendError(error2)
+        error1 = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "First Error")
+        error2 = internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Error")
+        error_list1 = error_list1%with_error_appended(error1)
+        error_list1 = error_list1%with_error_appended(error2)
 
-        allocate(error3, source = fatal_t( &
-                module_t("Some_m"), procedure_t("some"), "Third Error"))
-        allocate(error4, source = internal_t( &
-                module_t("Some_m"), procedure_t("some"), "Fourth Error"))
-        call error_list2%appendError(error3)
-        call error_list2%appendError(error4)
+        error3 = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "Third Error")
+        error4 = internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Fourth Error")
+        error_list2 = error_list2%with_error_appended(error3)
+        error_list2 = error_list2%with_error_appended(error4)
 
-        call error_list1%appendErrors( &
+        error_list1 = error_list1%with_errors_appended( &
                 error_list2, module_t("Another_m"), procedure_t("another"))
 
         result_ = &
-                assert_Includes(error1%to_string(), error_list1%toString()) &
-                .and.assert_Includes(error2%to_string(), error_list1%toString()) &
-                .and.assert_Includes(error3%to_string(), error_list1%toString()) &
-                .and.assert_Includes(error4%to_string(), error_list1%toString())
+                assert_Includes(error1%to_string(), error_list1%to_string()) &
+                .and.assert_Includes(error2%to_string(), error_list1%to_string()) &
+                .and.assert_Includes(error3%to_string(), error_list1%to_string()) &
+                .and.assert_Includes(error4%to_string(), error_list1%to_string())
     end function checkCombine
 
-    pure function checkFilterByType() result(result_)
+    function checkFilterByType() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: errors
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test error"))
-        call errors%appendError(internal_t( &
+        errors = errors%with_error_appended(internal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test warning"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 UNKNOWN_TYPE, module_t("Some_m"), procedure_t("some"), "Test error"))
 
         result_ = &
@@ -226,10 +226,10 @@ contains
                         "INTERNAL or UNKNOWN_TYPE")
     end function checkFilterByType
 
-    pure function checkFilterByOriginatingModule() result(result_)
+    function checkFilterByOriginatingModule() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: errors
         type(Module_t) :: module1
         type(Module_t) :: module2
         type(Module_t) :: module3
@@ -244,11 +244,11 @@ contains
         procedure2 = procedure_t("another")
         procedure3 = procedure_t("yetAnother")
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module1, procedure1, "Test error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module2, procedure2, "Another error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module3, procedure3, "Yet another error"))
 
         result_ = &
@@ -266,10 +266,10 @@ contains
                         module1%repr() // " or " // module2%repr())
     end function checkFilterByOriginatingModule
 
-    pure function checkFilterByOriginatingProcedure() result(result_)
+    function checkFilterByOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: errors
         type(Module_t) :: module1
         type(Module_t) :: module2
         type(Module_t) :: module3
@@ -284,11 +284,11 @@ contains
         procedure2 = procedure_t("another")
         procedure3 = procedure_t("yetAnother")
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module1, procedure1, "Test error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module2, procedure2, "Another error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module3, procedure3, "Yet another error"))
 
         result_ = &
@@ -309,13 +309,13 @@ contains
     function checkFilterByModulesThrough() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -346,39 +346,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -405,13 +405,13 @@ contains
     function checkFilterByProceduresThrough() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -442,39 +442,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -501,13 +501,13 @@ contains
     function checkFilterByModulesFrom() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -538,39 +538,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -597,13 +597,13 @@ contains
     function checkFilterByProceduresFrom() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -634,39 +634,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -690,27 +690,27 @@ contains
                         branch1_middle_procedure%repr() // " or " // branch2_middle_procedure%repr())
     end function checkFilterByProceduresFrom
 
-    pure function checkFilterByContents() result(result_)
+    function checkFilterByContents() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: errors
         type(VARYING_STRING) :: test_string1
         type(VARYING_STRING) :: test_string2
 
         test_string1 = "Hello"
         test_string2 = "Test"
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Test"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Goodbye Test"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Example Error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Simple Error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Error"))
 
         result_ = &
@@ -732,13 +732,13 @@ contains
                         'includingAllOf "' // test_string1 // '" or "' // test_string2 // '"')
     end function checkFilterByContents
 
-    pure function checkForType() result(result_)
+    function checkForType() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: empty_list
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: empty_list
+        type(error_list_t) :: errors
 
-        call errors%appendError(fatal_t( &
+        errors = error_list_t(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Error"))
 
         result_ = &
@@ -750,11 +750,11 @@ contains
                         errors%repr() // ".hasType." // FATAL%repr())
     end function checkForType
 
-    pure function checkForOriginatingModule() result(result_)
+    function checkForOriginatingModule() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: empty_list
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: empty_list
+        type(error_list_t) :: errors
 
         type(Module_t) :: module1
         type(Module_t) :: module2
@@ -766,9 +766,9 @@ contains
         procedure1 = procedure_t("some")
         procedure2 = procedure_t("another")
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module1, procedure1, "Test error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module2, procedure2, "Another error"))
 
         result_ = &
@@ -780,11 +780,11 @@ contains
                         errors%repr() // ".hasAnyOriginatingFrom." // module1%repr())
     end function checkForOriginatingModule
 
-    pure function checkForOriginatingProcedure() result(result_)
+    function checkForOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: empty_list
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: empty_list
+        type(error_list_t) :: errors
 
         type(Module_t) :: module1
         type(Module_t) :: module2
@@ -796,9 +796,9 @@ contains
         procedure1 = procedure_t("some")
         procedure2 = procedure_t("another")
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module1, procedure1, "Test error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module2, procedure2, "Another error"))
 
         result_ = &
@@ -813,13 +813,13 @@ contains
     function checkForThroughModule() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -850,39 +850,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -899,13 +899,13 @@ contains
     function checkForThroughProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -936,39 +936,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -985,13 +985,13 @@ contains
     function checkForFromModule() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -1022,39 +1022,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -1071,13 +1071,13 @@ contains
     function checkForFromProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: branch1_bottom_errors
-        type(ErrorList_t) :: branch1_middle_errors
-        type(ErrorList_t) :: branch2_bottom_errors
-        type(ErrorList_t) :: branch2_middle_errors
-        type(ErrorList_t) :: branch3_bottom_errors
-        type(ErrorList_t) :: branch3_middle_errors
-        type(ErrorList_t) :: top_level_errors
+        type(error_list_t) :: branch1_bottom_errors
+        type(error_list_t) :: branch1_middle_errors
+        type(error_list_t) :: branch2_bottom_errors
+        type(error_list_t) :: branch2_middle_errors
+        type(error_list_t) :: branch3_bottom_errors
+        type(error_list_t) :: branch3_middle_errors
+        type(error_list_t) :: top_level_errors
         type(Module_t) :: branch1_bottom_module
         type(Module_t) :: branch1_middle_module
         type(Module_t) :: branch2_bottom_module
@@ -1108,39 +1108,39 @@ contains
         branch3_middle_procedure = procedure_t("branch3Middle")
         top_level_procedure = procedure_t("topLevel")
 
-        call branch1_bottom_errors%appendError(fatal_t( &
+        branch1_bottom_errors = error_list_t(fatal_t( &
                 branch1_bottom_module, &
                 branch1_bottom_procedure, &
                 "error"))
-        call branch1_middle_errors%appendErrors( &
+        branch1_middle_errors = error_list_t( &
                 branch1_bottom_errors, &
                 branch1_middle_module, &
                 branch1_middle_procedure)
-        call branch2_bottom_errors%appendError(fatal_t( &
+        branch2_bottom_errors = error_list_t(fatal_t( &
                 branch2_bottom_module, &
                 branch2_bottom_procedure, &
                 "error"))
-        call branch2_middle_errors%appendErrors( &
+        branch2_middle_errors = error_list_t( &
                 branch2_bottom_errors, &
                 branch2_middle_module, &
                 branch2_middle_procedure)
-        call branch3_bottom_errors%appendError(fatal_t( &
+        branch3_bottom_errors = error_list_t(fatal_t( &
                 branch3_bottom_module, &
                 branch3_bottom_procedure, &
                 "error"))
-        call branch3_middle_errors%appendErrors( &
+        branch3_middle_errors = error_list_t( &
                 branch3_bottom_errors, &
                 branch3_middle_module, &
                 branch3_middle_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = error_list_t( &
                 branch1_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch2_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
-        call top_level_errors%appendErrors( &
+        top_level_errors = top_level_errors%with_errors_appended( &
                 branch3_middle_errors, &
                 top_level_module, &
                 top_level_procedure)
@@ -1154,10 +1154,10 @@ contains
                         top_level_errors%repr() // ".hasAnyFrom." // branch1_bottom_procedure%repr())
     end function checkForFromProcedure
 
-    pure function checkForContents() result(result_)
+    function checkForContents() result(result_)
         type(Result_t) :: result_
 
-        type(ErrorList_t) :: errors
+        type(error_list_t) :: errors
         type(VARYING_STRING) :: test_string1
         type(VARYING_STRING) :: test_string2
         type(VARYING_STRING) :: test_string3
@@ -1166,17 +1166,17 @@ contains
         test_string2 = "Test"
         test_string3 = "Other"
 
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Test"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Goodbye Test"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Example Error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Simple Error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Test Error"))
-        call errors%appendError(fatal_t( &
+        errors = errors%with_error_appended(fatal_t( &
                 module_t("Some_m"), procedure_t("some"), "Hello Error"))
 
         result_ = &
