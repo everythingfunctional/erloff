@@ -1,43 +1,23 @@
 module erloff
-    use Error_list_m, only: ErrorList_t, size
-    use Message_m, only: &
-            ! Types
-            MessageType_t, &
-            Message_t, &
-            Debug_t, &
-            Info_t, &
-            Warning_t, &
-            Error_t, &
-            Fatal_t, &
-            Internal_t, &
-            ! Message constructors
-            Debug, &
-            Info, &
-            Warning, &
-            Fatal, &
-            Internal, &
-            ! Debug Levels
-            GENERAL, &
-            MEDIUM, &
-            DETAILED, &
-            NITTY_GRITTY, &
-            ! Message types
-            DEBUG_TYPE, &
-            INFO_TYPE, &
-            WARNING_TYPE, &
-            ERROR_TYPE, &
-            FATAL_TYPE, &
-            INTERNAL_TYPE, &
-            INPUTS_TYPE, &
-            NOT_FOUND_TYPE, &
-            OUT_OF_BOUNDS_TYPE, &
-            OUTPUTS_TYPE, &
-            OUTSIDE_NORMAL_RANGE_TYPE, &
-            UNEQUAL_ARRAY_SIZES_TYPE, &
-            UNKNOWN_TYPE_TYPE
-    use Message_list_m, only: MessageList_t, size
-    use Module_m, only: Module_t, Module_
-    use Procedure_m, only: Procedure_t, Procedure_
-
-    implicit none
-end module erloff
+    use erloff_debug_m, only: debug_t, DEBUG
+    use erloff_debug_level_m, only: GENERAL, MEDIUM, DETAILED, NITTY_GRITTY
+    use erloff_error_m, only: error_t, ERROR
+    use erloff_error_list_m, only: error_list_t, size
+    use erloff_fatal_m, only: fatal_t, FATAL
+    use erloff_info_m, only: info_t, INFO
+    use erloff_internal_m, only: internal_t, INTERNAL
+    use erloff_message_m, only: message_t
+    use erloff_message_list_m, only: message_list_t, size
+    use erloff_message_type_m, only: &
+            message_type_t, &
+            INPUTS, &
+            NOT_FOUND, &
+            OUT_OF_BOUNDS, &
+            OUTPUTS, &
+            OUTSIDE_NORMAL_RANGE, &
+            UNEQUAL_ARRAY_SIZES, &
+            UNKNOWN_TYPE
+    use erloff_module_m, only: module_t
+    use erloff_procedure_m, only: procedure_t
+    use erloff_warning_m, only: warning_t, WARNING
+end module

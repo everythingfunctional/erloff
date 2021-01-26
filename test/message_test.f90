@@ -1,31 +1,26 @@
 module message_test
     use iso_varying_string, only: VARYING_STRING, operator(//), var_str
-    use Message_m, only: &
-            Message_t, &
-            Debug, &
-            Info, &
-            Warning, &
-            Fatal, &
-            Internal, &
-            DEBUG_TYPE, &
-            ERROR_TYPE, &
-            FATAL_TYPE, &
-            GENERAL, &
-            INFO_TYPE, &
-            INPUTS_TYPE, &
-            INTERNAL_TYPE, &
-            OUTSIDE_NORMAL_RANGE_TYPE, &
-            UNEQUAL_ARRAY_SIZES_TYPE, &
-            UNKNOWN_TYPE_TYPE, &
-            WARNING_TYPE
-    use Module_m, only: Module_t, Module_
-    use Procedure_m, only: Procedure_t, Procedure_
-    use Vegetables_m, only: &
+    use erloff_debug_m, only: debug_t, DEBUG
+    use erloff_debug_level_m, only: GENERAL
+    use erloff_error_m, only: ERROR
+    use erloff_fatal_m, only: fatal_t, FATAL
+    use erloff_info_m, only: info_t, INFO
+    use erloff_internal_m, only: internal_t, INTERNAL
+    use erloff_message_m, only: Message_t
+    use erloff_message_type_m, only: &
+            INPUTS, &
+            OUTSIDE_NORMAL_RANGE, &
+            UNEQUAL_ARRAY_SIZES, &
+            UNKNOWN_TYPE
+    use erloff_module_m, only: module_t
+    use erloff_procedure_m, only: procedure_t
+    use erloff_warning_m, only: warning_t, WARNING
+    use vegetables, only: &
             Result_t, &
-            TestItem_t, &
+            Test_Item_t, &
             Describe, &
-            assertNot, &
-            assertThat, &
+            assert_Not, &
+            assert_That, &
             It
 
     implicit none
@@ -34,9 +29,9 @@ module message_test
     public :: test_message
 contains
     function test_message() result(tests)
-        type(TestItem_t) :: tests
+        type(Test_Item_t) :: tests
 
-        type(TestItem_t) :: individual_tests(8)
+        type(Test_Item_t) :: individual_tests(8)
 
         individual_tests(1) = It( &
                 "Can tell whether it is of a given type", checkType)
@@ -73,272 +68,272 @@ contains
         class(Message_t), allocatable :: fatal_message
         class(Message_t), allocatable :: internal_message
 
-        allocate(debug_message, source = Debug( &
-                INPUTS_TYPE, &
-                Module_("Some_m"), &
-                Procedure_("some"), &
+        allocate(debug_message, source = debug_t( &
+                INPUTS, &
+                module_t("Some_m"), &
+                procedure_t("some"), &
                 GENERAL, &
                 "Test Message"))
 
-        allocate(info_message, source = Info( &
-                UNEQUAL_ARRAY_SIZES_TYPE, &
-                Module_("Some_m"), &
-                Procedure_("some"), &
+        allocate(info_message, source = info_t( &
+                UNEQUAL_ARRAY_SIZES, &
+                module_t("Some_m"), &
+                procedure_t("some"), &
                 "Test Message"))
 
-        allocate(warning_message, source = Warning( &
-                OUTSIDE_NORMAL_RANGE_TYPE, &
-                Module_("Some_m"), &
-                Procedure_("some"), &
+        allocate(warning_message, source = warning_t( &
+                OUTSIDE_NORMAL_RANGE, &
+                module_t("Some_m"), &
+                procedure_t("some"), &
                 "Test Message"))
 
-        allocate(fatal_message, source = Fatal( &
-                UNEQUAL_ARRAY_SIZES_TYPE, &
-                Module_("Some_m"), &
-                Procedure_("some"), &
+        allocate(fatal_message, source = fatal_t( &
+                UNEQUAL_ARRAY_SIZES, &
+                module_t("Some_m"), &
+                procedure_t("some"), &
                 "Test Message"))
 
-        allocate(internal_message, source = Internal( &
-                UNKNOWN_TYPE_TYPE, &
-                Module_("Some_m"), &
-                Procedure_("some"), &
+        allocate(internal_message, source = internal_t( &
+                UNKNOWN_TYPE, &
+                module_t("Some_m"), &
+                procedure_t("some"), &
                 "Test Message"))
 
         result_ = &
-                assertThat( &
-                        debug_message.isType.DEBUG_TYPE, &
-                        debug_message%repr() // ".isType." // DEBUG_TYPE%repr()) &
-                .and.assertThat( &
-                        debug_message.isType.INPUTS_TYPE, &
-                        debug_message%repr() // ".isType." // INPUTS_TYPE%repr()) &
-                .and.assertNot( &
-                        debug_message.isType.INFO_TYPE, &
-                        debug_message%repr() // ".isType." // INFO_TYPE%repr()) &
-                .and.assertNot( &
-                        debug_message.isType.ERROR_TYPE, &
-                        debug_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
-                        warning_message.isType.WARNING_TYPE, &
-                        warning_message%repr() // ".isType." // WARNING_TYPE%repr()) &
-                .and.assertThat( &
-                        warning_message.isType.OUTSIDE_NORMAL_RANGE_TYPE, &
-                        warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE_TYPE%repr()) &
-                .and.assertNot( &
-                        warning_message.isType.INFO_TYPE, &
-                        warning_message%repr() // ".isType." // INFO_TYPE%repr()) &
-                .and.assertNot( &
-                        warning_message.isType.ERROR_TYPE, &
-                        warning_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
-                        fatal_message.isType.ERROR_TYPE, &
-                        fatal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
-                        fatal_message.isType.FATAL_TYPE, &
-                        fatal_message%repr() // ".isType." // FATAL_TYPE%repr()) &
-                .and.assertThat( &
-                        fatal_message.isType.UNEQUAL_ARRAY_SIZES_TYPE, &
-                        fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES_TYPE%repr()) &
-                .and.assertNot( &
-                        fatal_message.isType.INTERNAL_TYPE, &
-                        fatal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
-                .and.assertThat( &
-                        internal_message.isType.ERROR_TYPE, &
-                        internal_message%repr() // ".isType." // ERROR_TYPE%repr()) &
-                .and.assertThat( &
-                        internal_message.isType.INTERNAL_TYPE, &
-                        internal_message%repr() // ".isType." // INTERNAL_TYPE%repr()) &
-                .and.assertThat( &
-                        internal_message.isType.UNKNOWN_TYPE_TYPE, &
-                        internal_message%repr() // ".isType." // UNKNOWN_TYPE_TYPE%repr())
+                assert_That( &
+                        debug_message.isType.DEBUG, &
+                        debug_message%repr() // ".isType." // DEBUG%repr()) &
+                .and.assert_That( &
+                        debug_message.isType.INPUTS, &
+                        debug_message%repr() // ".isType." // INPUTS%repr()) &
+                .and.assert_Not( &
+                        debug_message.isType.INFO, &
+                        debug_message%repr() // ".isType." // INFO%repr()) &
+                .and.assert_Not( &
+                        debug_message.isType.ERROR, &
+                        debug_message%repr() // ".isType." // ERROR%repr()) &
+                .and.assert_That( &
+                        warning_message.isType.WARNING, &
+                        warning_message%repr() // ".isType." // WARNING%repr()) &
+                .and.assert_That( &
+                        warning_message.isType.OUTSIDE_NORMAL_RANGE, &
+                        warning_message%repr() // ".isType." // OUTSIDE_NORMAL_RANGE%repr()) &
+                .and.assert_Not( &
+                        warning_message.isType.INFO, &
+                        warning_message%repr() // ".isType." // INFO%repr()) &
+                .and.assert_Not( &
+                        warning_message.isType.ERROR, &
+                        warning_message%repr() // ".isType." // ERROR%repr()) &
+                .and.assert_That( &
+                        fatal_message.isType.ERROR, &
+                        fatal_message%repr() // ".isType." // ERROR%repr()) &
+                .and.assert_That( &
+                        fatal_message.isType.FATAL, &
+                        fatal_message%repr() // ".isType." // FATAL%repr()) &
+                .and.assert_That( &
+                        fatal_message.isType.UNEQUAL_ARRAY_SIZES, &
+                        fatal_message%repr() // ".isType." // UNEQUAL_ARRAY_SIZES%repr()) &
+                .and.assert_Not( &
+                        fatal_message.isType.INTERNAL, &
+                        fatal_message%repr() // ".isType." // INTERNAL%repr()) &
+                .and.assert_That( &
+                        internal_message.isType.ERROR, &
+                        internal_message%repr() // ".isType." // ERROR%repr()) &
+                .and.assert_That( &
+                        internal_message.isType.INTERNAL, &
+                        internal_message%repr() // ".isType." // INTERNAL%repr()) &
+                .and.assert_That( &
+                        internal_message.isType.UNKNOWN_TYPE, &
+                        internal_message%repr() // ".isType." // UNKNOWN_TYPE%repr())
     end function checkType
 
-    pure function checkOriginatingModule() result(result_)
+    function checkOriginatingModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_module = Module_("Other_m")
-        allocate(message, source = Info( &
+        the_module = module_t("Some_m")
+        the_procedure = procedure_t("some")
+        another_module = module_t("Another_m")
+        another_procedure = procedure_t("another")
+        other_module = module_t("Other_m")
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.originatedFrom.the_module, &
                         message%repr() // '.originatedFrom.' // the_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.another_module, &
                         message%repr() // '.originatedFrom.' // another_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.other_module, &
                         message%repr() // '.originatedFrom.' // other_module%repr())
     end function checkOriginatingModule
 
-    pure function checkOriginatingProcedure() result(result_)
+    function checkOriginatingProcedure() result(result_)
         type(Result_t) :: result_
 
-        type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(module_t) :: another_module
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
-        type(Procedure_t) :: other_procedure
-        type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: other_procedure
+        type(module_t) :: the_module
+        type(procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
-        allocate(message, source = Info( &
+        the_module = module_t("Some_m")
+        the_procedure = procedure_t("some")
+        another_module = module_t("Another_m")
+        another_procedure = procedure_t("another")
+        other_procedure = procedure_t("other")
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.originatedFrom.the_procedure, &
                         message%repr() // '.originatedFrom.' // the_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.another_procedure, &
                         message%repr() // '.originatedFrom.' // another_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.originatedFrom.other_procedure, &
                         message%repr() // '.originatedFrom.' // other_procedure%repr())
     end function checkOriginatingProcedure
 
-    pure function checkFromModule() result(result_)
+    function checkFromModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_module = Module_("Other_m")
-        allocate(message, source = Info( &
+        the_module = module_t("Some_m")
+        the_procedure = procedure_t("some")
+        another_module = module_t("Another_m")
+        another_procedure = procedure_t("another")
+        other_module = module_t("Other_m")
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.isFrom.the_module, &
                         message%repr() // '.isFrom.' // the_module%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.isFrom.another_module, &
                         message%repr() // '.isFrom.' // another_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.isFrom.other_module, &
                         message%repr() // '.isFrom.' // other_module%repr())
     end function checkFromModule
 
-    pure function checkFromProcedure() result(result_)
+    function checkFromProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
-        type(Procedure_t) :: other_procedure
+        type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
-        allocate(message, source = Info( &
+        the_module = module_t("Some_m")
+        the_procedure = procedure_t("some")
+        another_module = module_t("Another_m")
+        another_procedure = procedure_t("another")
+        other_procedure = procedure_t("other")
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.isFrom.the_procedure, &
                         message%repr() // '.isFrom.' // the_procedure%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.isFrom.another_procedure, &
                         message%repr() // '.isFrom.' // another_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.isFrom.other_procedure, &
                         message%repr() // '.isFrom.' // other_procedure%repr())
     end function checkFromProcedure
 
-    pure function checkThroughModule() result(result_)
+    function checkThroughModule() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
         type(Module_t) :: other_module
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_module = Module_("Other_m")
-        allocate(message, source = Info( &
+        the_module = module_t("Some_m")
+        the_procedure = procedure_t("some")
+        another_module = module_t("Another_m")
+        another_procedure = procedure_t("another")
+        other_module = module_t("Other_m")
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         message.cameThrough.the_module, &
                         message%repr() // '.cameThrough.' // the_module%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.cameThrough.another_module, &
                         message%repr() // '.cameThrough.' // another_module%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.cameThrough.other_module, &
                         message%repr() // '.cameThrough.' // other_module%repr())
     end function checkThroughModule
 
-    pure function checkThroughProcedure() result(result_)
+    function checkThroughProcedure() result(result_)
         type(Result_t) :: result_
 
         type(Module_t) :: another_module
-        type(Procedure_t) :: another_procedure
+        type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
-        type(Procedure_t) :: other_procedure
+        type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
-        type(Procedure_t) :: the_procedure
+        type(procedure_t) :: the_procedure
 
-        the_module = Module_("Some_m")
-        the_procedure = Procedure_("some")
-        another_module = Module_("Another_m")
-        another_procedure = Procedure_("another")
-        other_procedure = Procedure_("other")
-        allocate(message, source = Info( &
+        the_module = module_t("Some_m")
+        the_procedure = procedure_t("some")
+        another_module = module_t("Another_m")
+        another_procedure = procedure_t("another")
+        other_procedure = procedure_t("other")
+        allocate(message, source = info_t( &
                 the_module, the_procedure, "Test Message"))
-        call message%prependNames(another_module, another_procedure)
+        message = message%with_names_prepended(another_module, another_procedure)
 
         result_ = &
-                assertNot( &
+                assert_Not( &
                         message.cameThrough.the_procedure, &
                         message%repr() // '.cameThrough.' // the_procedure%repr()) &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.cameThrough.another_procedure, &
                         message%repr() // '.cameThrough.' // another_procedure%repr()) &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.cameThrough.other_procedure, &
                         message%repr() // '.cameThrough.' // other_procedure%repr())
     end function checkThroughProcedure
 
-    pure function checkContents() result(result_)
+    function checkContents() result(result_)
         type(Result_t) :: result_
 
         class(Message_t), allocatable :: message
@@ -349,8 +344,8 @@ contains
         type(VARYING_STRING) :: includesAllStrings2(2)
         type(VARYING_STRING) :: includesAllStrings3(2)
 
-        allocate(message, source = Info( &
-                Module_("Some_m"), Procedure_("some"), "Test Message Content"))
+        allocate(message, source = info_t( &
+                module_t("Some_m"), procedure_t("some"), "Test Message Content"))
         includesAnyStrings1(1) = var_str("Test")
         includesAnyStrings1(2) = var_str("else")
         includesAnyStrings2(1) = var_str("Test")
@@ -365,28 +360,28 @@ contains
         includesAllStrings3(2) = var_str("message")
 
         result_ = &
-                assertThat( &
+                assert_That( &
                         message.includes."Test", &
                         message%repr() // '.includes."Test"') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includes."test", &
                         message%repr() // '.includes."test"') &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.includesAnyOf.includesAnyStrings1, &
                         message%repr() // '.includesAnyOf.[var_str("Test"), var_str("else")]') &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.includesAnyOf.includesAnyStrings2, &
                         message%repr() // '.includesAnyOf.[var_str("Test"), var_str("Content")]') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includesAnyOf.includesAnyStrings3, &
                         message%repr() // '.includesAnyOf.[var_str("test"), var_str("else")]') &
-                .and.assertThat( &
+                .and.assert_That( &
                         message.includesAllOf.includesAllStrings1, &
                         message%repr() // '.includesAllOf.[var_str("Test"), var_str("Message")]') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includesAllOf.includesAllStrings2, &
                         message%repr() // '.includesAllOf.[var_str("test"), var_str("Message")]') &
-                .and.assertNot( &
+                .and.assert_Not( &
                         message.includesAllOf.includesAllStrings3, &
                         message%repr() // '.includesAllOf.[var_str("Test"), var_str("message")]')
     end function checkContents
