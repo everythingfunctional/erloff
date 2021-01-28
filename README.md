@@ -9,6 +9,8 @@ Errors and logging for fortran
 The basic usage is that a procedure can have intent(out) message and/or error list arguments, or as a component of it's return value.
 If inside that procedure, you would like to log a message or signal an error, simply append a message to the appropriate list.
 The caller of that procedure is then responsible for either dealing with the errors or messages, or appending them to its own lists.
+A detailed references on the functionality of erloff is available in
+[the developer documentation](https://everythingfunctional.gitlab.io/erloff).
 
 ### Creating a Message
 
