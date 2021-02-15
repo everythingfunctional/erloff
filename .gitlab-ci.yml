@@ -1,8 +1,33 @@
-image: registry.gitlab.com/everythingfunctional/dockerfpm
-
-variables:
-    GIT_SUBMODULE_STRATEGY: normal
+stages:
+  - test
+  - documentation
+  - pages
 
 test:
+  stage: test
+  image: registry.gitlab.com/everythingfunctional/dockerfpm
   script:
     - ./run_ci.sh
+
+documentation:
+  stage: documentation
+  image: python:3.8
+  script:
+    - pip install ford
+    - apt update && apt install -y graphviz
+    - ford doc/front-matter.md
+  artifacts:
+    paths:
+      - public
+
+pages:
+  stage: pages
+  dependencies:
+    - documentation
+  script:
+    - echo "Deploying to pages"
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
