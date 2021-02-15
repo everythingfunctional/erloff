@@ -1,6 +1,5 @@
 module error_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
-    use erloff_error_m, only: error_t
     use erloff_error_list_m, only: error_list_t, size
     use erloff_fatal_m, only: fatal_t, FATAL
     use erloff_internal_m, only: internal_t, INTERNAL

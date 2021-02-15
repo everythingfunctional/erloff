@@ -2,7 +2,6 @@ module message_list_test
     use iso_varying_string, only: VARYING_STRING, assignment(=), operator(//)
     use erloff_fatal_m, only: fatal_t
     use erloff_info_m, only: info_t, INFO
-    use erloff_message_m, only: message_t
     use erloff_message_list_m, only: message_list_t, size
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t

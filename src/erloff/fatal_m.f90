@@ -13,7 +13,7 @@ module erloff_fatal_m
     private
     public :: fatal_t, FATAL
 
-    type, public, extends(error_t) :: fatal_t
+    type, extends(error_t) :: fatal_t
         private
         type(call_stack_t) :: call_stack_
         type(varying_string) :: message_

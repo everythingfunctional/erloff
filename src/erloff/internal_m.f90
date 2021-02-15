@@ -13,7 +13,7 @@ module erloff_internal_m
     private
     public :: internal_t, INTERNAL
 
-    type, public, extends(error_t) :: internal_t
+    type, extends(error_t) :: internal_t
         private
         type(call_stack_t) :: call_stack_
         type(varying_string) :: message_
