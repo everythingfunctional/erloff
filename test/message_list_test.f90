@@ -25,7 +25,7 @@ contains
     function test_message_list() result(tests)
         type(Test_Item_t) :: tests
 
-        type(Test_Item_t) :: individual_tests(22)
+        type(Test_Item_t) :: individual_tests(23)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -42,51 +42,53 @@ contains
                 "Can combine two empty lists", checkCombineEmpty)
         individual_tests(6) = It( &
                 "Can combine two lists", checkCombine)
-        individual_tests(7) = It( &
-                "Can filter messages by type", checkFilterByType)
+        individual_tests(7) = it( &
+                "can create a new list from multiple", checkNewFromMultiple)
         individual_tests(8) = It( &
+                "Can filter messages by type", checkFilterByType)
+        individual_tests(9) = It( &
                 "Can filter messages by the originating module", &
                 checkFilterByOriginatingModule)
-        individual_tests(9) = It( &
+        individual_tests(10) = It( &
                 "Can filter messages by the originating procedure", &
                 checkFilterByOriginatingProcedure)
-        individual_tests(10) = It( &
+        individual_tests(11) = It( &
                 "Can filter messages by modules passed through", &
                 checkFilterByModulesThrough)
-        individual_tests(11) = It( &
+        individual_tests(12) = It( &
                 "Can filter messages by procedures passed through", &
                 checkFilterByProceduresThrough)
-        individual_tests(12) = It( &
+        individual_tests(13) = It( &
                 "Can filter messages by the modules they are from", &
                 checkFilterByModulesFrom)
-        individual_tests(13) = It( &
+        individual_tests(14) = It( &
                 "Can filter messages by the procedures they are from", &
                 checkFilterByProceduresFrom)
-        individual_tests(14) = It( &
+        individual_tests(15) = It( &
                 "Can filter messages based on their contents", &
                 checkFilterByContents)
-        individual_tests(15) = It( &
+        individual_tests(16) = It( &
                 "Can tell if it has a message of a given type", &
                 checkForType)
-        individual_tests(16) = It( &
+        individual_tests(17) = It( &
                 "Can tell if it has a message originating from a module", &
                 checkForOriginatingModule)
-        individual_tests(17) = It( &
+        individual_tests(18) = It( &
                 "Can tell if it has a message originating from a procedure", &
                 checkForOriginatingProcedure)
-        individual_tests(18) = It( &
+        individual_tests(19) = It( &
                 "Can tell if it has a message coming through a module", &
                 checkForThroughModule)
-        individual_tests(19) = It( &
+        individual_tests(20) = It( &
                 "Can tell if it has a message coming through a procedure", &
                 checkForThroughProcedure)
-        individual_tests(20) = It( &
+        individual_tests(21) = It( &
                 "Can tell if it has a message coming from a module", &
                 checkForFromModule)
-        individual_tests(21) = It( &
+        individual_tests(22) = It( &
                 "Can tell if it has a message comming from a procedure", &
                 checkForFromProcedure)
-        individual_tests(22) = It( &
+        individual_tests(23) = It( &
                 "Can tell if it has a message with some contents", &
                 checkForContents)
         tests = Describe("message_list_t", individual_tests)
@@ -204,6 +206,43 @@ contains
                 .and.assert_Includes(message3%to_string(), message_list1%to_string()) &
                 .and.assert_Includes(message4%to_string(), message_list1%to_string())
     end function checkCombine
+
+    function checkNewFromMultiple() result(result_)
+        type(result_t) :: result_
+
+        type(info_t) :: message1
+        type(warning_t) :: message2
+        type(info_t) :: message3
+        type(warning_t) :: message4
+        type(message_list_t) :: message_list1
+        type(message_list_t) :: message_list2
+        type(message_list_t) :: combined
+
+        message1 = info_t( &
+                module_t("Some_m"), procedure_t("some"), "First Message")
+        message2 = warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Message")
+        message_list1 = message_list1%with_message_appended(message1)
+        message_list1 = message_list1%with_message_appended(message2)
+
+        message3 = info_t( &
+                module_t("Some_m"), procedure_t("some"), "Third Message")
+        message4 = warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Fourth Message")
+        message_list2 = message_list2%with_message_appended(message3)
+        message_list2 = message_list2%with_message_appended(message4)
+
+        combined = message_list_t( &
+                [message_list1, message_list2], &
+                module_t("Another_m"), &
+                procedure_t("another"))
+
+        result_ = &
+                assert_Includes(message1%to_string(), combined%to_string()) &
+                .and.assert_Includes(message2%to_string(), combined%to_string()) &
+                .and.assert_Includes(message3%to_string(), combined%to_string()) &
+                .and.assert_Includes(message4%to_string(), combined%to_string())
+    end function
 
     function checkFilterByType() result(result_)
         type(Result_t) :: result_

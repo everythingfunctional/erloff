@@ -88,6 +88,7 @@ module erloff_message_list_m
     interface message_list_t
         module procedure new_list
         module procedure from_existing_list
+        module procedure from_multiple_lists
     end interface
 
     interface size
@@ -111,6 +112,22 @@ contains
             allocate(new_list%messages, source = &
                     messages%messages%with_names_prepended(module_, procedure_))
         end if
+    end function
+
+    function from_multiple_lists(message_lists, module_, procedure_) result(new_list)
+        type(message_list_t), intent(in) :: message_lists(:)
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        type(message_list_t) :: new_list
+
+        integer :: i
+
+        allocate(new_list%messages(0))
+        do i = 1, size(message_lists)
+            if (allocated(message_lists(i)%messages)) then
+                new_list%messages = [new_list%messages, message_lists(i)%messages%with_names_prepended(module_, procedure_)]
+            end if
+        end do
     end function
 
     function with_message_appended(self, message) result(new_list)

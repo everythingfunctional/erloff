@@ -1,5 +1,5 @@
 name = "erloff"
-version = "2.0.1"
+version = "2.1.0"
 license = "MIT"
 author = "Brad Richardson"
 maintainer = "everythingfunctional@protonmail.com"
@@ -10,4 +10,4 @@ iso_varying_string = { git = "https://gitlab.com/everythingfunctional/iso_varyin
 strff = { git = "https://gitlab.com/everythingfunctional/strff.git", tag = "v2.0.1" }
 
 [dev-dependencies]
-vegetables = { git = "https://gitlab.com/everythingfunctional/vegetables", tag = "v7.0.2" }
+vegetables = { git = "https://gitlab.com/everythingfunctional/vegetables", tag = "v7.0.3" }

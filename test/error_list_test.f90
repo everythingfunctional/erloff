@@ -25,7 +25,7 @@ contains
     function test_error_list() result(tests)
         type(Test_Item_t) :: tests
 
-        type(Test_Item_t) :: individual_tests(22)
+        type(Test_Item_t) :: individual_tests(23)
 
         individual_tests(1) = It( &
                 "Converts to an empty string when it is empty", &
@@ -42,51 +42,53 @@ contains
                 "Can combine two empty lists", checkCombineEmpty)
         individual_tests(6) = It( &
                 "Can combine two lists", checkCombine)
-        individual_tests(7) = It( &
-                "Can filter errors by type", checkFilterByType)
+        individual_tests(7) = it( &
+                "can create a new list from multiple", checkNewFromMultiple)
         individual_tests(8) = It( &
+                "Can filter errors by type", checkFilterByType)
+        individual_tests(9) = It( &
                 "Can filter errors by the originating module", &
                 checkFilterByOriginatingModule)
-        individual_tests(9) = It( &
+        individual_tests(10) = It( &
                 "Can filter errors by the originating procedure", &
                 checkFilterByOriginatingProcedure)
-        individual_tests(10) = It( &
+        individual_tests(11) = It( &
                 "Can filter errors by modules passed through", &
                 checkFilterByModulesThrough)
-        individual_tests(11) = It( &
+        individual_tests(12) = It( &
                 "Can filter errors by procedures passed through", &
                 checkFilterByProceduresThrough)
-        individual_tests(12) = It( &
+        individual_tests(13) = It( &
                 "Can filter errors by the modules they are from", &
                 checkFilterByModulesFrom)
-        individual_tests(13) = It( &
+        individual_tests(14) = It( &
                 "Can filter errors by the procedures they are from", &
                 checkFilterByProceduresFrom)
-        individual_tests(14) = It( &
+        individual_tests(15) = It( &
                 "Can filter errors based on their contents", &
                 checkFilterByContents)
-        individual_tests(15) = It( &
+        individual_tests(16) = It( &
                 "Can tell if it has an error of a given type", &
                 checkForType)
-        individual_tests(16) = It( &
+        individual_tests(17) = It( &
                 "Can tell if it has an error originating from a module", &
                 checkForOriginatingModule)
-        individual_tests(17) = It( &
+        individual_tests(18) = It( &
                 "Can tell if it has an error originating from a procedure", &
                 checkForOriginatingProcedure)
-        individual_tests(18) = It( &
+        individual_tests(19) = It( &
                 "Can tell if it has an error coming through a module", &
                 checkForThroughModule)
-        individual_tests(19) = It( &
+        individual_tests(20) = It( &
                 "Can tell if it has an error coming through a procedure", &
                 checkForThroughProcedure)
-        individual_tests(20) = It( &
+        individual_tests(21) = It( &
                 "Can tell if it has an error coming from a module", &
                 checkForFromModule)
-        individual_tests(21) = It( &
+        individual_tests(22) = It( &
                 "Can tell if it has an error comming from a procedure", &
                 checkForFromProcedure)
-        individual_tests(22) = It( &
+        individual_tests(23) = It( &
                 "Can tell if it has an error with some contents", &
                 checkForContents)
         tests = Describe("error_list_t", individual_tests)
@@ -204,6 +206,43 @@ contains
                 .and.assert_Includes(error3%to_string(), error_list1%to_string()) &
                 .and.assert_Includes(error4%to_string(), error_list1%to_string())
     end function checkCombine
+
+    function checkNewFromMultiple() result(result_)
+        type(result_t) :: result_
+
+        type(fatal_t) :: error1
+        type(internal_t) :: error2
+        type(fatal_t) :: error3
+        type(internal_t) :: error4
+        type(error_list_t) :: error_list1
+        type(error_list_t) :: error_list2
+        type(error_list_t) :: combined
+
+        error1 = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "First Error")
+        error2 = internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Second Error")
+        error_list1 = error_list1%with_error_appended(error1)
+        error_list1 = error_list1%with_error_appended(error2)
+
+        error3 = fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "Third Error")
+        error4 = internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Fourth Error")
+        error_list2 = error_list2%with_error_appended(error3)
+        error_list2 = error_list2%with_error_appended(error4)
+
+        combined = error_list_t( &
+                [error_list1, error_list2], &
+                module_t("Another_m"), &
+                procedure_t("another"))
+
+        result_ = &
+                assert_Includes(error1%to_string(), combined%to_string()) &
+                .and.assert_Includes(error2%to_string(), combined%to_string()) &
+                .and.assert_Includes(error3%to_string(), combined%to_string()) &
+                .and.assert_Includes(error4%to_string(), combined%to_string())
+    end function
 
     function checkFilterByType() result(result_)
         type(Result_t) :: result_
