@@ -2,7 +2,7 @@ module erloff_call_stack_entry_m
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use iso_varying_string, only: varying_string, operator(//)
-    use strff, only: hanging_indent, indent, NEWLINE
+    use strff, only: add_hanging_indentation, indent, NEWLINE
 
     implicit none
     private
@@ -62,7 +62,7 @@ contains
         class(call_stack_entry_t), intent(in) :: self
         type(varying_string) :: repr
 
-        repr = hanging_indent( &
+        repr = add_hanging_indentation( &
                 "call_stack_entry_t(" // NEWLINE &
                     // "module = " // self%module_%repr() // "," // NEWLINE &
                     // "procedure = " // self%procedure_%repr(), &

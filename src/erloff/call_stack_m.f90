@@ -3,7 +3,7 @@ module erloff_call_stack_m
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use iso_varying_string, only: varying_string, operator(//)
-    use strff, only: hanging_indent, indent, join, NEWLINE
+    use strff, only: add_hanging_indentation, indent, join, NEWLINE
 
     implicit none
     private
@@ -99,7 +99,7 @@ contains
         class(call_stack_t), intent(in) :: self
         type(varying_string) :: repr
 
-        repr = hanging_indent( &
+        repr = add_hanging_indentation( &
                 "call_stack_t(" // NEWLINE &
                     // "entries = [" // NEWLINE &
                     // indent( &

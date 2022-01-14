@@ -6,7 +6,7 @@ module erloff_debug_m
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use iso_varying_string, only: varying_string, operator(//), var_str
-    use strff, only: hanging_indent, NEWLINE
+    use strff, only: add_hanging_indentation, NEWLINE
 
     implicit none
     private
@@ -144,7 +144,7 @@ contains
         class(debug_t), intent(in) :: self
         type(varying_string) :: repr
 
-        repr = hanging_indent( &
+        repr = add_hanging_indentation( &
                 'debug_t(' // NEWLINE &
                     // 'level = ' // self%level%repr() // ',' // NEWLINE &
                     // 'call_stack_ = ' // self%call_stack_%repr() // ',' // NEWLINE &

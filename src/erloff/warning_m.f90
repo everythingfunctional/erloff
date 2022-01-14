@@ -6,7 +6,7 @@ module erloff_warning_m
     use erloff_procedure_m, only: procedure_t
     use iso_varying_string, only: &
             varying_string, assignment(=), operator(//), var_str
-    use strff, only: hanging_indent, NEWLINE
+    use strff, only: add_hanging_indentation, NEWLINE
 
     implicit none
     private
@@ -138,7 +138,7 @@ contains
         class(warning_t), intent(in) :: self
         type(varying_string) :: repr
 
-        repr = hanging_indent( &
+        repr = add_hanging_indentation( &
                 'warning_t(' // NEWLINE &
                     // 'call_stack_ = ' // self%call_stack_%repr() // ',' // NEWLINE &
                     // 'message_type = ' // self%message_type_%repr() // ',' // NEWLINE &
