@@ -4,7 +4,7 @@ module erloff_message_m
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use iso_varying_string, only: varying_string, operator(//), var_str
-    use strff, only: operator(.includes.), hanging_indent, NEWLINE
+    use strff, only: operator(.includes.), add_hanging_indentation, NEWLINE
 
     implicit none
     private
@@ -102,7 +102,7 @@ contains
 
         call_stack = self%call_stack()
         message_type = self%message_type()
-        string = hanging_indent( &
+        string = add_hanging_indentation( &
                 call_stack%to_string() // ":" // NEWLINE &
                     // self%type_string() // message_type%to_string() &
                     // self%message(), &

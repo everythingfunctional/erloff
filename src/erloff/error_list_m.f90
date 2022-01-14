@@ -6,7 +6,7 @@ module erloff_error_list_m
             varying_string, assignment(=), operator(//), var_str
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
-    use strff, only: hanging_indent, indent, join, NEWLINE
+    use strff, only: add_hanging_indentation, indent, join, NEWLINE
 
     implicit none
     private
@@ -487,7 +487,7 @@ contains
             errors_string = "UNALLOCATED"
         end if
 
-        repr = hanging_indent( &
+        repr = add_hanging_indentation( &
                 "error_list_t(" // NEWLINE &
                     // "errors = " // errors_string, &
                 4) // NEWLINE // ")"
