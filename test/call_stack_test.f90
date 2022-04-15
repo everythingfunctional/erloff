@@ -3,7 +3,7 @@ module call_stack_test
     use iso_varying_string, only: operator(//)
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
-    use vegetables, only: &
+    use veggies, only: &
             Result_t, &
             Test_Item_t, &
             assert_Includes, &

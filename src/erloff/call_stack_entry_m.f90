@@ -2,7 +2,7 @@ module erloff_call_stack_entry_m
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use iso_varying_string, only: varying_string, operator(//)
-    use strff, only: add_hanging_indentation, indent, NEWLINE
+    use strff, only: add_hanging_indentation, NEWLINE
 
     implicit none
     private

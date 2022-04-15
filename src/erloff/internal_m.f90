@@ -24,6 +24,7 @@ module erloff_internal_m
         procedure, public :: message
         procedure, public :: message_type
         procedure, public :: with_names_prepended
+        procedure, public :: with_names_prepended_
         procedure, public :: type_string
         procedure, public :: repr
         procedure, public :: is_type
@@ -96,7 +97,16 @@ contains
         type(procedure_t), intent(in) :: procedure_
         class(message_t), allocatable :: new_message
 
-        new_message = internal_constructor( &
+        new_message = self%with_names_prepended_(module_, procedure_)
+    end function
+
+    function with_names_prepended_(self, module_, procedure_) result(new_error)
+        class(internal_t), intent(in) :: self
+        type(module_t), intent(in) :: module_
+        type(procedure_t), intent(in) :: procedure_
+        class(error_t), allocatable :: new_error
+
+        new_error = internal_constructor( &
                 self%message_type_, &
                 self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%message_)

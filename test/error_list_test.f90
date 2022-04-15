@@ -6,7 +6,7 @@ module error_list_test
     use erloff_message_type_m, only: UNKNOWN_TYPE
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
-    use vegetables, only: &
+    use veggies, only: &
             Result_t, &
             Test_Item_t, &
             assert_Empty, &

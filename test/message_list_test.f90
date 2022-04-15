@@ -6,7 +6,7 @@ module message_list_test
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use erloff_warning_m, only: warning_t, WARNING
-    use vegetables, only: &
+    use veggies, only: &
             Result_t, &
             Test_Item_t, &
             assert_Empty, &

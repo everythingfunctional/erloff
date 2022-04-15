@@ -15,7 +15,7 @@ module message_test
     use erloff_module_m, only: module_t
     use erloff_procedure_m, only: procedure_t
     use erloff_warning_m, only: warning_t, WARNING
-    use vegetables, only: &
+    use veggies, only: &
             Result_t, &
             Test_Item_t, &
             Describe, &
@@ -68,36 +68,36 @@ contains
         class(Message_t), allocatable :: fatal_message
         class(Message_t), allocatable :: internal_message
 
-        allocate(debug_message, source = debug_t( &
+        debug_message = debug_t( &
                 INPUTS, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
                 GENERAL, &
-                "Test Message"))
+                "Test Message")
 
-        allocate(info_message, source = info_t( &
+        info_message = info_t( &
                 UNEQUAL_ARRAY_SIZES, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
-                "Test Message"))
+                "Test Message")
 
-        allocate(warning_message, source = warning_t( &
+        warning_message = warning_t( &
                 OUTSIDE_NORMAL_RANGE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
-                "Test Message"))
+                "Test Message")
 
-        allocate(fatal_message, source = fatal_t( &
+        fatal_message = fatal_t( &
                 UNEQUAL_ARRAY_SIZES, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
-                "Test Message"))
+                "Test Message")
 
-        allocate(internal_message, source = internal_t( &
+        internal_message = internal_t( &
                 UNKNOWN_TYPE, &
                 module_t("Some_m"), &
                 procedure_t("some"), &
-                "Test Message"))
+                "Test Message")
 
         result_ = &
                 assert_That( &
@@ -153,6 +153,7 @@ contains
         type(Module_t) :: another_module
         type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: message2
         type(Module_t) :: other_module
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -162,9 +163,8 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
-        allocate(message, source = info_t( &
-                the_module, the_procedure, "Test Message"))
-        message = message%with_names_prepended(another_module, another_procedure)
+        message2 = info_t(the_module, the_procedure, "Test Message")
+        message = message2%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -184,6 +184,7 @@ contains
         type(module_t) :: another_module
         type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: message2
         type(procedure_t) :: other_procedure
         type(module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -193,9 +194,8 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_procedure = procedure_t("other")
-        allocate(message, source = info_t( &
-                the_module, the_procedure, "Test Message"))
-        message = message%with_names_prepended(another_module, another_procedure)
+        message2 = info_t(the_module, the_procedure, "Test Message")
+        message = message2%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -215,6 +215,7 @@ contains
         type(Module_t) :: another_module
         type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: message2
         type(Module_t) :: other_module
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -224,9 +225,8 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
-        allocate(message, source = info_t( &
-                the_module, the_procedure, "Test Message"))
-        message = message%with_names_prepended(another_module, another_procedure)
+        message2 = info_t(the_module, the_procedure, "Test Message")
+        message = message2%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -246,6 +246,7 @@ contains
         type(Module_t) :: another_module
         type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: message2
         type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -255,9 +256,8 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_procedure = procedure_t("other")
-        allocate(message, source = info_t( &
-                the_module, the_procedure, "Test Message"))
-        message = message%with_names_prepended(another_module, another_procedure)
+        message2 = info_t(the_module, the_procedure, "Test Message")
+        message = message2%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_That( &
@@ -277,6 +277,7 @@ contains
         type(Module_t) :: another_module
         type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: message2
         type(Module_t) :: other_module
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -286,9 +287,8 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_module = module_t("Other_m")
-        allocate(message, source = info_t( &
-                the_module, the_procedure, "Test Message"))
-        message = message%with_names_prepended(another_module, another_procedure)
+        message2 = info_t(the_module, the_procedure, "Test Message")
+        message = message2%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_Not( &
@@ -308,6 +308,7 @@ contains
         type(Module_t) :: another_module
         type(procedure_t) :: another_procedure
         class(Message_t), allocatable :: message
+        class(Message_t), allocatable :: message2
         type(procedure_t) :: other_procedure
         type(Module_t) :: the_module
         type(procedure_t) :: the_procedure
@@ -317,9 +318,8 @@ contains
         another_module = module_t("Another_m")
         another_procedure = procedure_t("another")
         other_procedure = procedure_t("other")
-        allocate(message, source = info_t( &
-                the_module, the_procedure, "Test Message"))
-        message = message%with_names_prepended(another_module, another_procedure)
+        message2 = info_t(the_module, the_procedure, "Test Message")
+        message = message2%with_names_prepended(another_module, another_procedure)
 
         result_ = &
                 assert_Not( &
@@ -344,8 +344,8 @@ contains
         type(VARYING_STRING) :: includesAllStrings2(2)
         type(VARYING_STRING) :: includesAllStrings3(2)
 
-        allocate(message, source = info_t( &
-                module_t("Some_m"), procedure_t("some"), "Test Message Content"))
+        message = info_t( &
+                module_t("Some_m"), procedure_t("some"), "Test Message Content")
         includesAnyStrings1(1) = var_str("Test")
         includesAnyStrings1(2) = var_str("else")
         includesAnyStrings2(1) = var_str("Test")

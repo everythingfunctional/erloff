@@ -55,10 +55,7 @@ contains
         type(procedure_t), intent(in) :: procedure_
         type(error_item_t) :: new_error
 
-        select type (with_names_prepended => self%error%with_names_prepended(module_, procedure_))
-        class is (error_t)
-            allocate(new_error%error, source = with_names_prepended)
-        end select
+        allocate(new_error%error, source = self%error%with_names_prepended_(module_, procedure_))
     end function
 
     elemental function is_type(self, type_tag)
