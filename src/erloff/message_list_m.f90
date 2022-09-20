@@ -89,6 +89,7 @@ module erloff_message_list_m
         module procedure new_list
         module procedure from_existing_list
         module procedure from_multiple_lists
+        module procedure combine_lists
     end interface
 
     interface size
@@ -126,6 +127,20 @@ contains
         do i = 1, size(message_lists)
             if (allocated(message_lists(i)%messages)) then
                 new_list%messages = [new_list%messages, message_lists(i)%messages%with_names_prepended(module_, procedure_)]
+            end if
+        end do
+    end function
+
+    function combine_lists(message_lists) result(new_list)
+        type(message_list_t), intent(in) :: message_lists(:)
+        type(message_list_t) :: new_list
+
+        integer :: i
+
+        allocate(new_list%messages(0))
+        do i = 1, size(message_lists)
+            if (allocated(message_lists(i)%messages)) then
+                new_list%messages = [new_list%messages, message_lists(i)%messages]
             end if
         end do
     end function

@@ -90,6 +90,7 @@ module erloff_error_list_m
         module procedure new_list
         module procedure from_existing_list
         module procedure from_multiple_lists
+        module procedure combine_lists
     end interface
 
     interface size
@@ -127,6 +128,20 @@ contains
         do i = 1, size(error_lists)
             if (allocated(error_lists(i)%errors)) then
                 new_list%errors = [new_list%errors, error_lists(i)%errors%with_names_prepended(module_, procedure_)]
+            end if
+        end do
+    end function
+
+    function combine_lists(error_lists) result(new_list)
+        type(error_list_t), intent(in) :: error_lists(:)
+        type(error_list_t) :: new_list
+
+        integer :: i
+
+        allocate(new_list%errors(0))
+        do i = 1, size(error_lists)
+            if (allocated(error_lists(i)%errors)) then
+                new_list%errors = [new_list%errors, error_lists(i)%errors]
             end if
         end do
     end function
