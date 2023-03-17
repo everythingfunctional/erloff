@@ -25,6 +25,8 @@ module erloff_fatal_m
         procedure, public :: message_type
         procedure, public :: with_names_prepended
         procedure, public :: with_names_prepended_
+        procedure, public :: with_content_prepended_s
+        procedure, public :: with_content_prepended_s_
         procedure, public :: type_string
         procedure, public :: repr
         procedure, public :: is_type
@@ -110,6 +112,25 @@ contains
                 self%message_type_, &
                 self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%message_)
+    end function
+
+    function with_content_prepended_s(self, string) result(new_message)
+        class(fatal_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        class(message_t), allocatable :: new_message
+
+        new_message = self%with_content_prepended_s_(string)
+    end function
+
+    function with_content_prepended_s_(self, string) result(new_error)
+        class(fatal_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        class(error_t), allocatable :: new_error
+
+        new_error = internal_constructor( &
+                self%message_type_, &
+                self%call_stack_, &
+                string // self%message_)
     end function
 
     pure function call_stack(self)
