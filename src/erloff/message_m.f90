@@ -17,6 +17,14 @@ module erloff_message_m
         procedure(message_i), public, deferred :: message
         procedure(message_type_i), public, deferred :: message_type
         procedure(prepend_names_i), public, deferred :: with_names_prepended
+        procedure(add_content_i), public, deferred :: with_content_appended_s
+        procedure :: with_content_appended_c
+        generic, public :: with_content_appended => &
+                with_content_appended_c, with_content_appended_s
+        procedure(add_content_i), public, deferred :: with_content_prepended_s
+        procedure :: with_content_prepended_c
+        generic, public :: with_content_prepended => &
+                with_content_prepended_c, with_content_prepended_s
         procedure, public :: to_string => message_to_string
         procedure(to_string_i), public, deferred :: type_string
         procedure, public :: is_type => default_is_type
@@ -65,6 +73,16 @@ module erloff_message_m
             class(message_t), allocatable :: new_message
         end function
 
+        function add_content_i(self, string) result(new_message)
+            import :: message_t, varying_string
+
+            implicit none
+
+            class(message_t), intent(in) :: self
+            type(varying_string), intent(in) :: string
+            class(message_t), allocatable :: new_message
+        end function
+
         pure function call_stack_i(self) result(call_stack)
             import :: message_t, call_stack_t
 
@@ -93,6 +111,22 @@ module erloff_message_m
         end function
     end interface
 contains
+    function with_content_appended_c(self, string) result(new_message)
+        class(message_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        class(message_t), allocatable :: new_message
+
+        new_message = self%with_content_appended(var_str(string))
+    end function
+
+    function with_content_prepended_c(self, string) result(new_message)
+        class(message_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        class(message_t), allocatable :: new_message
+
+        new_message = self%with_content_prepended(var_str(string))
+    end function
+
     pure function message_to_string(self) result(string)
         class(message_t), intent(in) :: self
         type(varying_string) :: string

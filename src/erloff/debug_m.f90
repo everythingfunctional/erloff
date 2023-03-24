@@ -24,6 +24,8 @@ module erloff_debug_m
         procedure, public :: message
         procedure, public :: message_type
         procedure, public :: with_names_prepended
+        procedure, public :: with_content_appended_s
+        procedure, public :: with_content_prepended_s
         procedure, public :: type_string
         procedure, public :: repr
         procedure, public :: is_type
@@ -110,6 +112,30 @@ contains
                 self%call_stack_%with_names_prepended(module_, procedure_), &
                 self%level, &
                 self%message_)
+    end function
+
+    function with_content_appended_s(self, string) result(new_message)
+        class(debug_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        class(message_t), allocatable :: new_message
+
+        new_message = internal_constructor( &
+                self%message_type_, &
+                self%call_stack_, &
+                self%level, &
+                self%message_ // string)
+    end function
+
+    function with_content_prepended_s(self, string) result(new_message)
+        class(debug_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        class(message_t), allocatable :: new_message
+
+        new_message = internal_constructor( &
+                self%message_type_, &
+                self%call_stack_, &
+                self%level, &
+                string // self%message_)
     end function
 
     pure function call_stack(self)
