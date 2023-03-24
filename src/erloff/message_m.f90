@@ -25,7 +25,7 @@ module erloff_message_m
         procedure :: with_content_prepended_c
         generic, public :: with_content_prepended => &
                 with_content_prepended_c, with_content_prepended_s
-                procedure, public :: to_string => message_to_string
+        procedure, public :: to_string => message_to_string
         procedure(to_string_i), public, deferred :: type_string
         procedure, public :: is_type => default_is_type
         generic, public :: operator(.isType.) => is_type
