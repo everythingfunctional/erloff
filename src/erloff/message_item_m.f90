@@ -15,6 +15,10 @@ module erloff_message_item_m
     contains
         private
         procedure, public :: with_names_prepended
+        procedure :: with_content_prepended_c
+        procedure :: with_content_prepended_s
+        generic, public :: with_content_prepended => &
+                with_content_prepended_c, with_content_prepended_s
         procedure :: is_type
         generic, public :: operator(.isType.) => is_type
         procedure :: originated_from_module
@@ -57,6 +61,22 @@ contains
 
         allocate(new_message%message, source = self%message%with_names_prepended( &
                 module_, procedure_))
+    end function
+
+    function with_content_prepended_c(self, string) result(new_message)
+        class(message_item_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        type(message_item_t) :: new_message
+
+        allocate(new_message%message, source = self%message%with_content_prepended(string))
+    end function
+
+    impure elemental function with_content_prepended_s(self, string) result(new_message)
+        class(message_item_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        type(message_item_t) :: new_message
+
+        allocate(new_message%message, source = self%message%with_content_prepended(string))
     end function
 
     elemental function is_type(self, type_tag)
