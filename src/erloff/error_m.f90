@@ -14,6 +14,10 @@ module erloff_error_m
         private
         procedure, public :: is_type => error_is_type
         procedure(prepend_names_i), public, deferred :: with_names_prepended_
+        procedure(add_content_i), public, deferred :: with_content_appended_s_
+        procedure, public :: with_content_appended_c_
+        generic, public :: with_content_appended_ => &
+                with_content_appended_c_, with_content_appended_s_
         procedure(add_content_i), public, deferred :: with_content_prepended_s_
         procedure, public :: with_content_prepended_c_
         generic, public :: with_content_prepended_ => &
@@ -57,6 +61,14 @@ contains
         else
             is_type = default_is_type(self, type_tag)
         end if
+    end function
+
+    function with_content_appended_c_(self, string) result(new_error)
+        class(error_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        class(error_t), allocatable :: new_error
+
+        new_error = self%with_content_appended_(var_str(string))
     end function
 
     function with_content_prepended_c_(self, string) result(new_error)

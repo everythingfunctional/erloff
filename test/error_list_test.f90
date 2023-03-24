@@ -40,6 +40,7 @@ contains
                 , it("Can combine two empty lists", checkCombineEmpty) &
                 , it("Can combine two lists", checkCombine) &
                 , it("can create a new list from multiple", checkNewFromMultiple) &
+                , it("can append content to messages in a list", check_append_content) &
                 , it("can prepend content to messages in a list", check_prepend_content) &
                 , it("Can filter errors by type", checkFilterByType) &
                 , it( &
@@ -238,6 +239,25 @@ contains
                 .and.assert_Includes(error2%to_string(), combined%to_string()) &
                 .and.assert_Includes(error3%to_string(), combined%to_string()) &
                 .and.assert_Includes(error4%to_string(), combined%to_string())
+    end function
+
+    function check_append_content() result(result_)
+        type(result_t) :: result_
+
+        character(len=*), parameter :: extra_stuff = " extra stuff"
+        type(error_list_t) :: errors
+        type(error_list_t) :: with_content
+
+        errors = errors%with_error_appended(fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "Test error"))
+        errors = errors%with_error_appended(internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Test warning"))
+        errors = errors%with_error_appended(fatal_t( &
+                UNKNOWN_TYPE, module_t("Some_m"), procedure_t("some"), "Test error"))
+
+        with_content = errors%with_content_appended(extra_stuff)
+
+        result_ = assert_includes(extra_stuff, with_content%to_string())
     end function
 
     function check_prepend_content() result(result_)

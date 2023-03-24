@@ -19,6 +19,10 @@ module erloff_error_list_m
         private
         procedure, public :: with_error_appended
         procedure, public :: with_errors_appended
+        procedure :: with_content_appended_c
+        procedure :: with_content_appended_s
+        generic, public :: with_content_appended => &
+                with_content_appended_c, with_content_appended_s
         procedure :: with_content_prepended_c
         procedure :: with_content_prepended_s
         generic, public :: with_content_prepended => &
@@ -184,6 +188,26 @@ contains
                 allocate(new_list%errors, source = &
                         [errors%errors%with_names_prepended(module_, procedure_)])
             end if
+        end if
+    end function
+
+    function with_content_appended_c(self, string) result(new_list)
+        class(error_list_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        type(error_list_t) :: new_list
+
+        new_list = self%with_content_appended(var_str(string))
+    end function
+
+    function with_content_appended_s(self, string) result(new_list)
+        class(error_list_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        type(error_list_t) :: new_list
+
+        if (allocated(self%errors)) then
+            allocate(new_list%errors, source = self%errors%with_content_appended(string))
+        else
+            allocate(new_list%errors(0))
         end if
     end function
 

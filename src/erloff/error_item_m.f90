@@ -15,6 +15,10 @@ module erloff_error_item_m
     contains
         private
         procedure, public :: with_names_prepended
+        procedure :: with_content_appended_c
+        procedure :: with_content_appended_s
+        generic, public :: with_content_appended => &
+                with_content_appended_c, with_content_appended_s
         procedure :: with_content_prepended_c
         procedure :: with_content_prepended_s
         generic, public :: with_content_prepended => &
@@ -60,6 +64,22 @@ contains
         type(error_item_t) :: new_error
 
         allocate(new_error%error, source = self%error%with_names_prepended_(module_, procedure_))
+    end function
+
+    function with_content_appended_c(self, string) result(new_error)
+        class(error_item_t), intent(in) :: self
+        character(len=*), intent(in) :: string
+        type(error_item_t) :: new_error
+
+        allocate(new_error%error, source = self%error%with_content_appended_(string))
+    end function
+
+    impure elemental function with_content_appended_s(self, string) result(new_error)
+        class(error_item_t), intent(in) :: self
+        type(varying_string), intent(in) :: string
+        type(error_item_t) :: new_error
+
+        allocate(new_error%error, source = self%error%with_content_appended_(string))
     end function
 
     function with_content_prepended_c(self, string) result(new_error)
