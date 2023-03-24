@@ -25,73 +25,69 @@ contains
     function test_error_list() result(tests)
         type(Test_Item_t) :: tests
 
-        type(Test_Item_t) :: individual_tests(23)
-
-        individual_tests(1) = It( &
-                "Converts to an empty string when it is empty", &
-                checkEmptyToString)
-        individual_tests(2) = It( &
-                "Can append an error to an empty list", &
-                checkAppendToEmpty)
-        individual_tests(3) = It( &
-                "Can append multiple to an empty list", &
-                checkAppendMultipleToEmpty)
-        individual_tests(4) = It( &
-                "Can append an empty list", checkAppendEmpty)
-        individual_tests(5) = It( &
-                "Can combine two empty lists", checkCombineEmpty)
-        individual_tests(6) = It( &
-                "Can combine two lists", checkCombine)
-        individual_tests(7) = it( &
-                "can create a new list from multiple", checkNewFromMultiple)
-        individual_tests(8) = It( &
-                "Can filter errors by type", checkFilterByType)
-        individual_tests(9) = It( &
-                "Can filter errors by the originating module", &
-                checkFilterByOriginatingModule)
-        individual_tests(10) = It( &
-                "Can filter errors by the originating procedure", &
-                checkFilterByOriginatingProcedure)
-        individual_tests(11) = It( &
-                "Can filter errors by modules passed through", &
-                checkFilterByModulesThrough)
-        individual_tests(12) = It( &
-                "Can filter errors by procedures passed through", &
-                checkFilterByProceduresThrough)
-        individual_tests(13) = It( &
-                "Can filter errors by the modules they are from", &
-                checkFilterByModulesFrom)
-        individual_tests(14) = It( &
-                "Can filter errors by the procedures they are from", &
-                checkFilterByProceduresFrom)
-        individual_tests(15) = It( &
-                "Can filter errors based on their contents", &
-                checkFilterByContents)
-        individual_tests(16) = It( &
-                "Can tell if it has an error of a given type", &
-                checkForType)
-        individual_tests(17) = It( &
-                "Can tell if it has an error originating from a module", &
-                checkForOriginatingModule)
-        individual_tests(18) = It( &
-                "Can tell if it has an error originating from a procedure", &
-                checkForOriginatingProcedure)
-        individual_tests(19) = It( &
-                "Can tell if it has an error coming through a module", &
-                checkForThroughModule)
-        individual_tests(20) = It( &
-                "Can tell if it has an error coming through a procedure", &
-                checkForThroughProcedure)
-        individual_tests(21) = It( &
-                "Can tell if it has an error coming from a module", &
-                checkForFromModule)
-        individual_tests(22) = It( &
-                "Can tell if it has an error comming from a procedure", &
-                checkForFromProcedure)
-        individual_tests(23) = It( &
-                "Can tell if it has an error with some contents", &
-                checkForContents)
-        tests = Describe("error_list_t", individual_tests)
+        tests = describe( &
+                "error_list_t", &
+                [ it( &
+                        "Converts to an empty string when it is empty", &
+                        checkEmptyToString) &
+                , it( &
+                        "Can append an error to an empty list", &
+                        checkAppendToEmpty) &
+                , it( &
+                        "Can append multiple to an empty list", &
+                        checkAppendMultipleToEmpty) &
+                , it("Can append an empty list", checkAppendEmpty) &
+                , it("Can combine two empty lists", checkCombineEmpty) &
+                , it("Can combine two lists", checkCombine) &
+                , it("can create a new list from multiple", checkNewFromMultiple) &
+                , it("can prepend content to messages in a list", check_prepend_content) &
+                , it("Can filter errors by type", checkFilterByType) &
+                , it( &
+                        "Can filter errors by the originating module", &
+                        checkFilterByOriginatingModule) &
+                , it( &
+                        "Can filter errors by the originating procedure", &
+                        checkFilterByOriginatingProcedure) &
+                , it( &
+                        "Can filter errors by modules passed through", &
+                        checkFilterByModulesThrough) &
+                , it( &
+                        "Can filter errors by procedures passed through", &
+                        checkFilterByProceduresThrough) &
+                , it( &
+                        "Can filter errors by the modules they are from", &
+                        checkFilterByModulesFrom) &
+                , it( &
+                        "Can filter errors by the procedures they are from", &
+                        checkFilterByProceduresFrom) &
+                , it( &
+                        "Can filter errors based on their contents", &
+                        checkFilterByContents) &
+                , it( &
+                        "Can tell if it has an error of a given type", &
+                        checkForType) &
+                , it( &
+                        "Can tell if it has an error originating from a module", &
+                        checkForOriginatingModule) &
+                , it( &
+                        "Can tell if it has an error originating from a procedure", &
+                        checkForOriginatingProcedure) &
+                , it( &
+                        "Can tell if it has an error coming through a module", &
+                        checkForThroughModule) &
+                , it( &
+                        "Can tell if it has an error coming through a procedure", &
+                        checkForThroughProcedure) &
+                , it( &
+                        "Can tell if it has an error coming from a module", &
+                        checkForFromModule) &
+                , it( &
+                        "Can tell if it has an error comming from a procedure", &
+                        checkForFromProcedure) &
+                , it( &
+                        "Can tell if it has an error with some contents", &
+                        checkForContents) &
+                ])
     end function test_error_list
 
     function checkEmptyToString() result(result_)
@@ -242,6 +238,25 @@ contains
                 .and.assert_Includes(error2%to_string(), combined%to_string()) &
                 .and.assert_Includes(error3%to_string(), combined%to_string()) &
                 .and.assert_Includes(error4%to_string(), combined%to_string())
+    end function
+
+    function check_prepend_content() result(result_)
+        type(result_t) :: result_
+
+        character(len=*), parameter :: extra_stuff = "Extra stuff "
+        type(error_list_t) :: errors
+        type(error_list_t) :: with_content
+
+        errors = errors%with_error_appended(fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "Test error"))
+        errors = errors%with_error_appended(internal_t( &
+                module_t("Some_m"), procedure_t("some"), "Test warning"))
+        errors = errors%with_error_appended(fatal_t( &
+                UNKNOWN_TYPE, module_t("Some_m"), procedure_t("some"), "Test error"))
+
+        with_content = errors%with_content_prepended(extra_stuff)
+
+        result_ = assert_includes(extra_stuff, with_content%to_string())
     end function
 
     function checkFilterByType() result(result_)

@@ -25,73 +25,69 @@ contains
     function test_message_list() result(tests)
         type(Test_Item_t) :: tests
 
-        type(Test_Item_t) :: individual_tests(23)
-
-        individual_tests(1) = It( &
-                "Converts to an empty string when it is empty", &
-                checkEmptyToString)
-        individual_tests(2) = It( &
-                "Can append a message to an empty list", &
-                checkAppendToEmpty)
-        individual_tests(3) = It( &
-                "Can append multiple to an empty list", &
-                checkAppendMultipleToEmpty)
-        individual_tests(4) = It( &
-                "Can append an empty list", checkAppendEmpty)
-        individual_tests(5) = It( &
-                "Can combine two empty lists", checkCombineEmpty)
-        individual_tests(6) = It( &
-                "Can combine two lists", checkCombine)
-        individual_tests(7) = it( &
-                "can create a new list from multiple", checkNewFromMultiple)
-        individual_tests(8) = It( &
-                "Can filter messages by type", checkFilterByType)
-        individual_tests(9) = It( &
-                "Can filter messages by the originating module", &
-                checkFilterByOriginatingModule)
-        individual_tests(10) = It( &
-                "Can filter messages by the originating procedure", &
-                checkFilterByOriginatingProcedure)
-        individual_tests(11) = It( &
-                "Can filter messages by modules passed through", &
-                checkFilterByModulesThrough)
-        individual_tests(12) = It( &
-                "Can filter messages by procedures passed through", &
-                checkFilterByProceduresThrough)
-        individual_tests(13) = It( &
-                "Can filter messages by the modules they are from", &
-                checkFilterByModulesFrom)
-        individual_tests(14) = It( &
-                "Can filter messages by the procedures they are from", &
-                checkFilterByProceduresFrom)
-        individual_tests(15) = It( &
-                "Can filter messages based on their contents", &
-                checkFilterByContents)
-        individual_tests(16) = It( &
-                "Can tell if it has a message of a given type", &
-                checkForType)
-        individual_tests(17) = It( &
-                "Can tell if it has a message originating from a module", &
-                checkForOriginatingModule)
-        individual_tests(18) = It( &
-                "Can tell if it has a message originating from a procedure", &
-                checkForOriginatingProcedure)
-        individual_tests(19) = It( &
-                "Can tell if it has a message coming through a module", &
-                checkForThroughModule)
-        individual_tests(20) = It( &
-                "Can tell if it has a message coming through a procedure", &
-                checkForThroughProcedure)
-        individual_tests(21) = It( &
-                "Can tell if it has a message coming from a module", &
-                checkForFromModule)
-        individual_tests(22) = It( &
-                "Can tell if it has a message comming from a procedure", &
-                checkForFromProcedure)
-        individual_tests(23) = It( &
-                "Can tell if it has a message with some contents", &
-                checkForContents)
-        tests = Describe("message_list_t", individual_tests)
+        tests = describe( &
+                "message_list_t", &
+                [ it( &
+                        "Converts to an empty string when it is empty", &
+                        checkEmptyToString) &
+                , it( &
+                        "Can append a message to an empty list", &
+                        checkAppendToEmpty) &
+                , it( &
+                        "Can append multiple to an empty list", &
+                        checkAppendMultipleToEmpty) &
+                , it("Can append an empty list", checkAppendEmpty) &
+                , it("Can combine two empty lists", checkCombineEmpty) &
+                , it("Can combine two lists", checkCombine) &
+                , it("can create a new list from multiple", checkNewFromMultiple) &
+                , it("can prepend content to messages in a list", check_prepend_content) &
+                , it("Can filter messages by type", checkFilterByType) &
+                , it( &
+                        "Can filter messages by the originating module", &
+                        checkFilterByOriginatingModule) &
+                , it( &
+                        "Can filter messages by the originating procedure", &
+                        checkFilterByOriginatingProcedure) &
+                , it( &
+                        "Can filter messages by modules passed through", &
+                        checkFilterByModulesThrough) &
+                , it( &
+                        "Can filter messages by procedures passed through", &
+                        checkFilterByProceduresThrough) &
+                , it( &
+                        "Can filter messages by the modules they are from", &
+                        checkFilterByModulesFrom) &
+                , it( &
+                        "Can filter messages by the procedures they are from", &
+                        checkFilterByProceduresFrom) &
+                , it( &
+                        "Can filter messages based on their contents", &
+                        checkFilterByContents) &
+                , it( &
+                        "Can tell if it has a message of a given type", &
+                        checkForType) &
+                , it( &
+                        "Can tell if it has a message originating from a module", &
+                        checkForOriginatingModule) &
+                , it( &
+                        "Can tell if it has a message originating from a procedure", &
+                        checkForOriginatingProcedure) &
+                , it( &
+                        "Can tell if it has a message coming through a module", &
+                        checkForThroughModule) &
+                , it( &
+                        "Can tell if it has a message coming through a procedure", &
+                        checkForThroughProcedure) &
+                , it( &
+                        "Can tell if it has a message coming from a module", &
+                        checkForFromModule) &
+                , it( &
+                        "Can tell if it has a message comming from a procedure", &
+                        checkForFromProcedure) &
+                , it( &
+                        "Can tell if it has a message with some contents", &
+                        checkForContents) &
+                ])
     end function test_message_list
 
     pure function checkEmptyToString() result(result_)
@@ -242,6 +238,25 @@ contains
                 .and.assert_Includes(message2%to_string(), combined%to_string()) &
                 .and.assert_Includes(message3%to_string(), combined%to_string()) &
                 .and.assert_Includes(message4%to_string(), combined%to_string())
+    end function
+
+    function check_prepend_content() result(result_)
+        type(result_t) :: result_
+
+        character(len=*), parameter :: extra_stuff = "Extra stuff "
+        type(message_list_t) :: messages
+        type(message_list_t) :: with_content
+
+        messages = message_list_t(info_t( &
+                module_t("Some_m"), procedure_t("some"), "Test message"))
+        messages = messages%with_message_appended(warning_t( &
+                module_t("Some_m"), procedure_t("some"), "Test warning"))
+        messages = messages%with_message_appended(fatal_t( &
+                module_t("Some_m"), procedure_t("some"), "Test error"))
+
+        with_content = messages%with_content_prepended(extra_stuff)
+
+        result_ = assert_includes(extra_stuff, with_content%to_string())
     end function
 
     function checkFilterByType() result(result_)
